@@ -1,0 +1,1 @@
+const companyName = 'ZERO';
