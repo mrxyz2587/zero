@@ -46,13 +46,12 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
         onPageChanged: onPageChanged,
       ),
       bottomNavigationBar: CupertinoTabBar(
-
         backgroundColor: mobileBackgroundColor,
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(
               Icons.home,
-              color: (_page == 0) ? primaryColor : secondaryColor,
+              color: (_page == 0) ? btnCOlorblue : webBackgroundColor,
             ),
             label: '',
             backgroundColor: primaryColor,
@@ -60,21 +59,21 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
           BottomNavigationBarItem(
               icon: Icon(
                 Icons.search,
-                color: (_page == 1) ? primaryColor : secondaryColor,
+                color: (_page == 1) ? btnCOlorblue : webBackgroundColor,
               ),
               label: '',
               backgroundColor: primaryColor),
           BottomNavigationBarItem(
               icon: Icon(
                 Icons.add_circle,
-                color: (_page == 2) ? primaryColor : secondaryColor,
+                color: (_page == 2) ? btnCOlorblue : webBackgroundColor,
               ),
               label: '',
               backgroundColor: primaryColor),
           BottomNavigationBarItem(
             icon: Icon(
               Icons.favorite,
-              color: (_page == 3) ? primaryColor : secondaryColor,
+              color: (_page == 3) ? btnCOlorblue : webBackgroundColor,
             ),
             label: '',
             backgroundColor: primaryColor,
@@ -82,7 +81,7 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
           BottomNavigationBarItem(
             icon: Icon(
               Icons.person,
-              color: (_page == 4) ? primaryColor : secondaryColor,
+              color: (_page == 4) ? btnCOlorblue : webBackgroundColor,
             ),
             label: '',
             backgroundColor: primaryColor,

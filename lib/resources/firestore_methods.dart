@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -30,6 +31,18 @@ class FireStoreMethods {
       res = "success";
     } catch (err) {
       res = err.toString();
+    }
+    return res;
+  }
+
+  Future<String> UploadResume(File file) async {
+    String res = "Some error occurred";
+    try {
+      String photoUrl =
+          await StorageMethods().uploadImageToResumeage('resume', file, true);
+      res = "success";
+    } catch (e) {
+      res = e.toString();
     }
     return res;
   }
@@ -98,15 +111,13 @@ class FireStoreMethods {
     return res;
   }
 
-  Future<void> followUser(
-    String uid,
-    String followId
-  ) async {
+  Future<void> followUser(String uid, String followId) async {
     try {
-      DocumentSnapshot snap = await _firestore.collection('users').doc(uid).get();
+      DocumentSnapshot snap =
+          await _firestore.collection('users').doc(uid).get();
       List following = (snap.data()! as dynamic)['following'];
 
-      if(following.contains(followId)) {
+      if (following.contains(followId)) {
         await _firestore.collection('users').doc(followId).update({
           'followers': FieldValue.arrayRemove([uid])
         });
@@ -123,8 +134,7 @@ class FireStoreMethods {
           'following': FieldValue.arrayUnion([followId])
         });
       }
-
-    } catch(e) {
+    } catch (e) {
       print(e.toString());
     }
   }

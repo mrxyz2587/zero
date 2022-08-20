@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '/providers/user_provider.dart';
 import '/responsive/mobile_screen_layout.dart';
 import '/responsive/responsive_layout.dart';
@@ -35,6 +36,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+        statusBarColor: Colors.white, statusBarIconBrightness: Brightness.dark
+        //or set color with: Color(0xFF0000FF)
+        ));
+
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
@@ -42,11 +48,9 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
+        color: Colors.white,
         debugShowCheckedModeBanner: false,
         title: 'zero',
-        theme: ThemeData.light().copyWith(
-          scaffoldBackgroundColor: mobileBackgroundColor,
-        ),
         home: Splash(),
       ),
     );

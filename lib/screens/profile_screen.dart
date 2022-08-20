@@ -1,13 +1,20 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:zero_fin/resources/storage_methods.dart';
 import '../widgets/post_card.dart';
 import '/resources/auth_methods.dart';
 import '/resources/firestore_methods.dart';
 import '/screens/login_screen.dart';
 import '/utils/colors.dart';
+import 'package:file_picker/file_picker.dart';
+
 import '/utils/utils.dart';
 import '/widgets/follow_button.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -22,11 +29,15 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   var userData = {};
+  var name;
+
   int postLen = 0;
   int followers = 0;
   int following = 0;
   bool isFollowing = false;
   bool isLoading = false;
+  Uint8List? _file;
+  File? file;
 
   @override
   void initState() {
@@ -166,7 +177,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontWeight: FontWeight.w700,
-                                    fontSize: 25.sp),
+                                    fontSize: 18.sp),
                               ),
                               Text('Quantum University, Roorkee',
                                   style: TextStyle(fontSize: 12.sp)),
@@ -296,19 +307,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        buildStatColumn(postLen, "Posts"),
+                        Container(
+                            width: 70.w,
+                            child: Center(
+                                child: buildStatColumn(postLen, "Posts"))),
                         Container(
                           height: 60.sp,
                           color: Colors.black,
                           width: 1,
                         ),
-                        buildStatColumn(followers, "Followers"),
+                        Container(
+                            width: 70.w,
+                            child: Center(
+                                child:
+                                    buildStatColumn(followers, "Followers"))),
                         Container(
                           height: 60.sp,
                           color: Colors.black,
                           width: 1,
                         ),
-                        buildStatColumn(following, "Following"),
+                        Container(
+                            width: 70.w,
+                            child: Center(
+                                child:
+                                    buildStatColumn(following, "Following"))),
                       ],
                     ),
                     SizedBox(
@@ -380,17 +402,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Column buildStatColumn(int num, String label) {
     return Column(
       mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         Text(
           num.toString(),
-          style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
         ),
         Container(
           margin: const EdgeInsets.only(top: 12),
           child: Text(
             label,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+            style: const TextStyle(fontSize: 15),
           ),
         ),
       ],
