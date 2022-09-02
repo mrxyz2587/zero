@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '/models/user.dart';
 import '/providers/user_provider.dart';
 import '/resources/firestore_methods.dart';
@@ -50,10 +51,24 @@ class _CommentsScreenState extends State<CommentsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: mobileBackgroundColor,
-        title: const Text(
-          'Comments',
+        elevation: 2,
+        leading: IconButton(
+          padding: EdgeInsets.only(right: 0),
+          icon: Icon(
+            FontAwesomeIcons.chevronLeft,
+            size: 25,
+            color: Colors.black87,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
+        backgroundColor: mobileBackgroundColor,
+        title: const Text('Comments',
+            style: TextStyle(
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF000000),
+                fontSize: 19)),
         centerTitle: false,
       ),
       body: StreamBuilder(
@@ -65,8 +80,12 @@ class _CommentsScreenState extends State<CommentsScreen> {
         builder: (context,
             AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
+            return Center(
+              child: Center(
+                  child: CircularProgressIndicator(
+                color: Colors.grey.shade200,
+                strokeWidth: 1.5,
+              )),
             );
           }
 

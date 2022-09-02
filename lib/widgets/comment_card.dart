@@ -7,7 +7,6 @@ class CommentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
       child: Row(
@@ -18,47 +17,60 @@ class CommentCard extends StatelessWidget {
             ),
             radius: 18,
           ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(left: 16),
+          Padding(
+            padding: const EdgeInsets.only(left: 10),
+            child: Container(
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                  color: Color(0xFFEFEFEF),
+                  borderRadius: BorderRadius.circular(12)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   RichText(
                     text: TextSpan(
                       children: [
                         TextSpan(
-                          text: snap.data()['name'],
-                          style: const TextStyle(fontWeight: FontWeight.bold,)
-                        ),
-                        TextSpan(
-                          text: ' ${snap.data()['text']}',
-                        ),
+                            text: snap.data()['name'],
+                            style: TextStyle(
+                                color: Color(0xFF000000),
+                                fontSize: 18,
+                                fontFamily: 'Roboto')),
                       ],
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 4),
-                    child: Text(
-                      DateFormat.yMMMd().format(
-                        snap.data()['datePublished'].toDate(),
-                      ),
-                      style: const TextStyle(
-                          fontSize: 12, fontWeight: FontWeight.w400,),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  RichText(
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                            text: '${snap.data()['text']}',
+                            style: TextStyle(
+                                color: Color(0xFF454545),
+                                fontSize: 15,
+                                fontFamily: 'Roboto')),
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    height: 3,
+                  ),
+                  Text(
+                    DateFormat.yMMMd().format(
+                      snap.data()['datePublished'].toDate(),
+                    ),
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w400,
                     ),
                   )
                 ],
               ),
             ),
           ),
-          Container(
-            padding: const EdgeInsets.all(8),
-            child: const Icon(
-              Icons.favorite,
-              size: 16,
-            ),
-          )
         ],
       ),
     );

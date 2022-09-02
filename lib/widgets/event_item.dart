@@ -10,12 +10,12 @@ class EventItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 2.5),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2.5),
       child: GestureDetector(
         onTap: onpressed,
         child: Card(
           clipBehavior: Clip.antiAlias,
-          elevation: 3,
+          elevation: 0,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
