@@ -187,265 +187,268 @@ class _SignupScreenState extends State<SignupScreen> {
           return Scaffold(
             backgroundColor: Colors.white,
             body: SafeArea(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  GestureDetector(
-                    child: CircleAvatar(
-                      backgroundColor: Color(0xFFDFDFDF),
-                      radius: 80,
-                      child: Padding(
-                        padding: const EdgeInsets.all(1),
-                        child: _image != null
-                            ? Padding(
-                                padding: const EdgeInsets.all(2.0),
-                                child: CircleAvatar(
-                                    radius: 80,
-                                    backgroundImage: MemoryImage(_image!)),
-                              )
-                            : Container(
-                                decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Color(0xFFF2F2F2)),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: [
-                                    Icon(
-                                      Icons.camera_alt_rounded,
-                                      size: 25,
-                                      color: Colors.black26,
-                                    ),
-                                    Text(
-                                      'Tap to click/select ',
-                                      style: TextStyle(
-                                          color: Colors.black26, fontSize: 12),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                    Text(
-                                      'your profile picture',
-                                      style: TextStyle(
-                                          color: Colors.black26, fontSize: 12),
-                                      textAlign: TextAlign.center,
-                                    )
-                                  ],
-                                ),
-                              ),
-                      ),
-                    ),
-                    onTap: () {
-                      bottomSheet2(context);
-                    },
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Text(
-                      'Create your account ',
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 22,
-                          fontFamily: 'Comfortaa'),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  TextFieldInput(
-                    hintText: 'Full name',
-                    textInputType: TextInputType.text,
-                    textEditingController: _usernameController,
-                    isPass: false,
-                  ),
-                  TextFieldInput(
-                    textEditingController: _emailController,
-                    hintText: 'email',
-                    textInputType: TextInputType.emailAddress,
-                    isPass: false,
-                  ),
-
-                  TextFieldInput(
-                    textEditingController: _passwordController,
-                    hintText: 'password',
-                    textInputType: TextInputType.text,
-                    isPass: true,
-                  ),
-                  // TextFieldInput(
-                  //   textEditingController: _designationController,
-                  //   hintText: 'Designation',
-                  //   textInputType: TextInputType.text,
-                  //   isPass: true,
-                  // ),
-                  // TextFieldInput(
-                  //   textEditingController: _deptController,
-                  //   hintText: 'department',
-                  //   textInputType: TextInputType.text,
-                  //   isPass: true,
-                  // ),
-                  // SelectionContainer(
-                  //     onPressing: () {
-                  //       print('pressed');
-                  //       showDialog(
-                  //           context: context,
-                  //           builder: (BuildContext context) {
-                  //             return Dialog(
-                  //               shape: RoundedRectangleBorder(
-                  //                   borderRadius: BorderRadius.circular(
-                  //                       12.0)), //this right here
-                  //               child: Container(
-                  //                 height: 300.h,
-                  //                 child: Column(
-                  //                   mainAxisAlignment:
-                  //                       MainAxisAlignment.start,
-                  //                   crossAxisAlignment:
-                  //                       CrossAxisAlignment.stretch,
-                  //                   children: <Widget>[
-                  //                     Padding(
-                  //                       padding: EdgeInsets.all(10.0),
-                  //                       child: Text(
-                  //                         'Select Designation',
-                  //                         style: TextStyle(
-                  //                             color: Colors.black,
-                  //                             fontWeight: FontWeight.bold,
-                  //                             fontSize: 20.sp),
-                  //                       ),
-                  //                     ),
-                  //                     TextButton(
-                  //                         onPressed: () {
-                  //                           Navigator.of(context).pop();
-                  //                         },
-                  //                         child: Text(
-                  //                           'Faculty',
-                  //                           style: TextStyle(
-                  //                               color: Colors.black,
-                  //                               fontSize: 18.sp),
-                  //                         )),
-                  //                     TextButton(
-                  //                         onPressed: () {
-                  //                           Navigator.of(context).pop();
-                  //                         },
-                  //                         child: Text(
-                  //                           'Developer',
-                  //                           style: TextStyle(
-                  //                               color: Colors.black,
-                  //                               fontSize: 20.0),
-                  //                         )),
-                  //                     TextButton(
-                  //                         onPressed: () {
-                  //                           Navigator.of(context).pop();
-                  //                         },
-                  //                         child: Text(
-                  //                           'Officer',
-                  //                           style: TextStyle(
-                  //                               color: Colors.black,
-                  //                               fontSize: 20.0),
-                  //                         )),
-                  //                     TextButton(
-                  //                         onPressed: () {
-                  //                           Navigator.of(context).pop();
-                  //                         },
-                  //                         child: Text(
-                  //                           'Student',
-                  //                           style: TextStyle(
-                  //                               color: Colors.black,
-                  //                               fontSize: 20.0),
-                  //                         )),
-                  //                     TextButton(
-                  //                         onPressed: () {
-                  //                           Navigator.of(context).pop();
-                  //                         },
-                  //                         child: Text(
-                  //                           'Influencer',
-                  //                           style: TextStyle(
-                  //                               color: Colors.black45,
-                  //                               fontSize: 20.0),
-                  //                         )),
-                  //                   ],
-                  //                 ),
-                  //               ),
-                  //             );
-                  //           });
-                  //     },
-                  //     title: "Designation",
-                  //     icon: Icons.keyboard_arrow_down_rounded),
-                  // SelectionContainer(
-                  //     onPressing: () {
-                  //
-                  //     },
-                  //     title: "Department",
-                  //     icon: Icons.keyboard_arrow_down_rounded),
-                  SelectionContainer(
-                      onPressing: () {
-                        showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime(1901),
-                          lastDate: DateTime.now(),
-                          builder: (context, child) {
-                            return Theme(
-                              data: Theme.of(context).copyWith(
-                                backgroundColor: Colors.black,
-                                colorScheme: ColorScheme.light(
-                                  background: Colors.black,
-
-                                  primary: Color(
-                                      0xFF2B2B2B), // header background color
-                                  onPrimary: Colors.white, // header text color
-                                  onSurface: Colors.black,
-                                  // body text color
-                                ),
-                                textButtonTheme: TextButtonThemeData(
-                                  style: TextButton.styleFrom(
-                                    primary: btnCOlorblue, // button text color
+              child: SingleChildScrollView(
+                physics: BouncingScrollPhysics(),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    GestureDetector(
+                      child: CircleAvatar(
+                        backgroundColor: Color(0xFFDFDFDF),
+                        radius: 80,
+                        child: Padding(
+                          padding: const EdgeInsets.all(1),
+                          child: _image != null
+                              ? Padding(
+                                  padding: const EdgeInsets.all(2.0),
+                                  child: CircleAvatar(
+                                      radius: 80,
+                                      backgroundImage: MemoryImage(_image!)),
+                                )
+                              : Container(
+                                  decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Color(0xFFF2F2F2)),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                      Icon(
+                                        Icons.camera_alt_rounded,
+                                        size: 25,
+                                        color: Colors.black26,
+                                      ),
+                                      Text(
+                                        'Tap to click/select ',
+                                        style: TextStyle(
+                                            color: Colors.black26, fontSize: 12),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      Text(
+                                        'your profile picture',
+                                        style: TextStyle(
+                                            color: Colors.black26, fontSize: 12),
+                                        textAlign: TextAlign.center,
+                                      )
+                                    ],
                                   ),
                                 ),
-                              ),
-                              child: child!,
-                            );
-                          },
-                        ).then((pickedDate) {
-                          if (pickedDate == null) return;
-                          setState(() {
-                            _selectedDate = pickedDate;
-                          });
-                        });
-                      },
-                      title: _selectedDate != null
-                          ? DateFormat.yMMMMd('en_US')
-                              .format(_selectedDate!)
-                              .toString()
-                          : dobString,
-                      icon: Icons.calendar_month_rounded),
-                  SizedBox(height: 30.h),
-                  GestureDetector(
-                    onTap: () {
-                      signUpUser();
-                    },
-                    child: Container(
-                      margin:
-                          EdgeInsets.symmetric(vertical: 8.0, horizontal: 40),
-                      padding: EdgeInsets.all(13),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                            colors: [
-                              Color(0xFF2B2B2B),
-                              Color(0xFF000000),
-                            ],
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight),
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(11.r),
                         ),
                       ),
-                      child: Center(
-                        child: Text('Proceed',
-                            style: TextStyle(
-                                color: Color(0xFFFFFFFF),
-                                fontSize: 15.sp,
-                                fontFamily: 'Roboto')),
+                      onTap: () {
+                        bottomSheet2(context);
+                      },
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Text(
+                        'Create your account ',
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 22,
+                            fontFamily: 'Comfortaa'),
+                        textAlign: TextAlign.center,
                       ),
                     ),
-                  ),
-                ],
+                    TextFieldInput(
+                      hintText: 'Full name',
+                      textInputType: TextInputType.text,
+                      textEditingController: _usernameController,
+                      isPass: false,
+                    ),
+                    TextFieldInput(
+                      textEditingController: _emailController,
+                      hintText: 'email',
+                      textInputType: TextInputType.emailAddress,
+                      isPass: false,
+                    ),
+              
+                    TextFieldInput(
+                      textEditingController: _passwordController,
+                      hintText: 'password',
+                      textInputType: TextInputType.text,
+                      isPass: true,
+                    ),
+                    // TextFieldInput(
+                    //   textEditingController: _designationController,
+                    //   hintText: 'Designation',
+                    //   textInputType: TextInputType.text,
+                    //   isPass: true,
+                    // ),
+                    // TextFieldInput(
+                    //   textEditingController: _deptController,
+                    //   hintText: 'department',
+                    //   textInputType: TextInputType.text,
+                    //   isPass: true,
+                    // ),
+                    // SelectionContainer(
+                    //     onPressing: () {
+                    //       print('pressed');
+                    //       showDialog(
+                    //           context: context,
+                    //           builder: (BuildContext context) {
+                    //             return Dialog(
+                    //               shape: RoundedRectangleBorder(
+                    //                   borderRadius: BorderRadius.circular(
+                    //                       12.0)), //this right here
+                    //               child: Container(
+                    //                 height: 300.h,
+                    //                 child: Column(
+                    //                   mainAxisAlignment:
+                    //                       MainAxisAlignment.start,
+                    //                   crossAxisAlignment:
+                    //                       CrossAxisAlignment.stretch,
+                    //                   children: <Widget>[
+                    //                     Padding(
+                    //                       padding: EdgeInsets.all(10.0),
+                    //                       child: Text(
+                    //                         'Select Designation',
+                    //                         style: TextStyle(
+                    //                             color: Colors.black,
+                    //                             fontWeight: FontWeight.bold,
+                    //                             fontSize: 20.sp),
+                    //                       ),
+                    //                     ),
+                    //                     TextButton(
+                    //                         onPressed: () {
+                    //                           Navigator.of(context).pop();
+                    //                         },
+                    //                         child: Text(
+                    //                           'Faculty',
+                    //                           style: TextStyle(
+                    //                               color: Colors.black,
+                    //                               fontSize: 18.sp),
+                    //                         )),
+                    //                     TextButton(
+                    //                         onPressed: () {
+                    //                           Navigator.of(context).pop();
+                    //                         },
+                    //                         child: Text(
+                    //                           'Developer',
+                    //                           style: TextStyle(
+                    //                               color: Colors.black,
+                    //                               fontSize: 20.0),
+                    //                         )),
+                    //                     TextButton(
+                    //                         onPressed: () {
+                    //                           Navigator.of(context).pop();
+                    //                         },
+                    //                         child: Text(
+                    //                           'Officer',
+                    //                           style: TextStyle(
+                    //                               color: Colors.black,
+                    //                               fontSize: 20.0),
+                    //                         )),
+                    //                     TextButton(
+                    //                         onPressed: () {
+                    //                           Navigator.of(context).pop();
+                    //                         },
+                    //                         child: Text(
+                    //                           'Student',
+                    //                           style: TextStyle(
+                    //                               color: Colors.black,
+                    //                               fontSize: 20.0),
+                    //                         )),
+                    //                     TextButton(
+                    //                         onPressed: () {
+                    //                           Navigator.of(context).pop();
+                    //                         },
+                    //                         child: Text(
+                    //                           'Influencer',
+                    //                           style: TextStyle(
+                    //                               color: Colors.black45,
+                    //                               fontSize: 20.0),
+                    //                         )),
+                    //                   ],
+                    //                 ),
+                    //               ),
+                    //             );
+                    //           });
+                    //     },
+                    //     title: "Designation",
+                    //     icon: Icons.keyboard_arrow_down_rounded),
+                    // SelectionContainer(
+                    //     onPressing: () {
+                    //
+                    //     },
+                    //     title: "Department",
+                    //     icon: Icons.keyboard_arrow_down_rounded),
+                    SelectionContainer(
+                        onPressing: () {
+                          showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime(1901),
+                            lastDate: DateTime.now(),
+                            builder: (context, child) {
+                              return Theme(
+                                data: Theme.of(context).copyWith(
+                                  backgroundColor: Colors.black,
+                                  colorScheme: ColorScheme.light(
+                                    background: Colors.black,
+              
+                                    primary: Color(
+                                        0xFF2B2B2B), // header background color
+                                    onPrimary: Colors.white, // header text color
+                                    onSurface: Colors.black,
+                                    // body text color
+                                  ),
+                                  textButtonTheme: TextButtonThemeData(
+                                    style: TextButton.styleFrom(
+                                      primary: btnCOlorblue, // button text color
+                                    ),
+                                  ),
+                                ),
+                                child: child!,
+                              );
+                            },
+                          ).then((pickedDate) {
+                            if (pickedDate == null) return;
+                            setState(() {
+                              _selectedDate = pickedDate;
+                            });
+                          });
+                        },
+                        title: _selectedDate != null
+                            ? DateFormat.yMMMMd('en_US')
+                                .format(_selectedDate!)
+                                .toString()
+                            : dobString,
+                        icon: Icons.calendar_month_rounded),
+                    SizedBox(height: 30.h),
+                    GestureDetector(
+                      onTap: () {
+                        signUpUser();
+                      },
+                      child: Container(
+                        margin:
+                            EdgeInsets.symmetric(vertical: 8.0, horizontal: 40),
+                        padding: EdgeInsets.all(13),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                              colors: [
+                                Color(0xFF2B2B2B),
+                                Color(0xFF000000),
+                              ],
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight),
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(11.r),
+                          ),
+                        ),
+                        child: Center(
+                          child: Text('Proceed',
+                              style: TextStyle(
+                                  color: Color(0xFFFFFFFF),
+                                  fontSize: 15.sp,
+                                  fontFamily: 'Roboto')),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           );
