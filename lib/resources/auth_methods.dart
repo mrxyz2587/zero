@@ -20,15 +20,17 @@ class AuthMethods {
 
   // Signing Up User
 
-  Future<String> signUpUser({
-    required String email,
-    required String password,
-    required String username,
-    required String designation,
-    required String department,
-    required String dateOfBirth,
-    required Uint8List file,
-  }) async {
+  Future<String> signUpUser(
+      {required String email,
+      required String password,
+      required String username,
+      required String designation,
+      required String department,
+      required String dateOfBirth,
+      required Uint8List file,
+      required String university}) async {
+    var ref = FirebaseFirestore.instance.collection("unregisteredusers").get();
+
     String res = "Some error Occurred";
     try {
       if (email.isNotEmpty ||
@@ -57,13 +59,16 @@ class AuthMethods {
             dateOfBirth: dateOfBirth,
             followers: [],
             following: [],
+            university: university,
+            distance: "",
+            latitudeCoordinates: "",
+            longCoordinates: "",
             bio: "Heyy I am also a zero");
-
-        // adding user in our database
         await _firestore
             .collection("users")
             .doc(cred.user!.uid)
             .set(_user.toJson());
+        // adding user in our database
 
         res = "success";
       } else {

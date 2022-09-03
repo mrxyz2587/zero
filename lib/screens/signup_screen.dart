@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -28,19 +29,16 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _designationController = TextEditingController();
   final TextEditingController _deptController = TextEditingController();
-
+  var dats = {};
   bool _isLoading = false;
+  String designation = "";
+  String department = "";
+  String university = "";
   Uint8List? _image;
   DateTime? _selectedDate;
   String dobString = "Date Of Birth";
   String? selectedValueSingleDialog;
-  List<String> designation = [
-    'Student',
-    'Faculty',
-    'Developer',
-    'Officer',
-    'Influencer'
-  ];
+
   @override
   void dispose() {
     super.dispose();
@@ -49,22 +47,55 @@ class _SignupScreenState extends State<SignupScreen> {
     _usernameController.dispose();
   }
 
+  final dbref = FirebaseFirestore.instance;
+  void checkData() async {
+    var userData = dbref
+        .collection(
+          'unregisteredUsers',
+        )
+        .where(
+          'email',
+          isEqualTo: _emailController.text,
+        )
+        .get()
+        .then((event) {
+      for (var docs in event.docs) {
+        department = docs.data()['department'].toString();
+        university = docs.data()['university'].toString();
+        designation = docs.data()['designation'].toString();
+        if (docs.data()['email'].toString() == _emailController.text) {
+          signUpUser();
+        } else {
+          print('please ask your college to register');
+        }
+      }
+    });
+    var useData = dbref
+        .collection(
+          'unregisteredUsers',
+        )
+        .where('email', isNotEqualTo: _emailController.text)
+        .get()
+        .then((event) {
+      print('user college not registered');
+    });
+  }
+
   void signUpUser() async {
-    // set loading to true
     setState(() {
       _isLoading = true;
     });
-
-    // signup user using our authmethodds
+    print('signUp called');
     String res = await AuthMethods().signUpUser(
         email: _emailController.text,
         password: _passwordController.text,
         username: _usernameController.text,
-        designation: _designationController.text,
+        designation: designation,
         dateOfBirth:
             DateFormat.yMMMMd('en_US').format(_selectedDate!).toString(),
-        department: _deptController.text,
-        file: _image!);
+        department: department,
+        file: _image!,
+        university: university);
     // if string returned is sucess, user has been created
     if (res == "success") {
       setState(() {
@@ -86,6 +117,39 @@ class _SignupScreenState extends State<SignupScreen> {
       // show the error
       showSnackBar(context, res);
     }
+    // set loading to true
+
+    //
+    // String res = await AuthMethods().signUpUser(
+    //     email: _emailController.text,
+    //     password: _passwordController.text,
+    //     username: _usernameController.text,
+    //     designation: "_designationController.text",
+    //     dateOfBirth:
+    //         DateFormat.yMMMMd('en_US').format(_selectedDate!).toString(),
+    //     department: "_deptController.text",
+    //     file: _image!);
+    // // if string returned is sucess, user has been created
+    // if (res == "success") {
+    //   setState(() {
+    //     _isLoading = false;
+    //   });
+    //   // navigate to the home screen
+    //   Navigator.of(context).pushReplacement(
+    //     MaterialPageRoute(
+    //       builder: (context) => const ResponsiveLayout(
+    //         mobileScreenLayout: MobileScreenLayout(),
+    //         webScreenLayout: WebScreenLayout(),
+    //       ),
+    //     ),
+    //   );
+    // } else {
+    //   setState(() {
+    //     _isLoading = false;
+    //   });
+    //   // show the error
+    //   showSnackBar(context, res);
+    // }
   }
 
   selectImage(ImageSource imageSource) async {
@@ -101,51 +165,74 @@ class _SignupScreenState extends State<SignupScreen> {
       context: context,
       builder: (BuildContext c) {
         return Container(
-          height: MediaQuery.of(context).size.height * 0.2,
-          width: MediaQuery.of(context).size.width,
-          margin: EdgeInsets.symmetric(
-            horizontal: 20.w,
-            vertical: 20.h,
-          ),
-          child: Column(
-            children: <Widget>[
-              Text(
-                "Choose Profile Picture",
-                style: TextStyle(fontSize: 20.0.sp, color: Colors.black54),
-              ),
-              SizedBox(
-                height: 20.h,
-              ),
-              Row(
+          color: Color(0xFFA3A3A3),
+          height: 200.h,
+          child: Container(
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(5), topLeft: Radius.circular(5))),
+            height: MediaQuery.of(context).size.height * 0.2,
+            width: MediaQuery.of(context).size.width,
+            padding: EdgeInsets.symmetric(
+              horizontal: 5.w,
+              vertical: 10.h,
+            ),
+            child: Column(
+              children: <Widget>[
+                SizedBox(height: 15),
+                Container(
+                  height: 5,
+                  width: 50,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    color: btnCOlorblue,
+                  ),
+                ),
+                SizedBox(height: 20),
+                Text(
+                  "Choose Profile Picture",
+                  style: TextStyle(fontSize: 18.0.sp, color: Colors.black54),
+                ),
+                SizedBox(
+                  height: 20.h,
+                ),
+                Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    IconButton(
-                      icon: Icon(Icons.camera),
-                      iconSize: 50.h,
-                      onPressed: () {
-                        selectImage(ImageSource.camera);
-                        Navigator.pop(context);
-                      },
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.image, semanticLabel: 'Gallery'),
-                      iconSize: 50.h,
-                      onPressed: () {
-                        selectImage(ImageSource.gallery);
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ]),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Text('camera'),
-                  Text('Gallery'),
-                ],
-              )
-            ],
+                    Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          IconButton(
+                            icon: Icon(Icons.camera),
+                            iconSize: 40.h,
+                            onPressed: () {
+                              selectImage(ImageSource.camera);
+                              Navigator.pop(context);
+                            },
+                          ),
+                          Text('Camera'),
+                        ]),
+                    Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          IconButton(
+                            icon: Icon(Icons.image, semanticLabel: 'Gallery'),
+                            iconSize: 40.h,
+                            onPressed: () {
+                              selectImage(ImageSource.gallery);
+                              Navigator.pop(context);
+                            },
+                          ),
+                          Text('Gallery'),
+                        ]),
+                  ],
+                )
+              ],
+            ),
           ),
         );
       },
@@ -164,267 +251,265 @@ class _SignupScreenState extends State<SignupScreen> {
           return Scaffold(
             backgroundColor: Colors.white,
             body: SafeArea(
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    SizedBox(height: 30),
-                    GestureDetector(
-                      child: CircleAvatar(
-                        backgroundColor: Color(0xFFDFDFDF),
-                        radius: 100,
-                        child: Padding(
-                          padding: const EdgeInsets.all(1),
-                          child: _image != null
-                              ? Padding(
-                                  padding: const EdgeInsets.all(2.0),
-                                  child: CircleAvatar(
-                                      radius: 100,
-                                      backgroundImage: MemoryImage(_image!)),
-                                )
-                              : Container(
-                                  decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Color(0xFFF2F2F2)),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.stretch,
-                                    children: [
-                                      Icon(
-                                        Icons.camera_alt_rounded,
-                                        size: 30,
-                                        color: Colors.black26,
-                                      ),
-                                      Text(
-                                        'Tap to click/select ',
-                                        style: TextStyle(
-                                            color: Colors.black26,
-                                            fontSize: 14),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                      Text(
-                                        'your profile picture',
-                                        style: TextStyle(
-                                            color: Colors.black26,
-                                            fontSize: 14),
-                                        textAlign: TextAlign.center,
-                                      )
-                                    ],
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    child: CircleAvatar(
+                      backgroundColor: Color(0xFFDFDFDF),
+                      radius: 80,
+                      child: Padding(
+                        padding: const EdgeInsets.all(1),
+                        child: _image != null
+                            ? Padding(
+                                padding: const EdgeInsets.all(2.0),
+                                child: CircleAvatar(
+                                    radius: 80,
+                                    backgroundImage: MemoryImage(_image!)),
+                              )
+                            : Container(
+                                decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Color(0xFFF2F2F2)),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    Icon(
+                                      Icons.camera_alt_rounded,
+                                      size: 25,
+                                      color: Colors.black26,
+                                    ),
+                                    Text(
+                                      'Tap to click/select ',
+                                      style: TextStyle(
+                                          color: Colors.black26, fontSize: 12),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    Text(
+                                      'your profile picture',
+                                      style: TextStyle(
+                                          color: Colors.black26, fontSize: 12),
+                                      textAlign: TextAlign.center,
+                                    )
+                                  ],
+                                ),
+                              ),
+                      ),
+                    ),
+                    onTap: () {
+                      bottomSheet2(context);
+                    },
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Text(
+                      'Create your account ',
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 22,
+                          fontFamily: 'Comfortaa'),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  TextFieldInput(
+                    hintText: 'Full name',
+                    textInputType: TextInputType.text,
+                    textEditingController: _usernameController,
+                    isPass: false,
+                  ),
+                  TextFieldInput(
+                    textEditingController: _emailController,
+                    hintText: 'email',
+                    textInputType: TextInputType.emailAddress,
+                    isPass: false,
+                  ),
+
+                  TextFieldInput(
+                    textEditingController: _passwordController,
+                    hintText: 'password',
+                    textInputType: TextInputType.text,
+                    isPass: true,
+                  ),
+                  // TextFieldInput(
+                  //   textEditingController: _designationController,
+                  //   hintText: 'Designation',
+                  //   textInputType: TextInputType.text,
+                  //   isPass: true,
+                  // ),
+                  // TextFieldInput(
+                  //   textEditingController: _deptController,
+                  //   hintText: 'department',
+                  //   textInputType: TextInputType.text,
+                  //   isPass: true,
+                  // ),
+                  // SelectionContainer(
+                  //     onPressing: () {
+                  //       print('pressed');
+                  //       showDialog(
+                  //           context: context,
+                  //           builder: (BuildContext context) {
+                  //             return Dialog(
+                  //               shape: RoundedRectangleBorder(
+                  //                   borderRadius: BorderRadius.circular(
+                  //                       12.0)), //this right here
+                  //               child: Container(
+                  //                 height: 300.h,
+                  //                 child: Column(
+                  //                   mainAxisAlignment:
+                  //                       MainAxisAlignment.start,
+                  //                   crossAxisAlignment:
+                  //                       CrossAxisAlignment.stretch,
+                  //                   children: <Widget>[
+                  //                     Padding(
+                  //                       padding: EdgeInsets.all(10.0),
+                  //                       child: Text(
+                  //                         'Select Designation',
+                  //                         style: TextStyle(
+                  //                             color: Colors.black,
+                  //                             fontWeight: FontWeight.bold,
+                  //                             fontSize: 20.sp),
+                  //                       ),
+                  //                     ),
+                  //                     TextButton(
+                  //                         onPressed: () {
+                  //                           Navigator.of(context).pop();
+                  //                         },
+                  //                         child: Text(
+                  //                           'Faculty',
+                  //                           style: TextStyle(
+                  //                               color: Colors.black,
+                  //                               fontSize: 18.sp),
+                  //                         )),
+                  //                     TextButton(
+                  //                         onPressed: () {
+                  //                           Navigator.of(context).pop();
+                  //                         },
+                  //                         child: Text(
+                  //                           'Developer',
+                  //                           style: TextStyle(
+                  //                               color: Colors.black,
+                  //                               fontSize: 20.0),
+                  //                         )),
+                  //                     TextButton(
+                  //                         onPressed: () {
+                  //                           Navigator.of(context).pop();
+                  //                         },
+                  //                         child: Text(
+                  //                           'Officer',
+                  //                           style: TextStyle(
+                  //                               color: Colors.black,
+                  //                               fontSize: 20.0),
+                  //                         )),
+                  //                     TextButton(
+                  //                         onPressed: () {
+                  //                           Navigator.of(context).pop();
+                  //                         },
+                  //                         child: Text(
+                  //                           'Student',
+                  //                           style: TextStyle(
+                  //                               color: Colors.black,
+                  //                               fontSize: 20.0),
+                  //                         )),
+                  //                     TextButton(
+                  //                         onPressed: () {
+                  //                           Navigator.of(context).pop();
+                  //                         },
+                  //                         child: Text(
+                  //                           'Influencer',
+                  //                           style: TextStyle(
+                  //                               color: Colors.black45,
+                  //                               fontSize: 20.0),
+                  //                         )),
+                  //                   ],
+                  //                 ),
+                  //               ),
+                  //             );
+                  //           });
+                  //     },
+                  //     title: "Designation",
+                  //     icon: Icons.keyboard_arrow_down_rounded),
+                  // SelectionContainer(
+                  //     onPressing: () {
+                  //
+                  //     },
+                  //     title: "Department",
+                  //     icon: Icons.keyboard_arrow_down_rounded),
+                  SelectionContainer(
+                      onPressing: () {
+                        showDatePicker(
+                          context: context,
+                          initialDate: DateTime.now(),
+                          firstDate: DateTime(1901),
+                          lastDate: DateTime.now(),
+                          builder: (context, child) {
+                            return Theme(
+                              data: Theme.of(context).copyWith(
+                                backgroundColor: Colors.black,
+                                colorScheme: ColorScheme.light(
+                                  background: Colors.black,
+
+                                  primary: Color(
+                                      0xFF2B2B2B), // header background color
+                                  onPrimary: Colors.white, // header text color
+                                  onSurface: Colors.black,
+                                  // body text color
+                                ),
+                                textButtonTheme: TextButtonThemeData(
+                                  style: TextButton.styleFrom(
+                                    primary: btnCOlorblue, // button text color
                                   ),
                                 ),
-                        ),
-                      ),
-                      onTap: () {
-                        bottomSheet2(context);
-                      },
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        'Create your account ',
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 25,
-                            fontFamily: 'Comfortaa'),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    TextFieldInput(
-                      hintText: 'Full name',
-                      textInputType: TextInputType.text,
-                      textEditingController: _usernameController,
-                      isPass: false,
-                    ),
-                    TextFieldInput(
-                      textEditingController: _emailController,
-                      hintText: 'email',
-                      textInputType: TextInputType.emailAddress,
-                      isPass: false,
-                    ),
-
-                    TextFieldInput(
-                      textEditingController: _passwordController,
-                      hintText: 'password',
-                      textInputType: TextInputType.text,
-                      isPass: true,
-                    ),
-                    TextFieldInput(
-                      textEditingController: _designationController,
-                      hintText: 'Designation',
-                      textInputType: TextInputType.text,
-                      isPass: true,
-                    ),
-                    TextFieldInput(
-                      textEditingController: _deptController,
-                      hintText: 'department',
-                      textInputType: TextInputType.text,
-                      isPass: true,
-                    ),
-                    // SelectionContainer(
-                    //     onPressing: () {
-                    //       print('pressed');
-                    //       showDialog(
-                    //           context: context,
-                    //           builder: (BuildContext context) {
-                    //             return Dialog(
-                    //               shape: RoundedRectangleBorder(
-                    //                   borderRadius: BorderRadius.circular(
-                    //                       12.0)), //this right here
-                    //               child: Container(
-                    //                 height: 300.h,
-                    //                 child: Column(
-                    //                   mainAxisAlignment:
-                    //                       MainAxisAlignment.start,
-                    //                   crossAxisAlignment:
-                    //                       CrossAxisAlignment.stretch,
-                    //                   children: <Widget>[
-                    //                     Padding(
-                    //                       padding: EdgeInsets.all(10.0),
-                    //                       child: Text(
-                    //                         'Select Designation',
-                    //                         style: TextStyle(
-                    //                             color: Colors.black,
-                    //                             fontWeight: FontWeight.bold,
-                    //                             fontSize: 20.sp),
-                    //                       ),
-                    //                     ),
-                    //                     TextButton(
-                    //                         onPressed: () {
-                    //                           Navigator.of(context).pop();
-                    //                         },
-                    //                         child: Text(
-                    //                           'Faculty',
-                    //                           style: TextStyle(
-                    //                               color: Colors.black,
-                    //                               fontSize: 18.sp),
-                    //                         )),
-                    //                     TextButton(
-                    //                         onPressed: () {
-                    //                           Navigator.of(context).pop();
-                    //                         },
-                    //                         child: Text(
-                    //                           'Developer',
-                    //                           style: TextStyle(
-                    //                               color: Colors.black,
-                    //                               fontSize: 20.0),
-                    //                         )),
-                    //                     TextButton(
-                    //                         onPressed: () {
-                    //                           Navigator.of(context).pop();
-                    //                         },
-                    //                         child: Text(
-                    //                           'Officer',
-                    //                           style: TextStyle(
-                    //                               color: Colors.black,
-                    //                               fontSize: 20.0),
-                    //                         )),
-                    //                     TextButton(
-                    //                         onPressed: () {
-                    //                           Navigator.of(context).pop();
-                    //                         },
-                    //                         child: Text(
-                    //                           'Student',
-                    //                           style: TextStyle(
-                    //                               color: Colors.black,
-                    //                               fontSize: 20.0),
-                    //                         )),
-                    //                     TextButton(
-                    //                         onPressed: () {
-                    //                           Navigator.of(context).pop();
-                    //                         },
-                    //                         child: Text(
-                    //                           'Influencer',
-                    //                           style: TextStyle(
-                    //                               color: Colors.black45,
-                    //                               fontSize: 20.0),
-                    //                         )),
-                    //                   ],
-                    //                 ),
-                    //               ),
-                    //             );
-                    //           });
-                    //     },
-                    //     title: "Designation",
-                    //     icon: Icons.keyboard_arrow_down_rounded),
-                    // SelectionContainer(
-                    //     onPressing: () {
-                    //
-                    //     },
-                    //     title: "Department",
-                    //     icon: Icons.keyboard_arrow_down_rounded),
-                    SelectionContainer(
-                        onPressing: () {
-                          showDatePicker(
-                            context: context,
-                            initialDate: DateTime.now(),
-                            firstDate: DateTime(1901),
-                            lastDate: DateTime.now(),
-                            // builder: (context, child) {
-                            //   return Theme(
-                            //     data: Theme.of(context).copyWith(
-                            //       colorScheme: ColorScheme.light(
-                            //         primary:
-                            //             Colors.black, // header background color
-                            //         onPrimary:
-                            //             Colors.white, // header text color
-                            //         onSurface: Colors.black, // body text color
-                            //       ),
-                            //       textButtonTheme: TextButtonThemeData(
-                            //         style: TextButton.styleFrom(
-                            //           primary: Colors.red, // button text color
-                            //         ),
-                            //       ),
-                            //     ),
-                            //     child: child!,
-                            //   );
-                            // },
-                          ).then((pickedDate) {
-                            if (pickedDate == null) return;
-                            setState(() {
-                              _selectedDate = pickedDate;
-                            });
-                          });
-                        },
-                        title: _selectedDate != null
-                            ? DateFormat.yMMMMd('en_US')
-                                .format(_selectedDate!)
-                                .toString()
-                            : dobString,
-                        icon: Icons.calendar_month_rounded),
-                    SizedBox(height: 30.h),
-                    Hero(
-                      tag: 'signUp',
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 40),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            signUpUser();
+                              ),
+                              child: child!,
+                            );
                           },
-                          // child: !_isLoading
-                          //     ? const Text(
-                          //         'Sign up',
-                          //       )
-                          //     : const CircularProgressIndicator(
-                          //         color: Colors.white,
-                          //       ),
-                          child: Text(
-                            'Proceed',
-                            style: TextStyle(
-                                color: Color(0xFFFFFFFF), fontSize: 16.sp),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            padding: EdgeInsets.all(16),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(13.r)),
-                            primary: Color(0xFF000000),
-                          ),
+                        ).then((pickedDate) {
+                          if (pickedDate == null) return;
+                          setState(() {
+                            _selectedDate = pickedDate;
+                          });
+                        });
+                      },
+                      title: _selectedDate != null
+                          ? DateFormat.yMMMMd('en_US')
+                              .format(_selectedDate!)
+                              .toString()
+                          : dobString,
+                      icon: Icons.calendar_month_rounded),
+                  SizedBox(height: 30.h),
+                  GestureDetector(
+                    onTap: () {
+                      checkData();
+                    },
+                    child: Container(
+                      margin:
+                          EdgeInsets.symmetric(vertical: 8.0, horizontal: 40),
+                      padding: EdgeInsets.all(13),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                            colors: [
+                              Color(0xFF2B2B2B),
+                              Color(0xFF000000),
+                            ],
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight),
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(11.r),
                         ),
                       ),
+                      child: Center(
+                        child: Text('Proceed',
+                            style: TextStyle(
+                                color: Color(0xFFFFFFFF),
+                                fontSize: 15.sp,
+                                fontFamily: 'Roboto')),
+                      ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           );

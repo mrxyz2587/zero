@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '/utils/colors.dart';
 import '/utils/global_variable.dart';
 
@@ -45,44 +46,64 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
         controller: pageController,
         onPageChanged: onPageChanged,
       ),
-      bottomNavigationBar: CupertinoTabBar(
-
+      bottomNavigationBar: BottomNavigationBar(
+        elevation: 25,
         backgroundColor: mobileBackgroundColor,
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(
-              Icons.home,
-              color: (_page == 0) ? primaryColor : secondaryColor,
+            icon: Padding(
+              padding: const EdgeInsets.only(top: 10.0),
+              child: Icon(
+                FontAwesomeIcons.house,
+                size: 22,
+                color: (_page == 0) ? btnCOlorblue : webBackgroundColor,
+              ),
             ),
             label: '',
             backgroundColor: primaryColor,
           ),
           BottomNavigationBarItem(
-              icon: Icon(
-                Icons.search,
-                color: (_page == 1) ? primaryColor : secondaryColor,
+              icon: Padding(
+                padding: const EdgeInsets.only(top: 10.0),
+                child: Icon(
+                  FontAwesomeIcons.solidBell,
+                  size: 22,
+                  color: (_page == 1) ? btnCOlorblue : webBackgroundColor,
+                ),
               ),
               label: '',
               backgroundColor: primaryColor),
           BottomNavigationBarItem(
-              icon: Icon(
-                Icons.add_circle,
-                color: (_page == 2) ? primaryColor : secondaryColor,
+              icon: Padding(
+                padding: const EdgeInsets.only(top: 10.0),
+                child: Icon(
+                  FontAwesomeIcons.circlePlus,
+                  size: 25,
+                  color: (_page == 2) ? btnCOlorblue : webBackgroundColor,
+                ),
               ),
               label: '',
               backgroundColor: primaryColor),
           BottomNavigationBarItem(
-            icon: Icon(
-              Icons.favorite,
-              color: (_page == 3) ? primaryColor : secondaryColor,
+            icon: Padding(
+              padding: const EdgeInsets.only(top: 10.0),
+              child: Icon(
+                FontAwesomeIcons.graduationCap,
+                size: 22,
+                color: (_page == 3) ? btnCOlorblue : webBackgroundColor,
+              ),
             ),
             label: '',
             backgroundColor: primaryColor,
           ),
           BottomNavigationBarItem(
-            icon: Icon(
-              Icons.person,
-              color: (_page == 4) ? primaryColor : secondaryColor,
+            icon: Padding(
+              padding: const EdgeInsets.only(top: 10.0),
+              child: Icon(
+                FontAwesomeIcons.fireFlameCurved,
+                size: 22,
+                color: (_page == 4) ? btnCOlorblue : webBackgroundColor,
+              ),
             ),
             label: '',
             backgroundColor: primaryColor,
@@ -90,6 +111,7 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
         ],
         onTap: navigationTapped,
         currentIndex: _page,
+        type: BottomNavigationBarType.fixed,
       ),
     );
   }

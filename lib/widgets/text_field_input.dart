@@ -22,21 +22,25 @@ class TextFieldInput extends StatelessWidget {
       child: TextField(
         controller: textEditingController,
         maxLines: 1,
-        style: TextStyle(fontFamily: 'Roboto', color: Colors.black45),
+        style: TextStyle(
+          fontFamily: 'Roboto',
+          color: Colors.black45,
+        ),
         keyboardType: textInputType,
         showCursor: false,
         obscureText: isPass,
         decoration: InputDecoration(
           enabled: true,
-          contentPadding: EdgeInsets.all(15),
+          isDense: true,
+          contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
           hintText: hintText,
           hintStyle: const TextStyle(
-              color: Color(0xFFA3A3A3), fontSize: 18, fontFamily: 'Roboto'),
+              color: Color(0xFFA3A3A3), fontSize: 15, fontFamily: 'Roboto'),
           fillColor: const Color(0xFFF2F2F2),
           filled: true,
           suffixIcon: Icon(
             iconData,
-            size: 40,
+            size: 10,
             color: Color(0xFFA3A3A3),
           ),
           focusedBorder: OutlineInputBorder(
