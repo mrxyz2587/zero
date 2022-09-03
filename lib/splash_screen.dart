@@ -68,7 +68,7 @@ class _SplashState extends State<Splash> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Container(
-              height: MediaQuery.of(context).size.height * 0.9,
+              height: MediaQuery.of(context).size.height * 0.8,
               padding:
                   EdgeInsets.all(MediaQuery.of(context).size.longestSide / 9),
               child: Image(
@@ -76,16 +76,41 @@ class _SplashState extends State<Splash> {
                 image: AssetImage('images/zero_logo.png'),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 20),
+            Expanded(child: SizedBox()),
+            Center(
               child: Text(
-                companyName,
+                'from',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 36,
-                  fontFamily: 'Lombok',
-                ),
+                    color: Color(0xFFACACAC),
+                    fontSize: 15,
+                    fontFamily: 'Roboto'),
               ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: Image.asset('images/capture.PNG', height: 30, width: 50),
+              // child: Row(
+              //   mainAxisAlignment: MainAxisAlignment.center,
+              //   crossAxisAlignment: CrossAxisAlignment.end,
+              //   children: [
+              //     Padding(
+              //       padding: const EdgeInsets.all(0),
+              //       child: Image.asset('images/logo.jpeg', height: 40),
+              //     ),
+              //     Padding(
+              //       padding: const EdgeInsets.only(bottom: 8, left: 0.5),
+              //       child: Text(
+              //         'ERO',
+              //         style: TextStyle(
+              //             color: Color(0xFF000000),
+              //             fontSize: 20,
+              //             fontWeight: FontWeight.w700,
+              //             fontFamily: 'Comfortaa'),
+              //       ),
+              //     ),
+              //   ],
+              // ),
             ),
           ],
         ),

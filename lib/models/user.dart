@@ -9,21 +9,28 @@ class User {
   final String department;
   final String dateOfBirth;
   final String bio;
-
+  final String university;
   final List followers;
   final List following;
+  final String distance;
+  final String longCoordinates;
+  final String latitudeCoordinates;
 
   const User(
       {required this.username,
       required this.uid,
       required this.photoUrl,
+      required this.distance,
       required this.email,
       required this.designation,
       required this.department,
       required this.dateOfBirth,
       required this.followers,
       required this.following,
-      required this.bio});
+      required this.bio,
+      required this.university,
+      required this.longCoordinates,
+      required this.latitudeCoordinates});
 
   static User fromSnap(DocumentSnapshot snap) {
     var snapshot = snap.data() as Map<String, dynamic>;
@@ -38,7 +45,11 @@ class User {
         dateOfBirth: snapshot["dateOfBirth"],
         followers: snapshot["followers"],
         following: snapshot["following"],
-        bio: snapshot["bio"]);
+        bio: snapshot["bio"],
+        university: snapshot["university"],
+        distance: snapshot['distance'],
+        longCoordinates: snapshot['longCoordinates'],
+        latitudeCoordinates: snapshot['latitudeCoordinates']);
   }
 
   Map<String, dynamic> toJson() => {
@@ -51,6 +62,10 @@ class User {
         "dateOfBirth": dateOfBirth,
         "followers": followers,
         "following": following,
-        "bio": bio
+        "bio": bio,
+        "university": university,
+        "distance": distance,
+        "longCoordinates": longCoordinates,
+        "latitudeCoordinates": latitudeCoordinates
       };
 }

@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -28,19 +29,16 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _designationController = TextEditingController();
   final TextEditingController _deptController = TextEditingController();
-
+  var dats = {};
   bool _isLoading = false;
+  String designation = "";
+  String department = "";
+  String university = "";
   Uint8List? _image;
   DateTime? _selectedDate;
   String dobString = "Date Of Birth";
   String? selectedValueSingleDialog;
-  List<String> designation = [
-    'Student',
-    'Faculty',
-    'Developer',
-    'Officer',
-    'Influencer'
-  ];
+
   @override
   void dispose() {
     super.dispose();
@@ -49,22 +47,55 @@ class _SignupScreenState extends State<SignupScreen> {
     _usernameController.dispose();
   }
 
+  final dbref = FirebaseFirestore.instance;
+  void checkData() async {
+    var userData = dbref
+        .collection(
+          'unregisteredUsers',
+        )
+        .where(
+          'email',
+          isEqualTo: _emailController.text,
+        )
+        .get()
+        .then((event) {
+      for (var docs in event.docs) {
+        department = docs.data()['department'].toString();
+        university = docs.data()['university'].toString();
+        designation = docs.data()['designation'].toString();
+        if (docs.data()['email'].toString() == _emailController.text) {
+          signUpUser();
+        } else {
+          print('please ask your college to register');
+        }
+      }
+    });
+    var useData = dbref
+        .collection(
+          'unregisteredUsers',
+        )
+        .where('email', isNotEqualTo: _emailController.text)
+        .get()
+        .then((event) {
+      print('user college not registered');
+    });
+  }
+
   void signUpUser() async {
-    // set loading to true
     setState(() {
       _isLoading = true;
     });
-
-    // signup user using our authmethodds
+    print('signUp called');
     String res = await AuthMethods().signUpUser(
         email: _emailController.text,
         password: _passwordController.text,
         username: _usernameController.text,
-        designation: _designationController.text,
+        designation: designation,
         dateOfBirth:
             DateFormat.yMMMMd('en_US').format(_selectedDate!).toString(),
-        department: _deptController.text,
-        file: _image!);
+        department: department,
+        file: _image!,
+        university: university);
     // if string returned is sucess, user has been created
     if (res == "success") {
       setState(() {
@@ -86,6 +117,39 @@ class _SignupScreenState extends State<SignupScreen> {
       // show the error
       showSnackBar(context, res);
     }
+    // set loading to true
+
+    //
+    // String res = await AuthMethods().signUpUser(
+    //     email: _emailController.text,
+    //     password: _passwordController.text,
+    //     username: _usernameController.text,
+    //     designation: "_designationController.text",
+    //     dateOfBirth:
+    //         DateFormat.yMMMMd('en_US').format(_selectedDate!).toString(),
+    //     department: "_deptController.text",
+    //     file: _image!);
+    // // if string returned is sucess, user has been created
+    // if (res == "success") {
+    //   setState(() {
+    //     _isLoading = false;
+    //   });
+    //   // navigate to the home screen
+    //   Navigator.of(context).pushReplacement(
+    //     MaterialPageRoute(
+    //       builder: (context) => const ResponsiveLayout(
+    //         mobileScreenLayout: MobileScreenLayout(),
+    //         webScreenLayout: WebScreenLayout(),
+    //       ),
+    //     ),
+    //   );
+    // } else {
+    //   setState(() {
+    //     _isLoading = false;
+    //   });
+    //   // show the error
+    //   showSnackBar(context, res);
+    // }
   }
 
   selectImage(ImageSource imageSource) async {
@@ -450,9 +514,55 @@ class _SignupScreenState extends State<SignupScreen> {
                                         fontSize: 15.sp,
                                         fontFamily: 'Roboto')),
                               ),
+<<<<<<< HEAD
                             ),
                           ),
                         ],
+=======
+                              child: child!,
+                            );
+                          },
+                        ).then((pickedDate) {
+                          if (pickedDate == null) return;
+                          setState(() {
+                            _selectedDate = pickedDate;
+                          });
+                        });
+                      },
+                      title: _selectedDate != null
+                          ? DateFormat.yMMMMd('en_US')
+                              .format(_selectedDate!)
+                              .toString()
+                          : dobString,
+                      icon: Icons.calendar_month_rounded),
+                  SizedBox(height: 30.h),
+                  GestureDetector(
+                    onTap: () {
+                      checkData();
+                    },
+                    child: Container(
+                      margin:
+                          EdgeInsets.symmetric(vertical: 8.0, horizontal: 40),
+                      padding: EdgeInsets.all(13),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                            colors: [
+                              Color(0xFF2B2B2B),
+                              Color(0xFF000000),
+                            ],
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight),
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(11.r),
+                        ),
+                      ),
+                      child: Center(
+                        child: Text('Proceed',
+                            style: TextStyle(
+                                color: Color(0xFFFFFFFF),
+                                fontSize: 15.sp,
+                                fontFamily: 'Roboto')),
+>>>>>>> 31a0fb6ee9b760494e504631daa7b618ce39421b
                       ),
                     ),
                   ),
