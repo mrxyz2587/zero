@@ -88,7 +88,13 @@ class _ReelsScreenState extends State<ReelsScreen> {
                             style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w700),
-                          )
+                          ),
+                                              Spacer(),
+                    Icon(
+                      Icons.camera_alt_sharp,
+                      size: 25,
+                      color: Colors.white,
+                    ),
                         ],
                       )),
                   Positioned(
@@ -159,6 +165,108 @@ class _ReelsScreenState extends State<ReelsScreen> {
                             'images/share_icons.png',
                             height: 20,
                           )),
+                           Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(children: <Widget>[
+                  CircleAvatar(
+                    radius: 16,
+                    backgroundImage: AssetImage('images/me.jpeg'),
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Text(
+                    "Zoya Firoz",
+                    style: TextStyle(
+                        fontSize: 15,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold),
+                  ),
+
+                ]),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Text(
+                      "Caption on reel........",
+                      style: TextStyle(fontSize: 12, color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.compare_arrows_rounded,
+                      size: 25,
+                      color: Colors.white,
+                    ),
+                    Text(
+                      "effets will go here",
+                      style: TextStyle(fontSize: 12, color: Colors.white),
+                    ),
+                    Icon(
+                      Icons.star_purple500,
+                      size: 25,
+                      color: Colors.white,
+                    ),
+                    SizedBox(
+                      width: 145,
+                    ),
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Colors.white, width: 2),
+                          borderRadius: BorderRadius.circular(10)),
+                      child: Image(
+                        image: AssetImage('images/me.jpeg'),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
+                child: Container(
+                  height: 50,
+                  width: double.infinity,
+                  color: Colors.black,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Icon(
+                        Icons.home,
+                        size: 25,
+                        color: Colors.white,
+                      ),
+                      Icon(
+                        Icons.search,
+                        size: 25,
+                        color: Colors.white,
+                      ),
+                      Icon(
+                        Icons.video_collection_outlined,
+                        size: 25,
+                        color: Colors.white,
+                      ),
+                      Icon(
+                         FontAwesomeIcons.solidHeart,
+                        size: 25,
+                        color: Colors.white,
+                      ),
+                      CircleAvatar(
+                        radius: 15,
+                        backgroundImage: AssetImage('images/me.jpeg'),
+                      ),
+                    ],
+                  ),
+                ),
+              )
                         ],
                       ))
                 ],
