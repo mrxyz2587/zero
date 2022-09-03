@@ -150,7 +150,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           ),
                           subtitle: Text(
                             (snapshot.data! as dynamic)
-                                .docs[index]['designation']
+                                .docs[index]['distance']
                                 .toString(),
                             style: TextStyle(fontSize: 12),
                           ),

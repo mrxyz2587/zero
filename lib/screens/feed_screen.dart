@@ -78,7 +78,7 @@ class _FeedScreenState extends State<FeedScreen> {
 
   @override
   void initState() {
-    // _determinePosition();
+    _determinePosition();
     // TODO: implement initState
     // getLocation();
     super.initState();
@@ -108,6 +108,7 @@ class _FeedScreenState extends State<FeedScreen> {
           "latitudeCoordinates": latitude.toString(),
           "distance": distanceInMeters.toString()
         });
+        print(longitude.toString() + "" + latitude.toString());
       }
     });
     getdistance();
@@ -117,7 +118,11 @@ class _FeedScreenState extends State<FeedScreen> {
 
   int i = 0;
   void getdistance() async {
-    await FirebaseFirestore.instance.collection("users").get().then((value) {
+    await FirebaseFirestore.instance
+        .collection("users")
+        .where("uid", isNotEqualTo: FirebaseAuth.instance.currentUser!.uid)
+        .get()
+        .then((value) {
       for (var docs in value.docs) {
         var lats = double.parse(docs.data()['latitudeCoordinates']);
         var long = double.parse(docs.data()['longCoordinates']);
@@ -130,7 +135,8 @@ class _FeedScreenState extends State<FeedScreen> {
         FirebaseFirestore.instance
             .collection("users")
             .doc(docs.data()["uid"])
-            .update(<String, dynamic>{"distance": distanceInMeters});
+            .update(<String, dynamic>{"distance": distanceInMeters.toString()});
+        distanceInMeters = 0;
       }
     });
   }
@@ -139,6 +145,8 @@ class _FeedScreenState extends State<FeedScreen> {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final UserProvider userProvider = Provider.of<UserProvider>(context);
+    getLocation();
+
     return Scaffold(
       backgroundColor:
           width > webScreenSize ? webBackgroundColor : Color(0xFFEFEFEF),
