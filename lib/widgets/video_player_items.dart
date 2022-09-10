@@ -1,12 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+import 'package:zero_fin/screens/reels_screen.dart';
 
 class VideoPlayerItem extends StatefulWidget {
   final String videoUrl;
-  const VideoPlayerItem({
-    Key? key,
-    required this.videoUrl,
-  }) : super(key: key);
+
+  const VideoPlayerItem({Key? key, required this.videoUrl}) : super(key: key);
 
   @override
   _VideoPlayerItemState createState() => _VideoPlayerItemState();
@@ -20,7 +21,7 @@ class _VideoPlayerItemState extends State<VideoPlayerItem> {
     super.initState();
     videoPlayerController = VideoPlayerController.network(widget.videoUrl)
       ..initialize().then((value) {
-        videoPlayerController.play();
+        videoPlayerController.pause();
         videoPlayerController.setVolume(1);
         videoPlayerController.setLooping(true);
       });

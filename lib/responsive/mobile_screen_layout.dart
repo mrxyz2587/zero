@@ -66,7 +66,7 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
               icon: Padding(
                 padding: const EdgeInsets.only(top: 10.0),
                 child: Icon(
-                  FontAwesomeIcons.solidBell,
+                  FontAwesomeIcons.magnifyingGlass,
                   size: 22,
                   color: (_page == 1) ? btnCOlorblue : webBackgroundColor,
                 ),

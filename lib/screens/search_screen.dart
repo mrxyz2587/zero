@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ffi';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -6,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:zero_fin/widgets/video_player_items.dart';
+import 'package:zero_fin/widgets/videoplayersearch.dart';
 import '/screens/profile_screen.dart';
 import '/utils/colors.dart';
 import '/utils/global_variable.dart';
@@ -37,28 +40,66 @@ class _SearchScreenState extends State<SearchScreen> {
       backgroundColor: Color(0xFFEFEFEF),
       appBar: AppBar(
         backgroundColor: mobileBackgroundColor,
-        title: Form(
-          child: TextFormField(
-            controller: searchController,
-            decoration:
-                const InputDecoration(labelText: 'Search for a user...'),
-            onFieldSubmitted: (String _) {
-              setState(() {
-                isShowUsers = true;
-              });
-              print(_);
-            },
+        title: TextFormField(
+          controller: searchController,
+          decoration: InputDecoration(
+            suffixIcon: Icon(
+              FontAwesomeIcons.magnifyingGlass,
+              color: Colors.black54,
+            ),
+            isDense: true,
+            isCollapsed: true,
+            filled: true,
+            contentPadding: EdgeInsets.fromLTRB(
+              10,
+              10,
+              0,
+              10,
+            ),
+            hintStyle: TextStyle(fontWeight: FontWeight.w700),
+            hintText: 'Search...',
+            fillColor: Color(0xFFEFEFEF),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide:
+                  BorderSide(color: const Color(0xFFD9D8D8), width: 1.5),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                color: Color(0xFFDFDFDF),
+                width: 1,
+              ),
+            ),
+          ),
+          onFieldSubmitted: (String _) {
+            setState(() {
+              isShowUsers = true;
+            });
+            print(_);
+          },
+        ),
+        leading: Padding(
+          padding: const EdgeInsets.only(
+            left: 5,
+          ),
+          child: IconButton(
+            icon: const Icon(
+              FontAwesomeIcons.chevronLeft,
+              color: Colors.black,
+            ),
+            onPressed: () {},
           ),
         ),
         actions: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Icon(
-              FontAwesomeIcons.magnifyingGlass,
-              color: Colors.black87,
-              size: 20,
-            ),
-          )
+          // Padding(
+          //   padding: const EdgeInsets.all(16),
+          //   child: Icon(
+          //     FontAwesomeIcons.magnifyingGlass,
+          //     color: Colors.black87,
+          //     size: 20,
+          //   ),
+          // )
         ],
       ),
       body: isShowUsers
@@ -108,9 +149,9 @@ class _SearchScreenState extends State<SearchScreen> {
             )
           : FutureBuilder(
               future: FirebaseFirestore.instance
-                  .collection('users')
+                  .collection('reels')
                   .where(
-                    'username',
+                    'reelId',
                   )
                   .get(),
               builder: (context, snapshot) {
@@ -120,44 +161,23 @@ class _SearchScreenState extends State<SearchScreen> {
                   );
                 }
 
-                return ListView.builder(
+                return StaggeredGridView.countBuilder(
+                  crossAxisCount: 3,
                   itemCount: (snapshot.data! as dynamic).docs.length,
-                  itemBuilder: (context, index) {
-                    return InkWell(
-                      onTap: () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => ProfileScreen(
-                            uid: (snapshot.data! as dynamic).docs[index]['uid'],
-                          ),
-                        ),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 4, 20, 4),
-                        child: ListTile(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(7)),
-                          tileColor: Colors.white,
-                          leading: CircleAvatar(
-                            backgroundImage: NetworkImage(
-                              (snapshot.data! as dynamic).docs[index]
-                                  ['photoUrl'],
-                            ),
-                            radius: 16,
-                          ),
-                          title: Text(
-                            (snapshot.data! as dynamic).docs[index]['username'],
-                            style: TextStyle(fontWeight: FontWeight.w700),
-                          ),
-                          subtitle: Text(
-                            (snapshot.data! as dynamic)
-                                .docs[index]['distance']
-                                .toString(),
-                            style: TextStyle(fontSize: 12),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
+                  itemBuilder: (context, index) => VideoPlayerSearch(
+                    videoUrl: (snapshot.data! as dynamic).docs[index]
+                        ['reelUrl'],
+                  ),
+                  staggeredTileBuilder: (index) => MediaQuery.of(context)
+                              .size
+                              .width >
+                          webScreenSize
+                      ? StaggeredTile.count(
+                          (index % 7 == 0) ? 1 : 1, (index % 7 == 0) ? 1 : 1)
+                      : StaggeredTile.count(
+                          (index % 7 == 0) ? 2 : 1, (index % 7 == 0) ? 2 : 1),
+                  mainAxisSpacing: 8.0,
+                  crossAxisSpacing: 8.0,
                 );
               },
             ),

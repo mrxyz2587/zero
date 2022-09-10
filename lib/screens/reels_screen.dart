@@ -12,7 +12,7 @@ import '../utils/utils.dart';
 import '../widgets/like_animation.dart';
 
 class ReelsScreen extends StatefulWidget {
-  const ReelsScreen({Key? key}) : super(key: key);
+  ReelsScreen();
 
   @override
   State<ReelsScreen> createState() => _ReelsScreenState();
@@ -66,7 +66,8 @@ class _ReelsScreenState extends State<ReelsScreen> {
               child: Stack(
                 children: [
                   VideoPlayerItem(
-                      videoUrl: snapshot.data!.docs[index].data()["reelUrl"]),
+                    videoUrl: snapshot.data!.docs[index].data()["reelUrl"],
+                  ),
                   Positioned(
                       top: 20,
                       left: 10,
