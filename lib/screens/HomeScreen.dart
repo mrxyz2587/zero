@@ -143,10 +143,11 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                     ),
                   ),
                 ),
-                RaisedButton(
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(5)),
-                  color: Colors.black87,
+                  backgroundColor: Colors.black87,),
                   onPressed: onSearch,
                   child: Text("Search", style: TextStyle(color: Colors.white)),
                 ),

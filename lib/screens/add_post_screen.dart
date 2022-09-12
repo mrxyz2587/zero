@@ -314,11 +314,14 @@ class _AddPostScreenState extends State<AddPostScreen> {
                             SizedBox(
                               width: 20,
                             ),
-                            RaisedButton(
-                              padding: EdgeInsets.symmetric(horizontal: 30),
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8)),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                padding: EdgeInsets.symmetric(horizontal: 30),
+                                elevation: 0,
+                                backgroundColor: btnCOlorblue,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8)),
+                              ),
                               onPressed: () => postImage(
                                 userProvider.getUser.uid,
                                 userProvider.getUser.username,
@@ -329,7 +332,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
                                       fontSize: 12,
                                       color: Color(0xFFFFFFFF),
                                       fontWeight: FontWeight.bold)),
-                              color: btnCOlorblue,
+                              // color: btnCOlorblue,
                             )
                           ],
                         ),
@@ -515,18 +518,21 @@ class _AddPostScreenState extends State<AddPostScreen> {
                           SizedBox(
                             width: 20,
                           ),
-                          RaisedButton(
-                            padding: EdgeInsets.symmetric(horizontal: 30),
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8)),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              padding: EdgeInsets.symmetric(horizontal: 30),
+                              elevation: 0,
+                              backgroundColor: Color(0xFFEEEEEE),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8)),
+                            ),
                             onPressed: () {},
                             child: Text('POST',
                                 style: TextStyle(
                                     fontSize: 12,
                                     color: Color(0xFF9E9E9E),
                                     fontWeight: FontWeight.bold)),
-                            color: Color(0xFFEEEEEE),
+                            // color: Color(0xFFEEEEEE),
                           )
                         ],
                       ),

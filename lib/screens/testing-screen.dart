@@ -58,7 +58,7 @@ class _TestingState extends State<Testing> {
             textEditingController: textController,
             hintText: 'email',
           ),
-          RaisedButton(
+          ElevatedButton(
             onPressed: () => getData(),
             child: Text('Fetch'),
           ),

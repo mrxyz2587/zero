@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
-import '../widgets/selection_container.dart';
+import '../widgets/selection_container.dart' as sc;
 import '/resources/auth_methods.dart';
 import '/responsive/mobile_screen_layout.dart';
 import '/responsive/responsive_layout.dart';
@@ -44,14 +44,20 @@ class _SignupScreenState extends State<SignupScreen> {
         Text('GeeksforGeeks'), // Message which will be pop up on the screen
     // Action widget which will provide the user to acknowledge the choice
     actions: [
-      FlatButton(
+      TextButton(
         // FlatButton widget is used to make a text to work like a button
-        textColor: Colors.black,
+        style: TextButton.styleFrom(
+          backgroundColor: Colors.black,
+        ),
+        // textColor: Colors.black,
         onPressed: () {}, // function used to perform after pressing the button
         child: Text('CANCEL'),
       ),
-      FlatButton(
-        textColor: Colors.black,
+      TextButton(
+        style: TextButton.styleFrom(
+          backgroundColor: Colors.black,
+        ),
+        // textColor: Colors.black,
         onPressed: () {},
         child: Text('ACCEPT'),
       ),
@@ -478,7 +484,7 @@ class _SignupScreenState extends State<SignupScreen> {
               //     },
               //     title: "Department",
               //     icon: Icons.keyboard_arrow_down_rounded),
-              SelectionContainer(
+              sc.SelectionContainer(
                   onPressing: () {
                     showDatePicker(
                       context: context,

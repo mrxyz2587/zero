@@ -12,6 +12,7 @@ import '/screens/login_screen.dart';
 import '/utils/colors.dart';
 import 'package:provider/provider.dart';
 import 'splash_screen.dart';
+import './screens/verify_email_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -52,7 +53,16 @@ class MyApp extends StatelessWidget {
         color: Colors.white,
         debugShowCheckedModeBanner: false,
         title: 'zero',
-        home: Splash(),
+        home: StreamBuilder<User?>(
+          stream: FirebaseAuth.instance.authStateChanges(),
+          builder:(context, snapshot) {
+            if (snapshot.hasData) {
+              return VerifyEmailPage();
+            } else {
+              return Splash();
+            }
+          },
+         ),
       ),
     );
   }

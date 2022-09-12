@@ -390,19 +390,21 @@ class _MentorshipCoursesState extends State<MentorshipCourses> {
                                               child: Padding(
                                                 padding: const EdgeInsets.only(
                                                     bottom: 15.0),
-                                                child: RaisedButton(
+                                                child: ElevatedButton(
+                                                  style: ElevatedButton.styleFrom(
+                                                    backgroundColor: btnCOlorblue,
                                                     shape: RoundedRectangleBorder(
                                                         borderRadius:
                                                             BorderRadius.all(
                                                                 Radius.circular(
-                                                                    7))),
+                                                                    7))),),
                                                     onPressed: () {
                                                       setState(() {
                                                         isReg = !isReg;
                                                         print(isReg.toString());
                                                       });
                                                     },
-                                                    color: btnCOlorblue,
+                                                    // color: btnCOlorblue,
                                                     child: isReg == true
                                                         ? Text(
                                                             'Applied',
