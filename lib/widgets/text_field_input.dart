@@ -30,7 +30,6 @@ class TextFieldInput extends StatelessWidget {
         showCursor: false,
         obscureText: isPass,
         decoration: InputDecoration(
-          enabled: true,
           isDense: true,
           contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
           hintText: hintText,

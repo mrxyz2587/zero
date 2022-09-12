@@ -7,20 +7,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:zero_fin/widgets/course_item.dart';
+import 'package:zero_fin/widgets/mentors_card.dart';
 
 import '../models/events_model.dart';
 import '../resources/firestore_methods.dart';
 import '../utils/colors.dart';
 import '../widgets/event_item.dart';
 
-class EventScreen extends StatefulWidget {
-  const EventScreen({Key? key}) : super(key: key);
+class MentorshipCourses extends StatefulWidget {
+  const MentorshipCourses({Key? key}) : super(key: key);
 
   @override
-  State<EventScreen> createState() => _EventScreenState();
+  State<MentorshipCourses> createState() => _MentorshipCoursesState();
 }
 
-class _EventScreenState extends State<EventScreen> {
+class _MentorshipCoursesState extends State<MentorshipCourses> {
   var name;
   File? file;
   Uint8List? _file;
@@ -41,15 +43,22 @@ class _EventScreenState extends State<EventScreen> {
                 appBar: AppBar(
                     elevation: 1,
                     backgroundColor: Colors.white,
-                    leading: Icon(FontAwesomeIcons.graduationCap,
-                        color: Colors.black),
+                    titleSpacing: 15,
+                    leading: Padding(
+                      padding: const EdgeInsets.only(left: 18),
+                      child: Image.asset(
+                        'images/mentorship_icon.png',
+                      ),
+                    ),
+                    leadingWidth: 40,
                     title: Text(
-                      'Events',
+                      'Mentors',
                       style: TextStyle(
                           color: Colors.black, fontWeight: FontWeight.bold),
                     )),
                 body: ListView(
                   children: [
+                    SizedBox(height: 2),
                     // Padding(
                     //   padding: const EdgeInsets.symmetric(
                     //       horizontal: 40, vertical: 20),
@@ -130,7 +139,9 @@ class _EventScreenState extends State<EventScreen> {
                     // ),
                     StreamBuilder(
                       stream: FirebaseFirestore.instance
-                          .collection('events')
+                          .collection('coursesection')
+                          .doc('mentorship')
+                          .collection('allmentors')
                           .snapshots(),
                       builder: (context,
                           AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
@@ -147,7 +158,7 @@ class _EventScreenState extends State<EventScreen> {
                           scrollDirection: Axis.vertical,
                           itemCount: snapshot.data!.docs.length,
                           itemBuilder: (ctx, index) => Container(
-                            child: EventItem(
+                            child: MentorsCard(
                               snap: snapshot.data!.docs[index].data(),
                               onpressed: () {
                                 showModalBottomSheet(
@@ -184,7 +195,7 @@ class _EventScreenState extends State<EventScreen> {
                                                   .width,
                                               child: Image.network(
                                                 snapshot.data!.docs[index]
-                                                    .data()["imageUrl"]
+                                                    .data()["mentorcoverimg"]
                                                     .toString(),
                                                 fit: BoxFit.fill,
                                               ),
@@ -202,7 +213,8 @@ class _EventScreenState extends State<EventScreen> {
                                                     backgroundImage:
                                                         NetworkImage(
                                                       snapshot.data!.docs[index]
-                                                          .data()["imageUrl"]
+                                                          .data()[
+                                                              "photomentorurl"]
                                                           .toString(),
                                                     ),
                                                   ),
@@ -211,13 +223,25 @@ class _EventScreenState extends State<EventScreen> {
                                                   ),
                                                   Text(
                                                     snapshot.data!.docs[index]
-                                                        .data()["evetitle"]
+                                                        .data()["name"]
                                                         .toString(),
                                                     style: TextStyle(
                                                       fontSize: 18.sp,
                                                       fontWeight:
                                                           FontWeight.bold,
                                                     ),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            12.0),
+                                                    child: GestureDetector(
+                                                        child: Icon(
+                                                            FontAwesomeIcons
+                                                                .globe,
+                                                            size: 15,
+                                                            color: Colors
+                                                                .black54)),
                                                   ),
                                                   Expanded(child: SizedBox()),
                                                   GestureDetector(
@@ -240,9 +264,7 @@ class _EventScreenState extends State<EventScreen> {
                                                             ),
                                                           )),
                                                       child: Image.asset(
-                                                        'images/share_icons.png',
-                                                        height: 19,
-                                                      ),
+                                                          'images/share_icons.png'),
                                                     ),
                                                   )),
                                                 ],
@@ -258,7 +280,7 @@ class _EventScreenState extends State<EventScreen> {
                                               ),
                                               child: Text(
                                                 snapshot.data!.docs[index]
-                                                    .data()["evedescc"]
+                                                    .data()["description"]
                                                     .toString(),
                                                 textAlign: TextAlign.left,
                                                 maxLines: 4,
@@ -282,8 +304,12 @@ class _EventScreenState extends State<EventScreen> {
                                                   )),
                                               child: Text(
                                                 snapshot.data!.docs[index]
-                                                    .data()["eventDate"]
-                                                    .toString(),
+                                                        .data()["price"]
+                                                        .toString() +
+                                                    " ⌚ " +
+                                                    snapshot.data!.docs[index]
+                                                        .data()["category"]
+                                                        .toString(),
                                                 style: TextStyle(
                                                     fontFamily: 'Roboto',
                                                     fontWeight: FontWeight.bold,
@@ -311,7 +337,7 @@ class _EventScreenState extends State<EventScreen> {
                                                     color: btnCOlorblue,
                                                     child: isReg == true
                                                         ? Text(
-                                                            'Registeredd',
+                                                            'Applied',
                                                             style: TextStyle(
                                                                 fontSize: 16.sp,
                                                                 color: Colors
@@ -326,7 +352,7 @@ class _EventScreenState extends State<EventScreen> {
                                                                     vertical:
                                                                         8),
                                                             child: Text(
-                                                              'Register',
+                                                              'Apply',
                                                               style: TextStyle(
                                                                   fontSize:
                                                                       16.sp,

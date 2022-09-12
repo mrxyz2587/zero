@@ -1,38 +1,38 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class Post {
+class Reels {
   final String description;
   final String uid;
   final String username;
   final likes;
   final saves;
-  final String postId;
+  final String reelId;
   final String datePublished;
-  final String postUrl;
+  final String reelUrl;
   final String profImage;
 
-  const Post(
+  const Reels(
       {required this.description,
       required this.uid,
       required this.username,
       required this.likes,
-      required this.postId,
+      required this.reelId,
       required this.datePublished,
-      required this.postUrl,
+      required this.reelUrl,
       required this.profImage,
       required this.saves});
 
-  static Post fromSnap(DocumentSnapshot snap) {
+  static Reels fromSnap(DocumentSnapshot snap) {
     var snapshot = snap.data() as Map<String, dynamic>;
 
-    return Post(
+    return Reels(
         description: snapshot["description"],
         uid: snapshot["uid"],
         likes: snapshot["likes"],
-        postId: snapshot["postId"],
+        reelId: snapshot["reelId"],
         datePublished: snapshot["datePublished"],
         username: snapshot["username"],
-        postUrl: snapshot['postUrl'],
+        reelUrl: snapshot['reelUrl'],
         saves: snapshot['saves'],
         profImage: snapshot['profImage']);
   }
@@ -42,9 +42,9 @@ class Post {
         "uid": uid,
         "likes": likes,
         "username": username,
-        "postId": postId,
+        "reelId": reelId,
         "datePublished": datePublished,
-        'postUrl': postUrl,
+        'reelUrl': reelUrl,
         'profImage': profImage,
         'saves': saves
       };

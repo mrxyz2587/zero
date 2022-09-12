@@ -7,20 +7,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:zero_fin/widgets/course_item.dart';
 
 import '../models/events_model.dart';
 import '../resources/firestore_methods.dart';
 import '../utils/colors.dart';
 import '../widgets/event_item.dart';
 
-class EventScreen extends StatefulWidget {
-  const EventScreen({Key? key}) : super(key: key);
+class ExamCrackers extends StatefulWidget {
+  const ExamCrackers({Key? key}) : super(key: key);
 
   @override
-  State<EventScreen> createState() => _EventScreenState();
+  State<ExamCrackers> createState() => _ExamCrackersState();
 }
 
-class _EventScreenState extends State<EventScreen> {
+class _ExamCrackersState extends State<ExamCrackers> {
   var name;
   File? file;
   Uint8List? _file;
@@ -44,7 +45,7 @@ class _EventScreenState extends State<EventScreen> {
                     leading: Icon(FontAwesomeIcons.graduationCap,
                         color: Colors.black),
                     title: Text(
-                      'Events',
+                      'Exam Crackers',
                       style: TextStyle(
                           color: Colors.black, fontWeight: FontWeight.bold),
                     )),
@@ -130,7 +131,9 @@ class _EventScreenState extends State<EventScreen> {
                     // ),
                     StreamBuilder(
                       stream: FirebaseFirestore.instance
-                          .collection('events')
+                          .collection('coursesection')
+                          .doc('certification')
+                          .collection('allCourses')
                           .snapshots(),
                       builder: (context,
                           AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
@@ -147,7 +150,7 @@ class _EventScreenState extends State<EventScreen> {
                           scrollDirection: Axis.vertical,
                           itemCount: snapshot.data!.docs.length,
                           itemBuilder: (ctx, index) => Container(
-                            child: EventItem(
+                            child: CourseItem(
                               snap: snapshot.data!.docs[index].data(),
                               onpressed: () {
                                 showModalBottomSheet(
@@ -184,7 +187,7 @@ class _EventScreenState extends State<EventScreen> {
                                                   .width,
                                               child: Image.network(
                                                 snapshot.data!.docs[index]
-                                                    .data()["imageUrl"]
+                                                    .data()["companyimage"]
                                                     .toString(),
                                                 fit: BoxFit.fill,
                                               ),
@@ -202,7 +205,8 @@ class _EventScreenState extends State<EventScreen> {
                                                     backgroundImage:
                                                         NetworkImage(
                                                       snapshot.data!.docs[index]
-                                                          .data()["imageUrl"]
+                                                          .data()[
+                                                              "companyimage"]
                                                           .toString(),
                                                     ),
                                                   ),
@@ -211,7 +215,8 @@ class _EventScreenState extends State<EventScreen> {
                                                   ),
                                                   Text(
                                                     snapshot.data!.docs[index]
-                                                        .data()["evetitle"]
+                                                        .data()[
+                                                            "certificationname"]
                                                         .toString(),
                                                     style: TextStyle(
                                                       fontSize: 18.sp,
@@ -258,7 +263,8 @@ class _EventScreenState extends State<EventScreen> {
                                               ),
                                               child: Text(
                                                 snapshot.data!.docs[index]
-                                                    .data()["evedescc"]
+                                                    .data()[
+                                                        "certificationdescription"]
                                                     .toString(),
                                                 textAlign: TextAlign.left,
                                                 maxLines: 4,
@@ -282,8 +288,13 @@ class _EventScreenState extends State<EventScreen> {
                                                   )),
                                               child: Text(
                                                 snapshot.data!.docs[index]
-                                                    .data()["eventDate"]
-                                                    .toString(),
+                                                        .data()[
+                                                            "certificationlevel"]
+                                                        .toString() +
+                                                    " ⌚ " +
+                                                    snapshot.data!.docs[index]
+                                                        .data()["coursetiming"]
+                                                        .toString(),
                                                 style: TextStyle(
                                                     fontFamily: 'Roboto',
                                                     fontWeight: FontWeight.bold,

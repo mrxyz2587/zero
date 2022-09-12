@@ -9,21 +9,21 @@ import '/utils/utils.dart';
 import '/widgets/comment_card.dart';
 import 'package:provider/provider.dart';
 
-class CommentsScreen extends StatefulWidget {
+class ReelsCommentsScreen extends StatefulWidget {
   final postId;
-  const CommentsScreen({Key? key, required this.postId}) : super(key: key);
+  const ReelsCommentsScreen({Key? key, required this.postId}) : super(key: key);
 
   @override
-  _CommentsScreenState createState() => _CommentsScreenState();
+  _ReelsCommentsScreenState createState() => _ReelsCommentsScreenState();
 }
 
-class _CommentsScreenState extends State<CommentsScreen> {
+class _ReelsCommentsScreenState extends State<ReelsCommentsScreen> {
   final TextEditingController commentEditingController =
       TextEditingController();
 
   void postComment(String uid, String name, String profilePic) async {
     try {
-      String res = await FireStoreMethods().postComment(
+      String res = await FireStoreMethods().reelsComment(
         widget.postId,
         commentEditingController.text,
         uid,
@@ -73,9 +73,9 @@ class _CommentsScreenState extends State<CommentsScreen> {
       ),
       body: StreamBuilder(
         stream: FirebaseFirestore.instance
-            .collection('posts')
+            .collection('reels')
             .doc(widget.postId)
-            .collection('comments')
+            .collection('reelscomments')
             .snapshots(),
         builder: (context,
             AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {

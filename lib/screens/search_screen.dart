@@ -1,6 +1,14 @@
+import 'dart:async';
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:zero_fin/widgets/video_player_items.dart';
+import 'package:zero_fin/widgets/videoplayersearch.dart';
 import '/screens/profile_screen.dart';
 import '/utils/colors.dart';
 import '/utils/global_variable.dart';
@@ -15,25 +23,84 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController searchController = TextEditingController();
   bool isShowUsers = false;
+  double longitude = 0;
+  double latitude = 0;
+  double distanceInMeters = 0;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFFEFEFEF),
       appBar: AppBar(
         backgroundColor: mobileBackgroundColor,
-        title: Form(
-          child: TextFormField(
-            controller: searchController,
-            decoration:
-                const InputDecoration(labelText: 'Search for a user...'),
-            onFieldSubmitted: (String _) {
-              setState(() {
-                isShowUsers = true;
-              });
-              print(_);
-            },
+        title: TextFormField(
+          controller: searchController,
+          decoration: InputDecoration(
+            suffixIcon: Icon(
+              FontAwesomeIcons.magnifyingGlass,
+              color: Colors.black54,
+            ),
+            isDense: true,
+            isCollapsed: true,
+            filled: true,
+            contentPadding: EdgeInsets.fromLTRB(
+              10,
+              10,
+              0,
+              10,
+            ),
+            hintStyle: TextStyle(fontWeight: FontWeight.w700),
+            hintText: 'Search...',
+            fillColor: Color(0xFFEFEFEF),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide:
+                  BorderSide(color: const Color(0xFFD9D8D8), width: 1.5),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                color: Color(0xFFDFDFDF),
+                width: 1,
+              ),
+            ),
+          ),
+          onFieldSubmitted: (String _) {
+            setState(() {
+              isShowUsers = true;
+            });
+            print(_);
+          },
+        ),
+        leading: Padding(
+          padding: const EdgeInsets.only(
+            left: 5,
+          ),
+          child: IconButton(
+            icon: const Icon(
+              FontAwesomeIcons.chevronLeft,
+              color: Colors.black,
+            ),
+            onPressed: () {},
           ),
         ),
+        actions: [
+          // Padding(
+          //   padding: const EdgeInsets.all(16),
+          //   child: Icon(
+          //     FontAwesomeIcons.magnifyingGlass,
+          //     color: Colors.black87,
+          //     size: 20,
+          //   ),
+          // )
+        ],
       ),
       body: isShowUsers
           ? FutureBuilder(
@@ -68,6 +135,9 @@ class _SearchScreenState extends State<SearchScreen> {
                           ),
                           radius: 16,
                         ),
+                        subtitle: Text(
+                          (snapshot.data! as dynamic).docs[index]['distance'],
+                        ),
                         title: Text(
                           (snapshot.data! as dynamic).docs[index]['username'],
                         ),
@@ -79,8 +149,10 @@ class _SearchScreenState extends State<SearchScreen> {
             )
           : FutureBuilder(
               future: FirebaseFirestore.instance
-                  .collection('posts')
-                  .orderBy('datePublished')
+                  .collection('reels')
+                  .where(
+                    'reelId',
+                  )
                   .get(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
@@ -92,9 +164,9 @@ class _SearchScreenState extends State<SearchScreen> {
                 return StaggeredGridView.countBuilder(
                   crossAxisCount: 3,
                   itemCount: (snapshot.data! as dynamic).docs.length,
-                  itemBuilder: (context, index) => Image.network(
-                    (snapshot.data! as dynamic).docs[index]['postUrl'],
-                    fit: BoxFit.cover,
+                  itemBuilder: (context, index) => VideoPlayerSearch(
+                    videoUrl: (snapshot.data! as dynamic).docs[index]
+                        ['reelUrl'],
                   ),
                   staggeredTileBuilder: (index) => MediaQuery.of(context)
                               .size
