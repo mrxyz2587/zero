@@ -27,6 +27,8 @@ class _CertificationCOursesState extends State<CertificationCOurses> {
   Uint8List? _file;
   bool isSubmitted = false;
 
+  String selectedText = " ";
+
   @override
   Widget build(BuildContext context) {
     bool isReg = false;
@@ -51,6 +53,64 @@ class _CertificationCOursesState extends State<CertificationCOurses> {
                     )),
                 body: ListView(
                   children: [
+                    GestureDetector(
+                      onTap: () {
+                        showDialog(
+                          useRootNavigator: false,
+                          context: context,
+                          builder: (context) {
+                            return Dialog(
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  children: [
+                                    SimpleDialogOption(
+                                        child: Text("all Courses"),
+                                        onPressed: () {
+                                          setState(() {
+                                            selectedText = " ";
+                                          });
+                                          Navigator.pop(context);
+                                        }),
+                                    SimpleDialogOption(
+                                        child: Text("Beginer"),
+                                        onPressed: () {
+                                          setState(() {
+                                            selectedText = "beginner";
+                                          });
+                                          Navigator.pop(context);
+                                        }),
+                                    SimpleDialogOption(
+                                        child: Text("Master"),
+                                        onPressed: () {
+                                          setState(() {
+                                            selectedText = "medium";
+                                          });
+                                          Navigator.pop(context);
+                                        }),
+                                    SimpleDialogOption(
+                                        child: Text("Expert"),
+                                        onPressed: () {
+                                          setState(() {
+                                            selectedText = "expert";
+                                          });
+                                          Navigator.pop(context);
+                                        }),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(25),
+                        child: Text(
+                          "Filter",
+                          textAlign: TextAlign.end,
+                        ),
+                      ),
+                    ),
+
                     // Padding(
                     //   padding: const EdgeInsets.symmetric(
                     //       horizontal: 40, vertical: 20),
@@ -130,11 +190,19 @@ class _CertificationCOursesState extends State<CertificationCOurses> {
                     //   ),
                     // ),
                     StreamBuilder(
-                      stream: FirebaseFirestore.instance
-                          .collection('coursesection')
-                          .doc('certification')
-                          .collection('allCourses')
-                          .snapshots(),
+                      stream: (selectedText == " ")
+                          ? FirebaseFirestore.instance
+                              .collection('coursesection')
+                              .doc('certification')
+                              .collection('allCourses')
+                              .snapshots()
+                          : FirebaseFirestore.instance
+                              .collection('coursesection')
+                              .doc('certification')
+                              .collection('allCourses')
+                              .where("certificationlevel",
+                                  isEqualTo: selectedText.toString())
+                              .snapshots(),
                       builder: (context,
                           AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
                               snapshot) {

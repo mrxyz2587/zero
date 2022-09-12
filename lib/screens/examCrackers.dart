@@ -30,7 +30,7 @@ class _ExamCrackersState extends State<ExamCrackers> {
   @override
   Widget build(BuildContext context) {
     bool isReg = false;
-
+    String selectedText = "";
     return ScreenUtilInit(
         designSize: const Size(360, 690),
         minTextAdapt: true,
@@ -51,6 +51,41 @@ class _ExamCrackersState extends State<ExamCrackers> {
                     )),
                 body: ListView(
                   children: [
+                    IconButton(
+                      onPressed: () {
+                        showDialog(
+                          useRootNavigator: false,
+                          context: context,
+                          builder: (context) {
+                            return Dialog(
+                              child: ListView(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 16),
+                                  shrinkWrap: true,
+                                  children: [
+                                    'Delete',
+                                  ]
+                                      .map(
+                                        (e) => InkWell(
+                                            child: Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 12,
+                                                      horizontal: 16),
+                                              child: Text(e),
+                                            ),
+                                            onTap: () {
+                                              // remove the dialog box
+                                              Navigator.of(context).pop();
+                                            }),
+                                      )
+                                      .toList()),
+                            );
+                          },
+                        );
+                      },
+                      icon: const Icon(FontAwesomeIcons.ellipsisVertical),
+                    ),
                     // Padding(
                     //   padding: const EdgeInsets.symmetric(
                     //       horizontal: 40, vertical: 20),
@@ -130,11 +165,19 @@ class _ExamCrackersState extends State<ExamCrackers> {
                     //   ),
                     // ),
                     StreamBuilder(
-                      stream: FirebaseFirestore.instance
-                          .collection('coursesection')
-                          .doc('certification')
-                          .collection('allCourses')
-                          .snapshots(),
+                      stream: (selectedText == " ")
+                          ? FirebaseFirestore.instance
+                              .collection('coursesection')
+                              .doc('certification')
+                              .collection('allCourses')
+                              .snapshots()
+                          : FirebaseFirestore.instance
+                              .collection('coursesection')
+                              .doc('certification')
+                              .collection('allCourses')
+                              .where("certificationlevel",
+                                  isEqualTo: selectedText.toString())
+                              .snapshots(),
                       builder: (context,
                           AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
                               snapshot) {
