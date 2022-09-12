@@ -123,42 +123,149 @@ class _SearchScreenState extends State<SearchScreen> {
                           builder: (context) {
                             return Dialog(
                               child: SingleChildScrollView(
-                                child: Column(
-                                  children: [
-                                    SimpleDialogOption(
-                                        child: Text("all Courses"),
-                                        onPressed: () {
-                                          setState(() {
-                                            selectedText = " ";
-                                          });
-                                          Navigator.pop(context);
-                                        }),
-                                    SimpleDialogOption(
-                                        child: Text("Mte"),
-                                        onPressed: () {
-                                          setState(() {
-                                            selectedText = "mte";
-                                          });
-                                          Navigator.pop(context);
-                                        }),
-                                    SimpleDialogOption(
-                                        child: Text("Master"),
-                                        onPressed: () {
-                                          setState(() {
-                                            selectedText = "medium";
-                                          });
-                                          Navigator.pop(context);
-                                        }),
-                                    SimpleDialogOption(
-                                        child: Text("Expert"),
-                                        onPressed: () {
-                                          setState(() {
-                                            selectedText = "expert";
-                                          });
-                                          Navigator.pop(context);
-                                        }),
-                                  ],
-                                ),
+                                child: Column(children: [
+                                  SimpleDialogOption(
+                                      child: Text(
+                                          "Computer Sciences & Engineering"),
+                                      onPressed: () {
+                                        setState(() {
+                                          selectedText =
+                                              "Computer Sciences & Engineering";
+                                        });
+                                        Navigator.pop(context);
+                                      }),
+                                  SimpleDialogOption(
+                                      child:
+                                          Text("Civil & Petroleum Engineering"),
+                                      onPressed: () {
+                                        setState(() {
+                                          selectedText =
+                                              "Civil & Petroleum Engineering";
+                                        });
+                                        Navigator.pop(context);
+                                      }),
+                                  SimpleDialogOption(
+                                      child: Text("Mechanical  Engineering"),
+                                      onPressed: () {
+                                        setState(() {
+                                          selectedText =
+                                              "Mechanical  Engineering";
+                                        });
+                                        Navigator.pop(context);
+                                      }),
+                                  SimpleDialogOption(
+                                      child: Text(
+                                          "Electrical & Electronics Engineering"),
+                                      onPressed: () {
+                                        setState(() {
+                                          selectedText =
+                                              "Electrical & Electronics Engineering";
+                                        });
+                                        Navigator.pop(context);
+                                      }),
+                                  SimpleDialogOption(
+                                      child: Text("Computer Applications"),
+                                      onPressed: () {
+                                        setState(() {
+                                          selectedText =
+                                              "Computer Applications";
+                                        });
+                                        Navigator.pop(context);
+                                      }),
+                                  SimpleDialogOption(
+                                      child: Text("Business Administration"),
+                                      onPressed: () {
+                                        setState(() {
+                                          selectedText =
+                                              "Business Administration";
+                                        });
+                                        Navigator.pop(context);
+                                      }),
+                                  SimpleDialogOption(
+                                      child: Text("Media Studies"),
+                                      onPressed: () {
+                                        setState(() {
+                                          selectedText = "Media Studies";
+                                        });
+                                        Navigator.pop(context);
+                                      }),
+                                  SimpleDialogOption(
+                                      child: Text("Law"),
+                                      onPressed: () {
+                                        setState(() {
+                                          selectedText = "Law";
+                                        });
+                                        Navigator.pop(context);
+                                      }),
+                                  SimpleDialogOption(
+                                      child: Text("Commerce & Finance"),
+                                      onPressed: () {
+                                        setState(() {
+                                          selectedText = "Commerce & Finance";
+                                        });
+                                        Navigator.pop(context);
+                                      }),
+                                  SimpleDialogOption(
+                                      child: Text("Sciences"),
+                                      onPressed: () {
+                                        setState(() {
+                                          selectedText = "Sciences";
+                                        });
+                                        Navigator.pop(context);
+                                      }),
+                                  SimpleDialogOption(
+                                      child:
+                                          Text("Humanities & Social Sciences"),
+                                      onPressed: () {
+                                        setState(() {
+                                          selectedText =
+                                              "Humanities & Social Sciences";
+                                        });
+                                        Navigator.pop(context);
+                                      }),
+                                  SimpleDialogOption(
+                                      child: Text("Hospitality & Tourism"),
+                                      onPressed: () {
+                                        setState(() {
+                                          selectedText =
+                                              "Hospitality & Tourism";
+                                        });
+                                        Navigator.pop(context);
+                                      }),
+                                  SimpleDialogOption(
+                                      child: Text("Agricultural Studies"),
+                                      onPressed: () {
+                                        setState(() {
+                                          selectedText = "Agricultural Studies";
+                                        });
+                                        Navigator.pop(context);
+                                      }),
+                                  SimpleDialogOption(
+                                      child: Text("Pharmacy"),
+                                      onPressed: () {
+                                        setState(() {
+                                          selectedText = "Pharmacy";
+                                        });
+                                        Navigator.pop(context);
+                                      }),
+                                  SimpleDialogOption(
+                                      child: Text("Applied Medical Sciences"),
+                                      onPressed: () {
+                                        setState(() {
+                                          selectedText =
+                                              "Applied Medical Sciences";
+                                        });
+                                        Navigator.pop(context);
+                                      }),
+                                  SimpleDialogOption(
+                                      child: Text("Paramedical Sciences"),
+                                      onPressed: () {
+                                        setState(() {
+                                          selectedText = "Paramedical Sciences";
+                                        });
+                                        Navigator.pop(context);
+                                      }),
+                                ]),
                               ),
                             );
                           },

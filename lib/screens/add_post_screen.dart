@@ -316,11 +316,12 @@ class _AddPostScreenState extends State<AddPostScreen> {
                             ),
                             ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                              padding: EdgeInsets.symmetric(horizontal: 30),
-                              elevation: 0,
-                              backgroundColor: btnCOlorblue,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8)),),
+                                padding: EdgeInsets.symmetric(horizontal: 30),
+                                elevation: 0,
+                                backgroundColor: btnCOlorblue,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8)),
+                              ),
                               onPressed: () => postImage(
                                 userProvider.getUser.uid,
                                 userProvider.getUser.username,
@@ -519,11 +520,12 @@ class _AddPostScreenState extends State<AddPostScreen> {
                           ),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                            padding: EdgeInsets.symmetric(horizontal: 30),
-                            elevation: 0,
-                            backgroundColor: Color(0xFFEEEEEE),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8)),),
+                              padding: EdgeInsets.symmetric(horizontal: 30),
+                              elevation: 0,
+                              backgroundColor: Color(0xFFEEEEEE),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8)),
+                            ),
                             onPressed: () {},
                             child: Text('POST',
                                 style: TextStyle(
