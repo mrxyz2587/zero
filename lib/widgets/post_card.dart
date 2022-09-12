@@ -17,10 +17,10 @@ import 'package:provider/provider.dart';
 
 class PostCard extends StatefulWidget {
   final snap;
-  const PostCard({
-    Key? key,
-    required this.snap,
-  }) : super(key: key);
+  final Function()? onshareingbtnPressed;
+  const PostCard(
+      {Key? key, required this.snap, required this.onshareingbtnPressed})
+      : super(key: key);
 
   @override
   State<PostCard> createState() => _PostCardState();
@@ -322,10 +322,11 @@ class _PostCardState extends State<PostCard> {
                   ),
                   SizedBox(width: 12),
                   GestureDetector(
+                      onTap: widget.onshareingbtnPressed,
                       child: Image.asset(
-                    'images/share_icons.png',
-                    height: 20,
-                  )),
+                        'images/share_icons.png',
+                        height: 20,
+                      )),
                   Expanded(child: SizedBox()),
                   GestureDetector(
                     onTap: () => Navigator.of(context).push(

@@ -364,6 +364,85 @@ class _FeedScreenState extends State<FeedScreen> {
                         ),
                         child: PostCard(
                           snap: snapshot.data!.docs[index].data(),
+                          onshareingbtnPressed: () {
+                            showModalBottomSheet(
+                                context: context,
+                                builder: (BuildContext ctx) {
+                                  return Container(
+                                    color: Colors.transparent,
+                                    child: Container(
+                                      child: StreamBuilder(
+                                        stream: FirebaseFirestore.instance
+                                            .collection('users')
+                                            .snapshots(),
+                                        builder: (context, snapshot) {
+                                          if (!snapshot.hasData) {
+                                            return const Center(
+                                              child:
+                                                  CircularProgressIndicator(),
+                                            );
+                                          }
+
+                                          return ListView.builder(
+                                            shrinkWrap: true,
+                                            itemCount:
+                                                (snapshot.data! as dynamic)
+                                                    .docs
+                                                    .length,
+                                            itemBuilder: (context, index) =>
+                                                Align(
+                                                    alignment:
+                                                        Alignment.topLeft,
+                                                    child: Container(
+                                                      color: Colors.white,
+                                                      child: Column(
+                                                        children: [
+                                                          CircleAvatar(
+                                                            backgroundImage:
+                                                                NetworkImage(
+                                                              (snapshot.data!
+                                                                      as dynamic)
+                                                                  .docs[index][
+                                                                      'photoUrl']
+                                                                  .toString(),
+                                                            ),
+                                                            radius: 40,
+                                                          ),
+                                                          Text(
+                                                              (snapshot.data!
+                                                                      as dynamic)
+                                                                  .docs[index][
+                                                                      'username']
+                                                                  .toString(),
+                                                              style: TextStyle(
+                                                                  color: Color(
+                                                                      0xFF000000),
+                                                                  fontSize: 15,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w700,
+                                                                  fontFamily:
+                                                                      'Roboto')),
+                                                          // Text(
+                                                          //   (snapshot.data! as dynamic)
+                                                          //       .docs[index]['university']
+                                                          //       .toString(),
+                                                          // )
+                                                        ],
+                                                      ),
+                                                    )),
+                                          );
+                                        },
+                                      ),
+                                      decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.only(
+                                              topRight: Radius.circular(20),
+                                              topLeft: Radius.circular(20))),
+                                    ),
+                                  );
+                                });
+                          },
                         ),
                       ),
                     );

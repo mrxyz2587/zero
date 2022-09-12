@@ -157,6 +157,230 @@ class _SearchScreenState extends State<SearchScreen> {
                                           });
                                           Navigator.pop(context);
                                         }),
+                                    SimpleDialogOption(
+                                        child: Text("all Courses"),
+                                        onPressed: () {
+                                          setState(() {
+                                            selectedText = " ";
+                                          });
+                                          Navigator.pop(context);
+                                        }),
+                                    SimpleDialogOption(
+                                        child: Text("Mte"),
+                                        onPressed: () {
+                                          setState(() {
+                                            selectedText = "mte";
+                                          });
+                                          Navigator.pop(context);
+                                        }),
+                                    SimpleDialogOption(
+                                        child: Text("Master"),
+                                        onPressed: () {
+                                          setState(() {
+                                            selectedText = "medium";
+                                          });
+                                          Navigator.pop(context);
+                                        }),
+                                    SimpleDialogOption(
+                                        child: Text("Expert"),
+                                        onPressed: () {
+                                          setState(() {
+                                            selectedText = "expert";
+                                          });
+                                          Navigator.pop(context);
+                                        }),
+                                    SimpleDialogOption(
+                                        child: Text("all Courses"),
+                                        onPressed: () {
+                                          setState(() {
+                                            selectedText = " ";
+                                          });
+                                          Navigator.pop(context);
+                                        }),
+                                    SimpleDialogOption(
+                                        child: Text("Mte"),
+                                        onPressed: () {
+                                          setState(() {
+                                            selectedText = "mte";
+                                          });
+                                          Navigator.pop(context);
+                                        }),
+                                    SimpleDialogOption(
+                                        child: Text("Master"),
+                                        onPressed: () {
+                                          setState(() {
+                                            selectedText = "medium";
+                                          });
+                                          Navigator.pop(context);
+                                        }),
+                                    SimpleDialogOption(
+                                        child: Text("Expert"),
+                                        onPressed: () {
+                                          setState(() {
+                                            selectedText = "expert";
+                                          });
+                                          Navigator.pop(context);
+                                        }),
+                                    SimpleDialogOption(
+                                        child: Text("all Courses"),
+                                        onPressed: () {
+                                          setState(() {
+                                            selectedText = " ";
+                                          });
+                                          Navigator.pop(context);
+                                        }),
+                                    SimpleDialogOption(
+                                        child: Text("Mte"),
+                                        onPressed: () {
+                                          setState(() {
+                                            selectedText = "mte";
+                                          });
+                                          Navigator.pop(context);
+                                        }),
+                                    SimpleDialogOption(
+                                        child: Text("Master"),
+                                        onPressed: () {
+                                          setState(() {
+                                            selectedText = "medium";
+                                          });
+                                          Navigator.pop(context);
+                                        }),
+                                    SimpleDialogOption(
+                                        child: Text("Expert"),
+                                        onPressed: () {
+                                          setState(() {
+                                            selectedText = "expert";
+                                          });
+                                          Navigator.pop(context);
+                                        }),
+                                    SimpleDialogOption(
+                                        child: Text("all Courses"),
+                                        onPressed: () {
+                                          setState(() {
+                                            selectedText = " ";
+                                          });
+                                          Navigator.pop(context);
+                                        }),
+                                    SimpleDialogOption(
+                                        child: Text("Mte"),
+                                        onPressed: () {
+                                          setState(() {
+                                            selectedText = "mte";
+                                          });
+                                          Navigator.pop(context);
+                                        }),
+                                    SimpleDialogOption(
+                                        child: Text("Master"),
+                                        onPressed: () {
+                                          setState(() {
+                                            selectedText = "medium";
+                                          });
+                                          Navigator.pop(context);
+                                        }),
+                                    SimpleDialogOption(
+                                        child: Text("Expert"),
+                                        onPressed: () {
+                                          setState(() {
+                                            selectedText = "expert";
+                                          });
+                                          Navigator.pop(context);
+                                        }),
+                                    SimpleDialogOption(
+                                        child: Text("all Courses"),
+                                        onPressed: () {
+                                          setState(() {
+                                            selectedText = " ";
+                                          });
+                                          Navigator.pop(context);
+                                        }),
+                                    SimpleDialogOption(
+                                        child: Text("Mte"),
+                                        onPressed: () {
+                                          setState(() {
+                                            selectedText = "mte";
+                                          });
+                                          Navigator.pop(context);
+                                        }),
+                                    SimpleDialogOption(
+                                        child: Text("Master"),
+                                        onPressed: () {
+                                          setState(() {
+                                            selectedText = "medium";
+                                          });
+                                          Navigator.pop(context);
+                                        }),
+                                    SimpleDialogOption(
+                                        child: Text("Expert"),
+                                        onPressed: () {
+                                          setState(() {
+                                            selectedText = "expert";
+                                          });
+                                          Navigator.pop(context);
+                                        }),
+                                    SimpleDialogOption(
+                                        child: Text("all Courses"),
+                                        onPressed: () {
+                                          setState(() {
+                                            selectedText = " ";
+                                          });
+                                          Navigator.pop(context);
+                                        }),
+                                    SimpleDialogOption(
+                                        child: Text("Mte"),
+                                        onPressed: () {
+                                          setState(() {
+                                            selectedText = "mte";
+                                          });
+                                          Navigator.pop(context);
+                                        }),
+                                    SimpleDialogOption(
+                                        child: Text("Master"),
+                                        onPressed: () {
+                                          setState(() {
+                                            selectedText = "medium";
+                                          });
+                                          Navigator.pop(context);
+                                        }),
+                                    SimpleDialogOption(
+                                        child: Text("Expert"),
+                                        onPressed: () {
+                                          setState(() {
+                                            selectedText = "expert";
+                                          });
+                                          Navigator.pop(context);
+                                        }),
+                                    SimpleDialogOption(
+                                        child: Text("all Courses"),
+                                        onPressed: () {
+                                          setState(() {
+                                            selectedText = " ";
+                                          });
+                                          Navigator.pop(context);
+                                        }),
+                                    SimpleDialogOption(
+                                        child: Text("Mte"),
+                                        onPressed: () {
+                                          setState(() {
+                                            selectedText = "mte";
+                                          });
+                                          Navigator.pop(context);
+                                        }),
+                                    SimpleDialogOption(
+                                        child: Text("Master"),
+                                        onPressed: () {
+                                          setState(() {
+                                            selectedText = "medium";
+                                          });
+                                          Navigator.pop(context);
+                                        }),
+                                    SimpleDialogOption(
+                                        child: Text("Expert"),
+                                        onPressed: () {
+                                          setState(() {
+                                            selectedText = "expert";
+                                          });
+                                          Navigator.pop(context);
+                                        }),
                                   ],
                                 ),
                               ),
@@ -307,35 +531,43 @@ class _SearchScreenState extends State<SearchScreen> {
                           itemCount: (snapshot.data! as dynamic).docs.length,
                           itemBuilder: (context, index) => Align(
                             alignment: Alignment.topLeft,
-                            child: Container(
-                              color: Colors.white,
-                              child: Column(
-                                children: [
-                                  CircleAvatar(
-                                    backgroundImage: NetworkImage(
-                                      (snapshot.data! as dynamic)
-                                          .docs[index]['photoUrl']
-                                          .toString(),
+                            child: (double.parse((snapshot.data! as dynamic)
+                                        .docs[index]['distance']
+                                        .toString()) <=
+                                    50)
+                                ? Container(
+                                    color: Colors.white,
+                                    child: Column(
+                                      children: [
+                                        CircleAvatar(
+                                          backgroundImage: NetworkImage(
+                                            (snapshot.data! as dynamic)
+                                                .docs[index]['photoUrl']
+                                                .toString(),
+                                          ),
+                                          radius: 40,
+                                        ),
+                                        Text(
+                                            (snapshot.data! as dynamic)
+                                                .docs[index]['username']
+                                                .toString(),
+                                            style: TextStyle(
+                                                color: Color(0xFF000000),
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w700,
+                                                fontFamily: 'Roboto')),
+                                        // Text(
+                                        //   (snapshot.data! as dynamic)
+                                        //       .docs[index]['university']
+                                        //       .toString(),
+                                        // )
+                                      ],
                                     ),
-                                    radius: 40,
-                                  ),
-                                  Text(
-                                      (snapshot.data! as dynamic)
-                                          .docs[index]['username']
-                                          .toString(),
-                                      style: TextStyle(
-                                          color: Color(0xFF000000),
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w700,
-                                          fontFamily: 'Roboto')),
-                                  // Text(
-                                  //   (snapshot.data! as dynamic)
-                                  //       .docs[index]['university']
-                                  //       .toString(),
-                                  // )
-                                ],
-                              ),
-                            ),
+                                  )
+                                : Container(
+                                    height: 50,
+                                    child: Text(
+                                        " Ladki dhoondo aur patak ke chodho")),
                           ),
                         );
                       },

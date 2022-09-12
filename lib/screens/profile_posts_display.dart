@@ -165,7 +165,10 @@ class _PostProfileLinearDisplayState extends State<PostProfileLinearDisplay> {
                             DocumentSnapshot snap =
                                 (snapshot.data! as dynamic).docs[index];
 
-                            return PostCard(snap: snap);
+                            return PostCard(
+                              snap: snap,
+                              onshareingbtnPressed: () {},
+                            );
                           },
                         );
                       },
