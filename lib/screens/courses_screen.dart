@@ -57,8 +57,13 @@ class _Course_screenState extends State<Course_screen> {
                     Padding(
                       padding: const EdgeInsets.only(
                           right: 40, top: 30, bottom: 20, left: 40),
-                      child: RaisedButton(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
                         padding: EdgeInsets.all(15),
+                       backgroundColor: Color(0xFF262626),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50)),
+                        ),
                         onPressed: () async {
                           FilePickerResult? result = await FilePicker.platform
                               .pickFiles(
@@ -131,9 +136,9 @@ class _Course_screenState extends State<Course_screen> {
                                 style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold)),
-                        color: Color(0xFF262626),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(50)),
+                        // color: Color(0xFF262626),
+                        // shape: RoundedRectangleBorder(
+                        //     borderRadius: BorderRadius.circular(50)),
                       ),
                     ),
                     Padding(

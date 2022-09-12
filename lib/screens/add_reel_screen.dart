@@ -180,11 +180,13 @@ class _AddReelsScreenState extends State<AddReelsScreen> {
               Positioned(
                   bottom: 20,
                   right: 20,
-                  child: RaisedButton(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
                     padding: EdgeInsets.symmetric(horizontal: 30),
                     elevation: 0,
+                    backgroundColor: btnCOlorblue,
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8)),
+                        borderRadius: BorderRadius.circular(8)),),
                     onPressed: () {
                       setState(() {
                         postReels(
@@ -201,7 +203,7 @@ class _AddReelsScreenState extends State<AddReelsScreen> {
                             fontSize: 12,
                             color: Color(0xFFFFFFFF),
                             fontWeight: FontWeight.bold)),
-                    color: btnCOlorblue,
+                    // color: btnCOlorblue,
                   )),
               isLoading
                   ? const LinearProgressIndicator()
