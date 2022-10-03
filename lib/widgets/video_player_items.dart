@@ -21,7 +21,7 @@ class _VideoPlayerItemState extends State<VideoPlayerItem> {
     super.initState();
     videoPlayerController = VideoPlayerController.network(widget.videoUrl)
       ..initialize().then((value) {
-        videoPlayerController.pause();
+        videoPlayerController.play();
         videoPlayerController.setVolume(1);
         videoPlayerController.setLooping(true);
       });
@@ -43,7 +43,7 @@ class _VideoPlayerItemState extends State<VideoPlayerItem> {
       decoration: const BoxDecoration(
         color: Colors.black,
       ),
-      child: VideoPlayer(videoPlayerController),
+      child: Stack(children: [VideoPlayer(videoPlayerController)]),
     );
   }
 }

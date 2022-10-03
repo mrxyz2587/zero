@@ -293,7 +293,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Scaffold (
       backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(

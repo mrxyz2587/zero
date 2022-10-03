@@ -19,8 +19,9 @@ class _VideoPlayerSearchState extends State<VideoPlayerSearch> {
   @override
   void initState() {
     super.initState();
-    videoPlayerController = VideoPlayerController.network(widget.videoUrl)
-      ..initialize().then((value) {
+    videoPlayerController = VideoPlayerController.network(
+      widget.videoUrl,
+    )..initialize().then((value) {
         videoPlayerController.play();
         videoPlayerController.setVolume(0);
         videoPlayerController.setLooping(true);
@@ -46,7 +47,7 @@ class _VideoPlayerSearchState extends State<VideoPlayerSearch> {
         width: size.width,
         height: size.height,
         decoration: const BoxDecoration(
-          color: Colors.black,
+          color: Color(0xFFF6F6F6),
         ),
         child: VideoPlayer(videoPlayerController),
       ),

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ffi';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -41,16 +40,17 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Color(0xFFEFEFEF),
+        backgroundColor: Colors.white,
         appBar: AppBar(
+          elevation: 0.5,
           backgroundColor: mobileBackgroundColor,
           title: TextFormField(
             controller: searchController,
             decoration: InputDecoration(
-              suffixIcon: Icon(
-                FontAwesomeIcons.magnifyingGlass,
-                color: Colors.black54,
-              ),
+              // suffixIcon: Icon(
+              //   FontAwesomeIcons.magnifyingGlass,
+              //   color: Colors.black54,
+              // ),
               isDense: true,
               isCollapsed: true,
               filled: true,
@@ -71,7 +71,7 @@ class _SearchScreenState extends State<SearchScreen> {
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
                 borderSide: BorderSide(
-                  color: Color(0xFFDFDFDF),
+                  color: Color(0xFFFFFFFF),
                   width: 1,
                 ),
               ),
@@ -123,31 +123,32 @@ class _SearchScreenState extends State<SearchScreen> {
                           builder: (context) {
                             return Dialog(
                               child: SingleChildScrollView(
-                                child: Column(children:[                                    SimpleDialogOption(
-                                    child: Text("all Courses"),
-                                    onPressed: () {
-                                      setState(() {
-                                        selectedText = " ";
-                                      });
-                                      Navigator.pop(context);
-                                    }),
+                                child: Column(children: [
+                                  SimpleDialogOption(
+                                      child: Text("all Courses"),
+                                      onPressed: () {
+                                        setState(() {
+                                          selectedText = " ";
+                                        });
+                                        Navigator.pop(context);
+                                      }),
                                   SimpleDialogOption(
                                       child: Text(
                                           "Computer Sciences & Engineering"),
                                       onPressed: () {
                                         setState(() {
                                           selectedText =
-                                          "Computer Sciences & Engineering";
+                                              "Computer Sciences & Engineering";
                                         });
                                         Navigator.pop(context);
                                       }),
                                   SimpleDialogOption(
                                       child:
-                                      Text("Civil & Petroleum Engineering"),
+                                          Text("Civil & Petroleum Engineering"),
                                       onPressed: () {
                                         setState(() {
                                           selectedText =
-                                          "Civil & Petroleum Engineering";
+                                              "Civil & Petroleum Engineering";
                                         });
                                         Navigator.pop(context);
                                       }),
@@ -156,7 +157,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                       onPressed: () {
                                         setState(() {
                                           selectedText =
-                                          "Mechanical  Engineering";
+                                              "Mechanical  Engineering";
                                         });
                                         Navigator.pop(context);
                                       }),
@@ -166,7 +167,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                       onPressed: () {
                                         setState(() {
                                           selectedText =
-                                          "Electrical & Electronics Engineering";
+                                              "Electrical & Electronics Engineering";
                                         });
                                         Navigator.pop(context);
                                       }),
@@ -175,7 +176,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                       onPressed: () {
                                         setState(() {
                                           selectedText =
-                                          "Computer Applications";
+                                              "Computer Applications";
                                         });
                                         Navigator.pop(context);
                                       }),
@@ -184,7 +185,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                       onPressed: () {
                                         setState(() {
                                           selectedText =
-                                          "Business Administration";
+                                              "Business Administration";
                                         });
                                         Navigator.pop(context);
                                       }),
@@ -222,11 +223,11 @@ class _SearchScreenState extends State<SearchScreen> {
                                       }),
                                   SimpleDialogOption(
                                       child:
-                                      Text("Humanities & Social Sciences"),
+                                          Text("Humanities & Social Sciences"),
                                       onPressed: () {
                                         setState(() {
                                           selectedText =
-                                          "Humanities & Social Sciences";
+                                              "Humanities & Social Sciences";
                                         });
                                         Navigator.pop(context);
                                       }),
@@ -235,7 +236,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                       onPressed: () {
                                         setState(() {
                                           selectedText =
-                                          "Hospitality & Tourism";
+                                              "Hospitality & Tourism";
                                         });
                                         Navigator.pop(context);
                                       }),
@@ -260,7 +261,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                       onPressed: () {
                                         setState(() {
                                           selectedText =
-                                          "Applied Medical Sciences";
+                                              "Applied Medical Sciences";
                                         });
                                         Navigator.pop(context);
                                       }),
@@ -272,7 +273,6 @@ class _SearchScreenState extends State<SearchScreen> {
                                         });
                                         Navigator.pop(context);
                                       }),
-
                                 ]),
                               ),
                             );
@@ -405,7 +405,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       ),
                     ],
                   )
-                : ListView(scrollDirection: Axis.vertical, children: [
+                : ListView(children: [
                     StreamBuilder(
                       stream: FirebaseFirestore.instance
                           .collection('users')
@@ -426,33 +426,65 @@ class _SearchScreenState extends State<SearchScreen> {
                                         .docs[index]['distance']
                                         .toString()) <=
                                     50)
-                                ? Container(
-                                    color: Colors.white,
-                                    child: Column(
-                                      children: [
-                                        CircleAvatar(
-                                          backgroundImage: NetworkImage(
-                                            (snapshot.data! as dynamic)
-                                                .docs[index]['photoUrl']
-                                                .toString(),
+                                ? Padding(
+                                    padding: const EdgeInsets.only(
+                                      top: 20,
+                                      left: 20.0,
+                                      bottom: 15,
+                                    ),
+                                    child: Container(
+                                      color: Colors.white,
+                                      padding: EdgeInsets.all(4),
+                                      child: Column(
+                                        children: [
+                                          Stack(
+                                            children: [
+                                              CircleAvatar(
+                                                backgroundImage: NetworkImage(
+                                                  (snapshot.data! as dynamic)
+                                                      .docs[index]['photoUrl']
+                                                      .toString(),
+                                                ),
+                                                radius: 30,
+                                              ),
+                                              Positioned(
+                                                bottom: 3,
+                                                right: 6,
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                      color: btnCOlorblue,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                      border: Border.all(
+                                                          color: Colors.white,
+                                                          width: 1)),
+                                                  constraints:
+                                                      BoxConstraints.tight(
+                                                          Size.fromRadius(5)),
+                                                ),
+                                              )
+                                            ],
                                           ),
-                                          radius: 40,
-                                        ),
-                                        Text(
-                                            (snapshot.data! as dynamic)
-                                                .docs[index]['username']
-                                                .toString(),
-                                            style: TextStyle(
-                                                color: Color(0xFF000000),
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.w700,
-                                                fontFamily: 'Roboto')),
-                                        // Text(
-                                        //   (snapshot.data! as dynamic)
-                                        //       .docs[index]['university']
-                                        //       .toString(),
-                                        // )
-                                      ],
+                                          SizedBox(
+                                            height: 10,
+                                          ),
+                                          Text(
+                                              (snapshot.data! as dynamic)
+                                                  .docs[index]['username']
+                                                  .toString(),
+                                              style: TextStyle(
+                                                  color: Color(0xFF000000),
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.w700,
+                                                  fontFamily: 'Roboto')),
+                                          // Text(
+                                          //   (snapshot.data! as dynamic)
+                                          //       .docs[index]['university']
+                                          //       .toString(),
+                                          // )
+                                        ],
+                                      ),
                                     ),
                                   )
                                 : Container(
@@ -463,6 +495,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         );
                       },
                     ),
+                    Divider(height: 0.5, thickness: 0.5, color: Colors.black26),
                     FutureBuilder(
                       future: FirebaseFirestore.instance
                           .collection('reels')
@@ -481,9 +514,11 @@ class _SearchScreenState extends State<SearchScreen> {
                           shrinkWrap: true,
                           crossAxisCount: 3,
                           itemCount: (snapshot.data! as dynamic).docs.length,
-                          itemBuilder: (context, index) => VideoPlayerSearch(
-                            videoUrl: (snapshot.data! as dynamic).docs[index]
-                                ['reelUrl'],
+                          itemBuilder: (context, index) => Container(
+                            child: VideoPlayerSearch(
+                              videoUrl: (snapshot.data! as dynamic).docs[index]
+                                  ['reelUrl'],
+                            ),
                           ),
                           staggeredTileBuilder: (index) =>
                               MediaQuery.of(context).size.width > webScreenSize
@@ -493,8 +528,8 @@ class _SearchScreenState extends State<SearchScreen> {
                                   : StaggeredTile.count(
                                       (index % 7 == 0) ? 2 : 1,
                                       (index % 7 == 0) ? 2 : 1),
-                          mainAxisSpacing: 8.0,
-                          crossAxisSpacing: 8.0,
+                          mainAxisSpacing: 2.0,
+                          crossAxisSpacing: 2.0,
                         );
                       },
                     ),
