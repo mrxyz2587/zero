@@ -6,8 +6,10 @@ import 'package:zero_fin/screens/reels_screen.dart';
 
 class VideoPlayerSearch extends StatefulWidget {
   final String videoUrl;
-
-  const VideoPlayerSearch({Key? key, required this.videoUrl}) : super(key: key);
+  const VideoPlayerSearch({
+    Key? key,
+    required this.videoUrl,
+  }) : super(key: key);
 
   @override
   _VideoPlayerSearchState createState() => _VideoPlayerSearchState();

@@ -2,7 +2,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:zero_fin/screens/search_screen.dart';
 import 'package:zero_fin/utils/colors.dart';
 
-import '/Authenticate/Methods.dart';
 import '/Screens/ChatRoom.dart';
 import '/group_chats/group_chat_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

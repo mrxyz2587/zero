@@ -405,134 +405,156 @@ class _SearchScreenState extends State<SearchScreen> {
                       ),
                     ],
                   )
-                : ListView(children: [
-                    StreamBuilder(
-                      stream: FirebaseFirestore.instance
-                          .collection('users')
-                          .snapshots(),
-                      builder: (context, snapshot) {
-                        if (!snapshot.hasData) {
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        }
+                : ListView(
+                    scrollDirection: Axis.vertical,
+                    children: [
+                      Align(
+                          alignment: Alignment.topLeft,
+                          child: Container(
+                            child: Text(
+                              "Nearby Buddies",
+                              style: TextStyle(
+                                  color: Colors.black54,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w700,
+                                  fontFamily: "Comfortaa"),
+                            ),
+                            padding:
+                                EdgeInsets.only(left: 22, top: 15, bottom: 5),
+                          )),
+                      StreamBuilder(
+                        stream: FirebaseFirestore.instance
+                            .collection('users')
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
 
-                        return ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: (snapshot.data! as dynamic).docs.length,
-                          itemBuilder: (context, index) => Align(
-                            alignment: Alignment.topLeft,
-                            child: (double.parse((snapshot.data! as dynamic)
-                                        .docs[index]['distance']
-                                        .toString()) <=
-                                    50)
-                                ? Padding(
-                                    padding: const EdgeInsets.only(
-                                      top: 20,
-                                      left: 20.0,
-                                      bottom: 15,
-                                    ),
-                                    child: Container(
-                                      color: Colors.white,
-                                      padding: EdgeInsets.all(4),
-                                      child: Column(
-                                        children: [
-                                          Stack(
+                          return SizedBox(
+                            height: 110,
+                            width: MediaQuery.of(context).size.width,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              controller:
+                                  ScrollController(keepScrollOffset: true),
+                              shrinkWrap: true,
+                              itemCount:
+                                  (snapshot.data! as dynamic).docs.length,
+                              itemBuilder: (context, index) => (double.parse(
+                                          (snapshot.data! as dynamic)
+                                              .docs[index]['distance']
+                                              .toString()) <=
+                                      50)
+                                  ? Align(
+                                      alignment: Alignment.topLeft,
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(
+                                            top: 10, left: 20.0, bottom: 5),
+                                        child: Container(
+                                          color: Colors.white,
+                                          padding: EdgeInsets.all(4),
+                                          child: Column(
                                             children: [
-                                              CircleAvatar(
-                                                backgroundImage: NetworkImage(
-                                                  (snapshot.data! as dynamic)
-                                                      .docs[index]['photoUrl']
-                                                      .toString(),
-                                                ),
-                                                radius: 30,
+                                              Stack(
+                                                children: [
+                                                  CircleAvatar(
+                                                    backgroundImage:
+                                                        NetworkImage(
+                                                      (snapshot.data!
+                                                              as dynamic)
+                                                          .docs[index]
+                                                              ['photoUrl']
+                                                          .toString(),
+                                                    ),
+                                                    radius: 30,
+                                                  ),
+                                                  Positioned(
+                                                    bottom: 3,
+                                                    right: 6,
+                                                    child: Container(
+                                                      decoration: BoxDecoration(
+                                                          color: btnCOlorblue,
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(10),
+                                                          border: Border.all(
+                                                              color:
+                                                                  Colors.white,
+                                                              width: 1)),
+                                                      constraints:
+                                                          BoxConstraints.tight(
+                                                              Size.fromRadius(
+                                                                  5)),
+                                                    ),
+                                                  )
+                                                ],
                                               ),
-                                              Positioned(
-                                                bottom: 3,
-                                                right: 6,
-                                                child: Container(
-                                                  decoration: BoxDecoration(
-                                                      color: btnCOlorblue,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      border: Border.all(
-                                                          color: Colors.white,
-                                                          width: 1)),
-                                                  constraints:
-                                                      BoxConstraints.tight(
-                                                          Size.fromRadius(5)),
-                                                ),
-                                              )
+                                              SizedBox(
+                                                height: 8,
+                                              ),
+                                              Text(
+                                                  (snapshot.data! as dynamic)
+                                                      .docs[index]['username']
+                                                      .toString(),
+                                                  style: TextStyle(
+                                                      color: Color(0xFF000000),
+                                                      fontSize: 10,
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                      fontFamily: 'Roboto')),
                                             ],
                                           ),
-                                          SizedBox(
-                                            height: 10,
-                                          ),
-                                          Text(
-                                              (snapshot.data! as dynamic)
-                                                  .docs[index]['username']
-                                                  .toString(),
-                                              style: TextStyle(
-                                                  color: Color(0xFF000000),
-                                                  fontSize: 10,
-                                                  fontWeight: FontWeight.w700,
-                                                  fontFamily: 'Roboto')),
-                                          // Text(
-                                          //   (snapshot.data! as dynamic)
-                                          //       .docs[index]['university']
-                                          //       .toString(),
-                                          // )
-                                        ],
+                                        ),
                                       ),
-                                    ),
-                                  )
-                                : Container(
-                                    height: 50,
-                                    child: Text(
-                                        " Ladki dhoondo aur patak ke chodho")),
-                          ),
-                        );
-                      },
-                    ),
-                    Divider(height: 0.5, thickness: 0.5, color: Colors.black26),
-                    FutureBuilder(
-                      future: FirebaseFirestore.instance
-                          .collection('reels')
-                          .where(
-                            'reelId',
-                          )
-                          .get(),
-                      builder: (context, snapshot) {
-                        if (!snapshot.hasData) {
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        }
-
-                        return StaggeredGridView.countBuilder(
-                          shrinkWrap: true,
-                          crossAxisCount: 3,
-                          itemCount: (snapshot.data! as dynamic).docs.length,
-                          itemBuilder: (context, index) => Container(
-                            child: VideoPlayerSearch(
-                              videoUrl: (snapshot.data! as dynamic).docs[index]
-                                  ['reelUrl'],
+                                    )
+                                  : Container(),
                             ),
-                          ),
-                          staggeredTileBuilder: (index) =>
-                              MediaQuery.of(context).size.width > webScreenSize
-                                  ? StaggeredTile.count(
-                                      (index % 7 == 0) ? 1 : 1,
-                                      (index % 7 == 0) ? 1 : 1)
-                                  : StaggeredTile.count(
-                                      (index % 7 == 0) ? 2 : 1,
-                                      (index % 7 == 0) ? 2 : 1),
-                          mainAxisSpacing: 2.0,
-                          crossAxisSpacing: 2.0,
-                        );
-                      },
-                    ),
-                  ]));
+                          );
+                        },
+                      ),
+                      Divider(
+                          height: 0.5, thickness: 0.5, color: Colors.black26),
+                      FutureBuilder(
+                        future: FirebaseFirestore.instance
+                            .collection('reels')
+                            .where(
+                              'reelId',
+                            )
+                            .get(),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+
+                          return StaggeredGridView.countBuilder(
+                            shrinkWrap: true,
+                            crossAxisCount: 3,
+                            itemCount: (snapshot.data! as dynamic).docs.length,
+                            itemBuilder: (context, index) => Container(
+                              child: VideoPlayerSearch(
+                                  videoUrl: (snapshot.data! as dynamic)
+                                      .docs[index]['reelUrl'],),
+                            ),
+                            staggeredTileBuilder: (index) =>
+                                MediaQuery.of(context).size.width >
+                                        webScreenSize
+                                    ? StaggeredTile.count(
+                                        (index % 7 == 0) ? 1 : 1,
+                                        (index % 7 == 0) ? 1 : 1)
+                                    : StaggeredTile.count(
+                                        (index % 7 == 0) ? 2 : 1,
+                                        (index % 7 == 0) ? 2 : 1),
+                            mainAxisSpacing: 2.0,
+                            crossAxisSpacing: 2.0,
+                          );
+                        },
+                      ),
+                    ],
+                  ));
   }
 }
