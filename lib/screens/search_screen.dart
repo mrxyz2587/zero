@@ -407,6 +407,8 @@ class _SearchScreenState extends State<SearchScreen> {
                   )
                 : ListView(
                     scrollDirection: Axis.vertical,
+                    shrinkWrap: true,
+                    physics: ClampingScrollPhysics(),
                     children: [
                       Align(
                           alignment: Alignment.topLeft,
@@ -437,6 +439,7 @@ class _SearchScreenState extends State<SearchScreen> {
                             height: 110,
                             width: MediaQuery.of(context).size.width,
                             child: ListView.builder(
+                              physics: ClampingScrollPhysics(),
                               scrollDirection: Axis.horizontal,
                               controller:
                                   ScrollController(keepScrollOffset: true),
@@ -537,8 +540,9 @@ class _SearchScreenState extends State<SearchScreen> {
                             itemCount: (snapshot.data! as dynamic).docs.length,
                             itemBuilder: (context, index) => Container(
                               child: VideoPlayerSearch(
-                                  videoUrl: (snapshot.data! as dynamic)
-                                      .docs[index]['reelUrl'],),
+                                videoUrl: (snapshot.data! as dynamic)
+                                    .docs[index]['reelUrl'],
+                              ),
                             ),
                             staggeredTileBuilder: (index) =>
                                 MediaQuery.of(context).size.width >

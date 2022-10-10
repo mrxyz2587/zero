@@ -292,10 +292,13 @@ class _FeedScreenState extends State<FeedScreen> {
                             child: ClipRRect(
                                 borderRadius: BorderRadius.circular(10),
                                 child: Image.network(
-                                    snapshot.data!.docs[itemIndex]
-                                        .data()["imageUrl"]
-                                        .toString(),
-                                    fit: BoxFit.fill)),
+                                        snapshot.data!.docs[itemIndex]
+                                            .data()["imageUrl"]
+                                            .toString(),
+                                        fit: BoxFit.fill) ??
+                                    Image.asset("images/logo.jpeg",
+                                        fit: BoxFit.fill
+                                    )),
                           ),
                         ),
                         // imageUrls.map((i) {

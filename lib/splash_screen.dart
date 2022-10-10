@@ -67,13 +67,17 @@ class _SplashState extends State<Splash> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            Expanded(child: SizedBox()),
             Container(
-              height: MediaQuery.of(context).size.height * 0.8,
               padding:
                   EdgeInsets.all(MediaQuery.of(context).size.longestSide / 9),
               child: Image(
+                height: 110,
+                width: 110,
                 fit: BoxFit.scaleDown,
-                image: AssetImage('images/zero_logo.png'),
+                image: AssetImage(
+                  'images/zero_logo.png',
+                ),
               ),
             ),
             Expanded(child: SizedBox()),

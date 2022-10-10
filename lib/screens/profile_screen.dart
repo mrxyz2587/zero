@@ -7,7 +7,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -16,7 +15,7 @@ import 'package:zero_fin/screens/profile_posts_display.dart';
 import 'package:zero_fin/widgets/text_field_input.dart';
 import '../providers/user_provider.dart';
 import '../widgets/like_animation.dart';
-import '../widgets/post_card.dart';
+import '../widgets/videoplayersearch.dart';
 import '/resources/auth_methods.dart';
 import '/resources/firestore_methods.dart';
 import '/screens/login_screen.dart';
@@ -39,7 +38,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   var userData = {};
   var name;
   OverlayEntry? _popupDialog;
-  final TextEditingController _nameControlee = TextEditingController();
+  // final TextEditingController _nameControlee = TextEditingController();
   final TextEditingController bioCOntrolee = TextEditingController();
   var postData = {};
   int postLen = 0;
@@ -55,6 +54,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   bool isDispAllPost = true;
   bool isDispSavedPostt = false;
+
+  final _controllername = TextEditingController();
 
   @override
   void initState() {
@@ -116,309 +117,259 @@ class _ProfileScreenState extends State<ProfileScreen> {
               strokeWidth: 1.5,
             )),
           )
-        : ScreenUtilInit(
-            designSize: const Size(360, 690),
-            minTextAdapt: true,
-            splitScreenMode: true,
-            builder: (context, child) {
-              return Scaffold(
-                backgroundColor: Colors.white,
-                body: ListView(
+        : Scaffold(
+            backgroundColor: Colors.white,
+            body: ListView(
+              children: [
+                Stack(
                   children: [
-                    Stack(
-                      children: [
-                        Container(
-                          height: 150.h,
-                          color: Colors.grey.shade200,
-                          width: double.infinity,
-                          child: Image.network(
-                            'https://www.insidesport.in/wp-content/uploads/2021/04/016_WM37_04102021CG_01753-290270b6e5fecca96e9e57bf0cb1fe50.jpg',
-                            fit: BoxFit.cover,
-                            filterQuality: FilterQuality.high,
-                          ),
+                    Container(
+                      height: 140,
+                      color: Colors.grey.shade200,
+                      width: double.infinity,
+                      child: Image.network(
+                        'https://www.insidesport.in/wp-content/uploads/2021/04/016_WM37_04102021CG_01753-290270b6e5fecca96e9e57bf0cb1fe50.jpg',
+                        fit: BoxFit.cover,
+                        filterQuality: FilterQuality.high,
+                      ),
+                    ),
+                    Positioned(
+                      left: 20,
+                      top: 20,
+                      bottom: 20,
+                      child: CircleAvatar(
+                        backgroundColor: Colors.white,
+                        radius: 53,
+                        child: Stack(
+                          children: [
+                            CircleAvatar(
+                              maxRadius: 48,
+                              backgroundImage: NetworkImage(
+                                userData['photoUrl'],
+                              ),
+                            ),
+                            if (FirebaseAuth.instance.currentUser!.uid ==
+                                widget.uid)
+                              Positioned(
+                                  right: 0,
+                                  bottom: 5,
+                                  child: CircleAvatar(
+                                      backgroundColor: Colors.white,
+                                      child: Center(
+                                        child: Icon(
+                                          FontAwesomeIcons.plus,
+                                          color: Colors.black,
+                                          size: 18,
+                                        ),
+                                      ),
+                                      radius: 12)),
+                          ],
                         ),
-                        Positioned(
-                          left: 20.w,
-                          top: 20.h,
-                          bottom: 20.h,
+                      ),
+                    ),
+                    if (FirebaseAuth.instance.currentUser!.uid == widget.uid)
+                      Positioned(
+                        right: 20,
+                        top: 15,
+                        child: GestureDetector(
+                          onTap: () {},
                           child: CircleAvatar(
                             backgroundColor: Colors.white,
-                            radius: 53.r,
-                            child: Stack(
-                              children: [
-                                CircleAvatar(
-                                  maxRadius: 50.r,
-                                  backgroundImage: NetworkImage(
-                                    userData['photoUrl'],
-                                  ),
+                            radius: 18,
+                            child: CircleAvatar(
+                                backgroundColor: Color(0xFFFFA100),
+                                child: Icon(
+                                  Icons.create,
+                                  color: Colors.white,
                                 ),
-                                if (FirebaseAuth.instance.currentUser!.uid ==
-                                    widget.uid)
-                                  Positioned(
-                                      right: 0,
-                                      bottom: 5,
-                                      child: CircleAvatar(
-                                          backgroundColor: Colors.white,
-                                          child: Center(
-                                            child: Icon(
-                                              FontAwesomeIcons.plus,
-                                              color: Colors.black,
-                                              size: 18,
-                                            ),
-                                          ),
-                                          radius: 12)),
-                              ],
-                            ),
+                                radius: 16),
                           ),
                         ),
-                        if (FirebaseAuth.instance.currentUser!.uid ==
-                            widget.uid)
-                          Positioned(
-                            right: 20.w,
-                            top: 15.h,
-                            child: GestureDetector(
-                              onTap: () {},
-                              child: CircleAvatar(
-                                backgroundColor: Colors.white,
-                                radius: 18.r,
-                                child: CircleAvatar(
-                                    backgroundColor: Color(0xFFFFA100),
-                                    child: Icon(
-                                      Icons.create,
-                                      color: Colors.white,
-                                    ),
-                                    radius: 16.r),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(
-                          top: 14, left: 20, right: 20, bottom: 4.5),
-                      child: Row(
+                      ),
+                  ],
+                ),
+                Padding(
+                  padding: EdgeInsets.only(
+                      top: 14, left: 27, right: 27, bottom: 4.5),
+                  child: Row(
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Text(
-                                userData['username'],
-                                style: TextStyle(
-                                    color: Colors.black87,
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 18.sp),
-                              ),
-                              Text('Quantum University, Roorkee',
-                                  style: TextStyle(
-                                      fontSize: 12.sp, color: Colors.black)),
-                            ],
+                          Text(
+                            userData['username'],
+                            style: TextStyle(
+                                color: Colors.black87,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 18),
                           ),
-                          Expanded(child: SizedBox()),
-                          FirebaseAuth.instance.currentUser!.uid == widget.uid
-                              ? OutlinedButton(
-                                  style: OutlinedButton.styleFrom(
-                                      fixedSize: Size.fromHeight(30),
-                                      minimumSize: Size.zero,
-                                      padding:
-                                          EdgeInsets.symmetric(horizontal: 10),
-                                      side: BorderSide(
-                                          width: 1, color: Colors.black54),
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(7.r))),
-                                  onPressed: () {
-                                    showModalBottomSheet(
-                                        context: context,
-                                        builder: (BuildContext ctx) {
-                                          return Container(
-                                            color:
-                                                Colors.black.withOpacity(0.1),
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                  color: Colors.white,
-                                                  borderRadius:
-                                                      BorderRadius.only(
-                                                          topRight:
-                                                              Radius.circular(
-                                                                  5),
-                                                          topLeft:
-                                                              Radius.circular(
-                                                                  5))),
-                                              padding: EdgeInsets.symmetric(
-                                                horizontal: 5,
-                                                vertical: 10,
-                                              ),
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8.0),
-                                                child: Column(children: [
-                                                  Row(
-                                                    children: [
-                                                      Text('Name'),
-                                                      Container(
-                                                        width: 250,
-                                                        child: TextFieldInput(
-                                                            textEditingController:
-                                                                _nameControlee,
-                                                            hintText:
-                                                                "change your name",
-                                                            textInputType:
-                                                                TextInputType
-                                                                    .text),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  Row(
-                                                    children: [
-                                                      Text('Bio'),
-                                                      Container(
-                                                        width: 300,
-                                                        child: TextFieldInput(
-                                                            textEditingController:
-                                                                bioCOntrolee,
-                                                            hintText:
-                                                                "change your name",
-                                                            textInputType:
-                                                                TextInputType
-                                                                    .text),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  TextButton(
-                                                    onPressed: () {
-                                                      final docRef =
-                                                          FirebaseFirestore
-                                                              .instance
-                                                              .collection(
-                                                                  "users")
-                                                              .doc(widget.uid);
-                                                      final updates =
-                                                          <String, dynamic>{
-                                                        "username":
-                                                            _nameControlee.text,
-                                                        "bio": bioCOntrolee.text
-                                                      };
-
-                                                      docRef.update(updates).then(
-                                                          (value) => print(
-                                                              "DocumentSnapshot successfully updated!"),
-                                                          onError: (e) => print(
-                                                              "Error updating document $e"));
-                                                    },
-                                                    child: Text('Submit'),
-                                                  )
-                                                ]),
-                                              ),
-                                            ),
-                                          );
-                                        });
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(0),
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Icons.create,
-                                          color: Colors.black54,
-                                          size: 15,
-                                        ),
-                                        Text(
-                                          'Edit',
-                                          style: TextStyle(
-                                              color: Colors.black54,
-                                              fontSize: 12.sp),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                )
-
-                              // FollowButton(
-                              //   text: 'Sign Out',
-                              //   backgroundColor: mobileBackgroundColor,
-                              //   textColor: primaryColor,
-                              //   borderColor: Colors.grey,
-                              //   function: () async {
-                              //     await AuthMethods().signOut();
-                              //     Navigator.of(context).pushReplacement(
-                              //       MaterialPageRoute(
-                              //         builder: (context) => const LoginScreen(),
-                              //       ),
-                              //     );
-                              //   },
-                              // )
-                              : isFollowing
-                                  ? FollowButton(
-                                      iconData: FontAwesomeIcons.userCheck,
-                                      iconColor: Color(0xFF78CD00),
-                                      function: () async {
-                                        await FireStoreMethods().followUser(
-                                          FirebaseAuth
-                                              .instance.currentUser!.uid,
-                                          userData['uid'],
-                                        );
-
-                                        setState(() {
-                                          isFollowing = false;
-                                          followers--;
-                                        });
-                                      },
-                                    )
-                                  : FollowButton(
-                                      iconColor: Colors.black54,
-                                      iconData: FontAwesomeIcons.userPlus,
-                                      function: () async {
-                                        await FireStoreMethods().followUser(
-                                          FirebaseAuth
-                                              .instance.currentUser!.uid,
-                                          userData['uid'],
-                                        );
-
-                                        setState(() {
-                                          isFollowing = true;
-                                          followers++;
-                                        });
-                                      },
-                                    ),
-                          SizedBox(width: 9),
-                          if (FirebaseAuth.instance.currentUser!.uid ==
-                              widget.uid)
-                            GestureDetector(
-                              onTap: () {
+                          Text('Quantum University, Roorkee',
+                              style:
+                                  TextStyle(fontSize: 12, color: Colors.black)),
+                        ],
+                      ),
+                      Expanded(child: SizedBox()),
+                      FirebaseAuth.instance.currentUser!.uid == widget.uid
+                          ? OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                  fixedSize: Size.fromHeight(30),
+                                  minimumSize: Size.zero,
+                                  padding: EdgeInsets.symmetric(horizontal: 10),
+                                  side: BorderSide(
+                                      width: 1, color: Colors.black54),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(7))),
+                              onPressed: () {
                                 showModalBottomSheet(
                                     context: context,
                                     builder: (BuildContext ctx) {
                                       return Container(
                                         color: Colors.black.withOpacity(0.1),
                                         child: Container(
-                                          height: 250,
+                                          height: 300,
                                           decoration: BoxDecoration(
                                               color: Colors.white,
                                               borderRadius: BorderRadius.only(
                                                   topRight: Radius.circular(5),
                                                   topLeft: Radius.circular(5))),
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal: 5,
-                                            vertical: 10,
-                                          ),
+                                          // padding: EdgeInsets.symmetric(
+                                          //   horizontal: 5,
+                                          //   vertical: 10,
+                                          // ),
                                           child: Padding(
                                             padding: const EdgeInsets.all(8.0),
                                             child: Column(children: [
-                                              ListTile(
-                                                onTap: () async {
-                                                  await AuthMethods().signOut();
-                                                  Navigator.of(context)
-                                                      .pushReplacement(
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          const LoginScreen(),
+                                              Row(
+                                                children: [
+                                                  Text('Name'),
+                                                  SizedBox(width: 30),
+                                                  Container(
+                                                    width: 250,
+                                                    child: TextFormField(
+                                                        controller:
+                                                            _controllername,
+                                                        decoration: InputDecoration(
+                                                            hintText: "",
+                                                            labelText: userData[
+                                                                "username"]),
+                                                        keyboardType:
+                                                            TextInputType.text),
+                                                  ),
+                                                ],
+                                              ),
+                                              SizedBox(
+                                                height: 10,
+                                              ),
+                                              Container(
+                                                height: 4,
+                                                width: 30,
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(5),
+                                                  color: Colors.black45,
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.all(15.0),
+                                                child: Row(
+                                                  children: [
+                                                    Text('Bio'),
+                                                    SizedBox(width: 30),
+                                                    Container(
+                                                      width: 260,
+                                                      child: TextFormField(
+                                                        controller:
+                                                            bioCOntrolee,
+                                                        keyboardType:
+                                                            TextInputType.text,
+                                                        maxLines: 5,
+                                                        maxLength: 50,
+                                                        style: TextStyle(
+                                                          fontFamily: 'Roboto',
+                                                          color: Colors.black45,
+                                                        ),
+                                                        cursorColor:
+                                                            Colors.black38,
+                                                        decoration:
+                                                            InputDecoration(
+                                                          isDense: true,
+                                                          contentPadding:
+                                                              EdgeInsets
+                                                                  .symmetric(
+                                                                      horizontal:
+                                                                          20,
+                                                                      vertical:
+                                                                          20),
+                                                          hintText: "",
+                                                          hintStyle:
+                                                              const TextStyle(
+                                                                  color: Color(
+                                                                      0xFFA3A3A3),
+                                                                  fontSize: 15,
+                                                                  fontFamily:
+                                                                      'Roboto'),
+                                                          fillColor:
+                                                              const Color(
+                                                                  0xFFF2F2F2),
+                                                          filled: true,
+                                                          focusedBorder:
+                                                              OutlineInputBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        8),
+                                                            borderSide: BorderSide(
+                                                                color: const Color(
+                                                                    0xFFD9D8D8),
+                                                                width: 1.5),
+                                                          ),
+                                                          enabledBorder:
+                                                              OutlineInputBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10),
+                                                            borderSide:
+                                                                BorderSide(
+                                                              color: Color(
+                                                                  0xFFDFDFDF),
+                                                              width: 1,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
                                                     ),
-                                                  );
+                                                  ],
+                                                ),
+                                              ),
+                                              OutlinedButton(
+                                                style: OutlinedButton.styleFrom(
+                                                    side: BorderSide(
+                                                  color: Colors.lightBlueAccent,
+                                                )),
+                                                onPressed: () {
+                                                  setState(() {
+                                                    final docRef =
+                                                        FirebaseFirestore
+                                                            .instance
+                                                            .collection("users")
+                                                            .doc(widget.uid);
+                                                    final updates =
+                                                        <String, dynamic>{
+                                                      "bio": bioCOntrolee.text
+                                                    };
+
+                                                    docRef.update(updates).then(
+                                                        (value) => print(
+                                                            "DocumentSnapshot successfully updated!"),
+                                                        onError: (e) => print(
+                                                            "Error updating document $e"));
+                                                  });
+                                                  Navigator.pop(context);
                                                 },
-                                                title: Text('Logout'),
+                                                child: Text('Submit'),
                                               )
                                             ]),
                                           ),
@@ -426,478 +377,658 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       );
                                     });
                               },
-                              child: Icon(
-                                FontAwesomeIcons.gear,
-                                color: Colors.black54,
+                              child: Padding(
+                                padding: const EdgeInsets.all(0),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.create,
+                                      color: Colors.black54,
+                                      size: 15,
+                                    ),
+                                    Text(
+                                      'Edit',
+                                      style: TextStyle(
+                                          color: Colors.black54, fontSize: 12),
+                                    ),
+                                  ],
+                                ),
                               ),
                             )
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            flex: 2,
-                            child: Container(
-                              child: Align(
-                                alignment: Alignment.topLeft,
-                                child: Text(
-                                  userData['bio'],
-                                  textAlign: TextAlign.justify,
-                                  style: TextStyle(
-                                      fontSize: 11.sp, color: Colors.black54),
-                                  maxLines: 5,
+
+                          // FollowButton(
+                          //   text: 'Sign Out',
+                          //   backgroundColor: mobileBackgroundColor,
+                          //   textColor: primaryColor,
+                          //   borderColor: Colors.grey,
+                          //   function: () async {
+                          //     await AuthMethods().signOut();
+                          //     Navigator.of(context).pushReplacement(
+                          //       MaterialPageRoute(
+                          //         builder: (context) => const LoginScreen(),
+                          //       ),
+                          //     );
+                          //   },
+                          // )
+                          : isFollowing
+                              ? FollowButton(
+                                  iconData: FontAwesomeIcons.userCheck,
+                                  iconColor: Color(0xFF78CD00),
+                                  function: () async {
+                                    await FireStoreMethods().followUser(
+                                      FirebaseAuth.instance.currentUser!.uid,
+                                      userData['uid'],
+                                    );
+
+                                    setState(() {
+                                      isFollowing = false;
+                                      followers--;
+                                    });
+                                  },
+                                )
+                              : FollowButton(
+                                  iconColor: Colors.black54,
+                                  iconData: FontAwesomeIcons.userPlus,
+                                  function: () async {
+                                    await FireStoreMethods().followUser(
+                                      FirebaseAuth.instance.currentUser!.uid,
+                                      userData['uid'],
+                                    );
+
+                                    setState(() {
+                                      isFollowing = true;
+                                      followers++;
+                                    });
+                                  },
                                 ),
-                              ),
-                            ),
-                          ),
-                          Flexible(
-                              flex: 1,
-                              child: Align(
-                                alignment: Alignment.topRight,
-                                child: OutlinedButton(
-                                  style: OutlinedButton.styleFrom(
-                                      backgroundColor: btnCOlorblue,
-                                      fixedSize: Size.fromWidth(90),
-                                      side: BorderSide(
-                                          width: 1.2, color: btnCOlorblue),
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(7.r))),
-                                  onPressed: () {},
-                                  child: Text(
-                                    userData['designation'],
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 12.sp),
-                                  ),
-                                ),
-                              )),
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      height: 25.sp,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
-                            width: 70.w,
-                            child: Center(
-                                child: buildStatColumn(postLen, "Posts"))),
-                        Container(
-                          height: 50.sp,
-                          color: Colors.black54,
-                          width: 1,
-                        ),
-                        Container(
-                            width: 70.w,
-                            child: Center(
-                                child:
-                                    buildStatColumn(followers, "Followers"))),
-                        Container(
-                          height: 50.sp,
-                          color: Colors.black54,
-                          width: 1,
-                        ),
-                        Container(
-                            width: 70.w,
-                            child: Center(
-                                child:
-                                    buildStatColumn(following, "Following"))),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 25.sp,
-                    ),
-                    Divider(height: 1, thickness: 1, color: Colors.black45),
-                    Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  isDispAllPost = true;
-                                  isDispSavedPostt = false;
+                      SizedBox(width: 9),
+                      if (FirebaseAuth.instance.currentUser!.uid == widget.uid)
+                        GestureDetector(
+                          onTap: () {
+                            showModalBottomSheet(
+                                context: context,
+                                builder: (BuildContext ctx) {
+                                  return Container(
+                                    color: Colors.black.withOpacity(0.1),
+                                    child: Container(
+                                      height: 250,
+                                      decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.only(
+                                              topRight: Radius.circular(5),
+                                              topLeft: Radius.circular(5))),
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 5,
+                                        vertical: 10,
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Column(children: [
+                                          ListTile(
+                                            onTap: () async {
+                                              await AuthMethods().signOut();
+                                              Navigator.of(context)
+                                                  .pushReplacement(
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      const LoginScreen(),
+                                                ),
+                                              );
+                                            },
+                                            title: Text('Logout'),
+                                          )
+                                        ]),
+                                      ),
+                                    ),
+                                  );
                                 });
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.all(6.0),
-                                child: Icon(
-                                  Icons.image,
-                                  color: isDispAllPost
-                                      ? Colors.black
-                                      : Colors.black54,
-                                  size: 26,
-                                ),
-                              ),
+                          },
+                          child: Icon(
+                            FontAwesomeIcons.gear,
+                            color: Colors.black54,
+                          ),
+                        )
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 27.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: Container(
+                          child: Align(
+                            alignment: Alignment.topLeft,
+                            child: Text(
+                              userData['bio'],
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                  fontSize: 11, color: Colors.black54),
+                              maxLines: 5,
                             ),
                           ),
-                          if (FirebaseAuth.instance.currentUser!.uid ==
-                              widget.uid)
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    isDispAllPost = false;
-                                    isDispSavedPostt = true;
-                                    print('saved pressed');
-                                  });
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.all(6.0),
-                                  child: Icon(
-                                    FontAwesomeIcons.solidBookmark,
-                                    color: isDispSavedPostt
-                                        ? Colors.black
-                                        : Colors.black54,
-                                    size: 21,
-                                  ),
-                                ),
+                        ),
+                      ),
+                      Flexible(
+                          flex: 1,
+                          child: Align(
+                            alignment: Alignment.topRight,
+                            child: OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                  backgroundColor: btnCOlorblue,
+                                  fixedSize: Size.fromWidth(90),
+                                  side: BorderSide(
+                                      width: 1.2, color: btnCOlorblue),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(7))),
+                              onPressed: () {},
+                              child: Text(
+                                userData['designation'],
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12),
                               ),
                             ),
-                        ]),
-                    Divider(height: 1, thickness: 1, color: Colors.black45),
-                    if (isDispAllPost)
-                      FutureBuilder(
-                        future: FirebaseFirestore.instance
-                            .collection('posts')
-                            .where('uid', isEqualTo: widget.uid)
-                            .get(),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          }
-
-                          return GridView.builder(
-                            controller:
-                                ScrollController(keepScrollOffset: true),
-                            scrollDirection: Axis.vertical,
-                            shrinkWrap: true,
-                            itemCount: (snapshot.data! as dynamic).docs.length,
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3,
-                              crossAxisSpacing: 1.5,
-                              mainAxisSpacing: 1.5,
-                              childAspectRatio: 1,
-                            ),
-                            itemBuilder: (context, index) {
-                              DocumentSnapshot snap =
-                                  (snapshot.data! as dynamic).docs[index];
-
-                              return GestureDetector(
-                                onLongPress: () {
-                                  showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 8.0, vertical: 160),
-                                          child: Container(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.2,
-                                            decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(10)),
-                                              color: Colors.white,
-                                            ),
-                                            width: MediaQuery.of(context)
-                                                .size
-                                                .width,
-                                            child: Column(children: [
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8.0),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
-                                                  children: [
-                                                    CircleAvatar(
-                                                      maxRadius: 12.r,
-                                                      backgroundImage:
-                                                          NetworkImage(
-                                                        userData['photoUrl'],
-                                                      ),
-                                                    ),
-                                                    SizedBox(width: 10),
-                                                    Text(
-                                                      userData['username']
-                                                          .toString(),
-                                                      style: TextStyle(
-                                                          color: Colors.black,
-                                                          fontSize: 15.sp,
-                                                          fontWeight:
-                                                              FontWeight.w700,
-                                                          fontFamily: 'Roboto'),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                              Expanded(
-                                                child: Container(
-                                                  child: Image.network(
-                                                    snap['postUrl'],
-                                                    width:
-                                                        MediaQuery.of(context)
-                                                            .size
-                                                            .width,
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                ),
-                                              ),
-                                              Material(
-                                                borderRadius: BorderRadius.all(
-                                                    Radius.circular(10)),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceEvenly,
-                                                  children: [
-                                                    LikeAnimation(
-                                                      smallLike: true,
-                                                      isAnimating: false,
-                                                      child: IconButton(
-                                                          icon: isLsoading
-                                                              ? const Icon(
-                                                                  FontAwesomeIcons
-                                                                      .solidHeart,
-                                                                  color: Colors
-                                                                      .red,
-                                                                )
-                                                              : const Icon(
-                                                                  FontAwesomeIcons
-                                                                      .heart,
-                                                                ),
-                                                          onPressed: () {
-                                                            setState(() {
-                                                              !isLsoading;
-                                                            });
-                                                          }),
-                                                    ),
-                                                    IconButton(
-                                                      icon: const Icon(
-                                                        Icons.comment_outlined,
-                                                      ),
-                                                      onPressed: () {},
-                                                    ),
-                                                    GestureDetector(
-                                                        child: Image.asset(
-                                                      'images/share_icons.png',
-                                                      height: 20,
-                                                    )),
-                                                  ],
-                                                ),
-                                              )
-                                            ]),
-                                          ),
-                                        );
-                                      });
-                                },
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              PostProfileLinearDisplay(
-                                                uid: snap['uid'],
-                                              )));
-                                },
-                                child: Container(
-                                  child: Image(
-                                    image: NetworkImage(snap['postUrl']),
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      ),
-                    if (isDispSavedPostt)
-                      FutureBuilder(
-                        future: FirebaseFirestore.instance
-                            .collection('posts')
-                            .where('uid', isEqualTo: widget.uid)
-                            .where('saves',
-                                arrayContains:
-                                    FirebaseAuth.instance.currentUser!.uid)
-                            .get(),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          }
-
-                          return GridView.builder(
-                            controller:
-                                ScrollController(keepScrollOffset: true),
-                            scrollDirection: Axis.vertical,
-                            shrinkWrap: true,
-                            itemCount: (snapshot.data! as dynamic).docs.length,
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3,
-                              crossAxisSpacing: 1.5,
-                              mainAxisSpacing: 1.5,
-                              childAspectRatio: 1,
-                            ),
-                            itemBuilder: (context, index) {
-                              DocumentSnapshot snap =
-                                  (snapshot.data! as dynamic).docs[index];
-
-                              return GestureDetector(
-                                onLongPress: () {
-                                  showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 8.0, vertical: 160),
-                                          child: Container(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.2,
-                                            decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(10)),
-                                              color: Colors.white,
-                                            ),
-                                            width: MediaQuery.of(context)
-                                                .size
-                                                .width,
-                                            child: Column(children: [
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8.0),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
-                                                  children: [
-                                                    CircleAvatar(
-                                                      maxRadius: 12.r,
-                                                      backgroundImage:
-                                                          NetworkImage(
-                                                        userData['photoUrl'],
-                                                      ),
-                                                    ),
-                                                    SizedBox(width: 10),
-                                                    Text(
-                                                      userData['username']
-                                                          .toString(),
-                                                      style: TextStyle(
-                                                          color: Colors.black,
-                                                          fontSize: 15.sp,
-                                                          fontWeight:
-                                                              FontWeight.w700,
-                                                          fontFamily: 'Roboto'),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                              Expanded(
-                                                child: Container(
-                                                  child: Image.network(
-                                                    snap['postUrl'],
-                                                    width:
-                                                        MediaQuery.of(context)
-                                                            .size
-                                                            .width,
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                ),
-                                              ),
-                                              Material(
-                                                borderRadius: BorderRadius.all(
-                                                    Radius.circular(10)),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceEvenly,
-                                                  children: [
-                                                    LikeAnimation(
-                                                      smallLike: true,
-                                                      isAnimating: false,
-                                                      child: IconButton(
-                                                          icon: isLsoading
-                                                              ? const Icon(
-                                                                  FontAwesomeIcons
-                                                                      .solidHeart,
-                                                                  color: Colors
-                                                                      .red,
-                                                                )
-                                                              : const Icon(
-                                                                  FontAwesomeIcons
-                                                                      .heart,
-                                                                ),
-                                                          onPressed: () {
-                                                            setState(() {
-                                                              !isLsoading;
-                                                            });
-                                                          }),
-                                                    ),
-                                                    IconButton(
-                                                      icon: const Icon(
-                                                        Icons.comment_outlined,
-                                                      ),
-                                                      onPressed: () {},
-                                                    ),
-                                                    GestureDetector(
-                                                        child: Image.asset(
-                                                      'images/share_icons.png',
-                                                      height: 20,
-                                                    )),
-                                                  ],
-                                                ),
-                                              )
-                                            ]),
-                                          ),
-                                        );
-                                      });
-                                },
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              PostProfileLinearDisplay(
-                                                uid: snap['uid'],
-                                              )));
-                                },
-                                child: Container(
-                                  child: Image(
-                                    image: NetworkImage(snap['postUrl']),
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      ),
+                          )),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 25,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                        width: 70,
+                        child:
+                            Center(child: buildStatColumn(postLen, "Posts"))),
+                    Container(
+                      height: 50,
+                      color: Colors.black54,
+                      width: 1,
+                    ),
+                    Container(
+                        width: 70,
+                        child: Center(
+                            child: buildStatColumn(followers, "Followers"))),
+                    Container(
+                      height: 50,
+                      color: Colors.black54,
+                      width: 1,
+                    ),
+                    Container(
+                        width: 70,
+                        child: Center(
+                            child: buildStatColumn(following, "Following"))),
                   ],
                 ),
-              );
-            });
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20.0, vertical: 10),
+                  child: StreamBuilder(
+                    stream: FirebaseFirestore.instance
+                        .collection('reels')
+                        .where("uid", isEqualTo: widget.uid)
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      } else {}
+                      if ((snapshot.data! as dynamic).docs.length > 0) {
+                        return SizedBox(
+                          height: 90,
+                          child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              controller:
+                                  ScrollController(keepScrollOffset: true),
+                              shrinkWrap: true,
+                              itemCount:
+                                  (snapshot.data! as dynamic).docs.length,
+                              itemBuilder: (context, index) => Padding(
+                                    padding: const EdgeInsets.all(4.0),
+                                    child: Container(
+                                      height: 80,
+                                      width: 80,
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(6))),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(12),
+                                        ),
+                                        child: VideoPlayerSearch(
+                                          videoUrl: (snapshot.data! as dynamic)
+                                              .docs[index]['reelUrl'],
+                                        ),
+                                      ),
+                                    ),
+                                  )),
+                        );
+                      }
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10.0, vertical: 8),
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(15),
+                                child: Container(
+                                  child: Image.asset("images/gmail_icon.png"),
+                                  height: 80,
+                                  width: 80,
+                                ),
+                              ),
+                              SizedBox(
+                                width: 20,
+                              ),
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(15),
+                                child: Container(
+                                  child: Image.asset("images/gmail_icon.png"),
+                                  height: 80,
+                                  width: 80,
+                                ),
+                              ),
+                              SizedBox(
+                                width: 20,
+                              ),
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(15),
+                                child: Container(
+                                  child: Image.asset("images/gmail_icon.png"),
+                                  height: 80,
+                                  width: 80,
+                                ),
+                              ),
+                              SizedBox(
+                                width: 20,
+                              ),
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(15),
+                                child: Container(
+                                  child: Image.asset("images/gmail_icon.png"),
+                                  height: 80,
+                                  width: 80,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                Divider(height: 1, thickness: 1, color: Colors.black45),
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              isDispAllPost = true;
+                              isDispSavedPostt = false;
+                            });
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(6.0),
+                            child: Icon(
+                              Icons.image,
+                              color:
+                                  isDispAllPost ? Colors.black : Colors.black54,
+                              size: 26,
+                            ),
+                          ),
+                        ),
+                      ),
+                      if (FirebaseAuth.instance.currentUser!.uid == widget.uid)
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                isDispAllPost = false;
+                                isDispSavedPostt = true;
+                                print('saved pressed');
+                              });
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(6.0),
+                              child: Icon(
+                                FontAwesomeIcons.solidBookmark,
+                                color: isDispSavedPostt
+                                    ? Colors.black
+                                    : Colors.black54,
+                                size: 21,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ]),
+                Divider(height: 1, thickness: 1, color: Colors.black45),
+                if (isDispAllPost)
+                  FutureBuilder(
+                    future: FirebaseFirestore.instance
+                        .collection('posts')
+                        .where('uid', isEqualTo: widget.uid)
+                        .get(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+
+                      return GridView.builder(
+                        controller: ScrollController(keepScrollOffset: true),
+                        scrollDirection: Axis.vertical,
+                        shrinkWrap: true,
+                        itemCount: (snapshot.data! as dynamic).docs.length,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          crossAxisSpacing: 1.5,
+                          mainAxisSpacing: 1.5,
+                          childAspectRatio: 1,
+                        ),
+                        itemBuilder: (context, index) {
+                          DocumentSnapshot snap =
+                              (snapshot.data! as dynamic).docs[index];
+
+                          return GestureDetector(
+                            onLongPress: () {
+                              showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8.0, vertical: 160),
+                                      child: Container(
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                                0.2,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(10)),
+                                          color: Colors.white,
+                                        ),
+                                        width:
+                                            MediaQuery.of(context).size.width,
+                                        child: Column(children: [
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                CircleAvatar(
+                                                  maxRadius: 12,
+                                                  backgroundImage: NetworkImage(
+                                                    userData['photoUrl'],
+                                                  ),
+                                                ),
+                                                SizedBox(width: 10),
+                                                Text(
+                                                  userData['username']
+                                                      .toString(),
+                                                  style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 15,
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                      fontFamily: 'Roboto'),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Container(
+                                              child: Image.network(
+                                                snap['postUrl'],
+                                                width: MediaQuery.of(context)
+                                                    .size
+                                                    .width,
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                          ),
+                                          Material(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(10)),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceEvenly,
+                                              children: [
+                                                LikeAnimation(
+                                                  smallLike: true,
+                                                  isAnimating: false,
+                                                  child: IconButton(
+                                                      icon: isLsoading
+                                                          ? const Icon(
+                                                              FontAwesomeIcons
+                                                                  .solidHeart,
+                                                              color: Colors.red,
+                                                            )
+                                                          : const Icon(
+                                                              FontAwesomeIcons
+                                                                  .heart,
+                                                            ),
+                                                      onPressed: () {
+                                                        setState(() {
+                                                          !isLsoading;
+                                                        });
+                                                      }),
+                                                ),
+                                                IconButton(
+                                                  icon: const Icon(
+                                                    Icons.comment_outlined,
+                                                  ),
+                                                  onPressed: () {},
+                                                ),
+                                                GestureDetector(
+                                                    child: Image.asset(
+                                                  'images/share_icons.png',
+                                                  height: 20,
+                                                )),
+                                              ],
+                                            ),
+                                          )
+                                        ]),
+                                      ),
+                                    );
+                                  });
+                            },
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          PostProfileLinearDisplay(
+                                            uid: snap['uid'],
+                                          )));
+                            },
+                            child: Container(
+                              child: Image(
+                                image: NetworkImage(snap['postUrl']),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                if (isDispSavedPostt)
+                  FutureBuilder(
+                    future: FirebaseFirestore.instance
+                        .collection('posts')
+                        .where('uid', isEqualTo: widget.uid)
+                        .where('saves',
+                            arrayContains:
+                                FirebaseAuth.instance.currentUser!.uid)
+                        .get(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+
+                      return GridView.builder(
+                        controller: ScrollController(keepScrollOffset: true),
+                        scrollDirection: Axis.vertical,
+                        shrinkWrap: true,
+                        itemCount: (snapshot.data! as dynamic).docs.length,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          crossAxisSpacing: 1.5,
+                          mainAxisSpacing: 1.5,
+                          childAspectRatio: 1,
+                        ),
+                        itemBuilder: (context, index) {
+                          DocumentSnapshot snap =
+                              (snapshot.data! as dynamic).docs[index];
+
+                          return GestureDetector(
+                            onLongPress: () {
+                              showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8.0, vertical: 160),
+                                      child: Container(
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                                0.2,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(10)),
+                                          color: Colors.white,
+                                        ),
+                                        width:
+                                            MediaQuery.of(context).size.width,
+                                        child: Column(children: [
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                CircleAvatar(
+                                                  maxRadius: 12,
+                                                  backgroundImage: NetworkImage(
+                                                    userData['photoUrl'],
+                                                  ),
+                                                ),
+                                                SizedBox(width: 10),
+                                                Text(
+                                                  userData['username']
+                                                      .toString(),
+                                                  style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 15,
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                      fontFamily: 'Roboto'),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Container(
+                                              child: Image.network(
+                                                snap['postUrl'],
+                                                width: MediaQuery.of(context)
+                                                    .size
+                                                    .width,
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                          ),
+                                          Material(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(10)),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceEvenly,
+                                              children: [
+                                                LikeAnimation(
+                                                  smallLike: true,
+                                                  isAnimating: false,
+                                                  child: IconButton(
+                                                      icon: isLsoading
+                                                          ? const Icon(
+                                                              FontAwesomeIcons
+                                                                  .solidHeart,
+                                                              color: Colors.red,
+                                                            )
+                                                          : const Icon(
+                                                              FontAwesomeIcons
+                                                                  .heart,
+                                                            ),
+                                                      onPressed: () {
+                                                        setState(() {
+                                                          !isLsoading;
+                                                        });
+                                                      }),
+                                                ),
+                                                IconButton(
+                                                  icon: const Icon(
+                                                    Icons.comment_outlined,
+                                                  ),
+                                                  onPressed: () {},
+                                                ),
+                                                GestureDetector(
+                                                    child: Image.asset(
+                                                  'images/share_icons.png',
+                                                  height: 20,
+                                                )),
+                                              ],
+                                            ),
+                                          )
+                                        ]),
+                                      ),
+                                    );
+                                  });
+                            },
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          PostProfileLinearDisplay(
+                                            uid: snap['uid'],
+                                          )));
+                            },
+                            child: Container(
+                              child: Image(
+                                image: NetworkImage(snap['postUrl']),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+              ],
+            ),
+          );
   }
 
   void showAlertDialog() {
@@ -946,7 +1077,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   CircleAvatar(
-                    maxRadius: 12.r,
+                    maxRadius: 12,
                     backgroundImage: NetworkImage(
                       userData['photoUrl'],
                     ),
@@ -954,7 +1085,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   SizedBox(width: 10),
                   Text(
                     userData['username'].toString(),
-                    style: TextStyle(color: Colors.black, fontSize: 18.sp),
+                    style: TextStyle(color: Colors.black, fontSize: 18),
                   ),
                 ],
               ),
@@ -1018,7 +1149,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       children: [
         Text(
           num.toString(),
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+          style: TextStyle(fontSize: 19, fontWeight: FontWeight.w700),
         ),
         Container(
           margin: const EdgeInsets.only(top: 12),

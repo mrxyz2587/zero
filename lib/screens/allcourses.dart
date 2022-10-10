@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
-
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -23,15 +23,40 @@ class CertificationCOurses extends StatefulWidget {
 
 class _CertificationCOursesState extends State<CertificationCOurses> {
   var name;
+
   File? file;
   Uint8List? _file;
   bool isSubmitted = false;
-
+  final _razorpay = Razorpay();
   String selectedText = " ";
+  bool isReg = false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+  }
+
+  void _handlePaymentSuccess(PaymentSuccessResponse response) {
+    isReg = true;
+    print(
+        response.paymentId.toString() + " / /" + response.paymentId.toString());
+  }
+
+  void _handlePaymentError(PaymentFailureResponse response) {
+    // Do something when payment fails
+  }
+
+  void _handleExternalWallet(ExternalWalletResponse response) {
+    // Do something when an external wallet was selected
+  }
 
   @override
   Widget build(BuildContext context) {
-    bool isReg = false;
+    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
 
     return ScreenUtilInit(
         designSize: const Size(360, 690),
@@ -219,6 +244,7 @@ class _CertificationCOursesState extends State<CertificationCOurses> {
                           itemCount: snapshot.data!.docs.length,
                           itemBuilder: (ctx, index) => Container(
                             child: CourseItem(
+                              isReg: isReg,
                               snap: snapshot.data!.docs[index].data(),
                               onpressed: () {
                                 showModalBottomSheet(
@@ -376,45 +402,56 @@ class _CertificationCOursesState extends State<CertificationCOurses> {
                                                 padding: const EdgeInsets.only(
                                                     bottom: 15.0),
                                                 child: ElevatedButton(
-                                                  style: ElevatedButton.styleFrom(
-                                                    backgroundColor: btnCOlorblue,
-                                                    shape: RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius.all(
-                                                                Radius.circular(
-                                                                    7))),),
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      backgroundColor:
+                                                          btnCOlorblue,
+                                                      shape: RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius.all(
+                                                                  Radius
+                                                                      .circular(
+                                                                          7))),
+                                                    ),
                                                     onPressed: () {
-                                                      setState(() {
-                                                        isReg = !isReg;
-                                                        print(isReg.toString());
-                                                      });
+                                                      var options = {
+                                                        'key':
+                                                            'rzp_test_ejd8EnzOi2drxw',
+                                                        'amount': (snapshot
+                                                            .data!.docs[index]
+                                                            .data()["price"]
+                                                            .toString()),
+                                                        'name': snapshot
+                                                            .data!.docs[index]
+                                                            .data()["evetitle"]
+                                                            .toString(),
+                                                        'description': snapshot
+                                                            .data!.docs[index]
+                                                            .data()["evetitle"]
+                                                            .toString(),
+                                                        'prefill': {
+                                                          'contact':
+                                                              '7985370853',
+                                                          'email':
+                                                              'test@razorpay.com'
+                                                        }
+                                                      };
+                                                      _razorpay.open(options);
                                                     },
                                                     // color: btnCOlorblue,
-                                                    child: isReg == true
-                                                        ? Text(
-                                                            'Registeredd',
-                                                            style: TextStyle(
-                                                                fontSize: 16.sp,
-                                                                color: Colors
-                                                                    .white),
-                                                          )
-                                                        : Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                        .symmetric(
-                                                                    horizontal:
-                                                                        50,
-                                                                    vertical:
-                                                                        8),
-                                                            child: Text(
-                                                              'Register',
-                                                              style: TextStyle(
-                                                                  fontSize:
-                                                                      16.sp,
-                                                                  color: Colors
-                                                                      .white),
-                                                            ),
-                                                          )),
+                                                    child: Padding(
+                                                      padding: const EdgeInsets
+                                                              .symmetric(
+                                                          horizontal: 50,
+                                                          vertical: 8),
+                                                      child: Text(
+                                                        'Register',
+                                                        style: TextStyle(
+                                                            fontSize: 16.sp,
+                                                            color:
+                                                                Colors.white),
+                                                      ),
+                                                    )),
                                               ),
                                             )
                                           ],

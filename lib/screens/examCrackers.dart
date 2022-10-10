@@ -194,6 +194,7 @@ class _ExamCrackersState extends State<ExamCrackers> {
                           itemCount: snapshot.data!.docs.length,
                           itemBuilder: (ctx, index) => Container(
                             child: CourseItem(
+                              isReg: isReg,
                               snap: snapshot.data!.docs[index].data(),
                               onpressed: () {
                                 showModalBottomSheet(
@@ -351,13 +352,17 @@ class _ExamCrackersState extends State<ExamCrackers> {
                                                 padding: const EdgeInsets.only(
                                                     bottom: 15.0),
                                                 child: ElevatedButton(
-                                                  style: ElevatedButton.styleFrom(
-                                                    backgroundColor: btnCOlorblue,
-                                                    shape: RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius.all(
-                                                                Radius.circular(
-                                                                    7))),),
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      backgroundColor:
+                                                          btnCOlorblue,
+                                                      shape: RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius.all(
+                                                                  Radius
+                                                                      .circular(
+                                                                          7))),
+                                                    ),
                                                     onPressed: () {
                                                       setState(() {
                                                         isReg = !isReg;

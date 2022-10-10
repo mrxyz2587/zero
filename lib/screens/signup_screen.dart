@@ -63,7 +63,7 @@ class _SignupScreenState extends State<SignupScreen> {
       ),
     ],
   );
-
+  bool checkDataDialog = false;
   @override
   void dispose() {
     super.dispose();
@@ -74,7 +74,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
   final dbref = FirebaseFirestore.instance;
   void checkData() async {
-    alertProgressIndicator(context, "Verifying");
+    String res = "Some error occurred";
     var userData = dbref
         .collection(
           'unregisteredUsers',
@@ -94,6 +94,7 @@ class _SignupScreenState extends State<SignupScreen> {
         } else {}
       }
     });
+
     var useData = dbref
         .collection(
           'unregisteredUsers',
@@ -102,7 +103,10 @@ class _SignupScreenState extends State<SignupScreen> {
         .get()
         .then((event) {
       for (var docs in event.docs) {
-        if (docs.data()['email'].toString() != _emailController.text) {}
+        if (docs.data()['email'].toString() != _emailController.text) {
+          // Navigator.pop(context);
+          // alertBOxNotifiying(context, "ENETERE");
+        }
       }
     });
   }
@@ -199,6 +203,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
   alertProgressIndicator(context, text) {
     showDialog(
+        barrierDismissible: false,
         context: context,
         builder: (context) => AlertDialog(
               scrollable: false,
@@ -293,7 +298,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold (
+    return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
@@ -537,8 +542,20 @@ class _SignupScreenState extends State<SignupScreen> {
                       _passwordController.text.isEmpty ||
                       _selectedDate == null ||
                       _image == null) {
-                    showSnackBar(context, "Please enter all values");
+                    showSnackBar(context, "Please fill all details");
                   } else {
+                    showDialog(
+                        barrierDismissible: false,
+                        context: context,
+                        builder: (context) => AlertDialog(
+                              scrollable: false,
+                              backgroundColor: Colors.white,
+                              title: Text("text"),
+                              content: LinearProgressIndicator(
+                                color: Colors.blue,
+                              ),
+                            ));
+
                     checkData();
                   }
                 },

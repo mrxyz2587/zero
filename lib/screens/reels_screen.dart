@@ -63,10 +63,105 @@ class _ReelsScreenState extends State<ReelsScreen> {
             itemBuilder: (ctx, index) => Stack(
               children: [
                 Container(
-                  height: MediaQuery.of(context).size.height,
-                  width: MediaQuery.of(context).size.width,
                   child: VideoPlayerItem(
                     videoUrl: snapshot.data!.docs[index].data()["reelUrl"],
+                  ),
+                  height: MediaQuery.of(context).size.height,
+                  width: MediaQuery.of(context).size.width,
+                ),
+                Positioned(
+                  top: 30,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8.0, vertical: 10),
+                    child: Row(
+                      children: [
+                        Icon(FontAwesomeIcons.arrowLeft, color: Colors.white),
+                        SizedBox(width: 20),
+                        Text(
+                          "Social Wall",
+                          style: TextStyle(color: Colors.white, fontSize: 20),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Positioned(
+                  right: 30,
+                  bottom: 80,
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.favorite_outlined,
+                        color: Colors.red,
+                        size: 30,
+                      ),
+                      SizedBox(height: 12),
+                      Text(
+                        "126.5K",
+                        style: TextStyle(color: Colors.white, fontSize: 10),
+                      ),
+                      SizedBox(height: 20),
+                      Icon(FontAwesomeIcons.comment,
+                          color: Colors.white, size: 25),
+                      SizedBox(height: 10),
+                      Text(
+                        "126",
+                        style: TextStyle(color: Colors.white, fontSize: 10),
+                      ),
+                      SizedBox(height: 20),
+                      Icon(
+                        FontAwesomeIcons.solidPaperPlane,
+                        color: Colors.white,
+                        size: 22,
+                      ),
+                      SizedBox(height: 10),
+                      Text(
+                        "126",
+                        style: TextStyle(color: Colors.white, fontSize: 10),
+                      ),
+                      SizedBox(height: 20),
+                      InkWell(
+                        onTap: () {},
+                        child: Icon(
+                          Icons.more_vert_rounded,
+                          color: Colors.white,
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                    ],
+                  ),
+                ),
+                Positioned(
+                  left: 25,
+                  bottom: 80,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            backgroundImage: AssetImage("images/zero_logo.png"),
+                            radius: 15,
+                          ),
+                          SizedBox(width: 10),
+                          Text(
+                            snapshot.data!.docs[index].data()["username"],
+                            style: TextStyle(color: Colors.white, fontSize: 18),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        width: 250,
+                        child: Text(
+                          "desvkgmb fvmfbdl mbmbgkbm bkmbokgm gkbgbgb  "
+                          " gbgt bg  kr rg rgrgbrgbv rfrgr rgrg",
+                          softWrap: true,
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      )
+                    ],
                   ),
                 ),
               ],
@@ -77,3 +172,5 @@ class _ReelsScreenState extends State<ReelsScreen> {
     );
   }
 }
+
+//TODO: double tap like animation,number of likes like button,

@@ -4,8 +4,10 @@ import 'package:intl/intl.dart';
 
 class CourseItem extends StatelessWidget {
   final snap;
+  final bool isReg;
   final Function()? onpressed;
-  const CourseItem({Key? key, required this.snap, this.onpressed})
+  const CourseItem(
+      {Key? key, required this.snap, this.onpressed, required this.isReg})
       : super(key: key);
 
   @override
@@ -66,14 +68,26 @@ class CourseItem extends StatelessWidget {
                       SizedBox(
                         height: 10.h,
                       ),
-                      Text(
-                        snap["certificationlevel"].toString() +
-                            ' | ' +
-                            snap["coursetiming"].toString(),
-                        // 'Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled.',
-                        maxLines: 4,
-                        style:
-                            TextStyle(fontSize: 11.sp, color: Colors.black54),
+                      Row(
+                        children: [
+                          Text(
+                            snap["certificationlevel"].toString() +
+                                ' | ' +
+                                snap["coursetiming"].toString(),
+                            // 'Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled.',
+                            maxLines: 4,
+                            style: TextStyle(
+                                fontSize: 11.sp, color: Colors.black54),
+                          ),
+                          if (isReg == true)
+                            Text(
+                              "Registered",
+                              style: TextStyle(
+                                  fontSize: 15.sp,
+                                  color: Colors.green,
+                                  fontStyle: FontStyle.italic),
+                            ),
+                        ],
                       ),
                     ],
                   ),
