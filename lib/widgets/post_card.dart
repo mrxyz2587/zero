@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:pinch_zoom/pinch_zoom.dart';
 import '../screens/profile_screen.dart';
 import '/models/user.dart' as model;
 import '/providers/user_provider.dart';
@@ -12,7 +11,6 @@ import '/utils/colors.dart';
 import '/utils/global_variable.dart';
 import '/utils/utils.dart';
 import '/widgets/like_animation.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class PostCard extends StatefulWidget {
@@ -201,10 +199,13 @@ class _PostCardState extends State<PostCard> {
           color: Colors.transparent,
           child: Container(
             decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(8), topLeft: Radius.circular(8))),
-            height: MediaQuery.of(context).size.height * 0.35,
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topRight: Radius.circular(8),
+                topLeft: Radius.circular(8),
+              ),
+            ),
+            height: MediaQuery.of(context).size.height * 0.28,
             width: MediaQuery.of(context).size.width,
             padding: EdgeInsets.symmetric(
               horizontal: 5,
