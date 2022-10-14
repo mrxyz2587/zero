@@ -31,6 +31,151 @@ class _FeedScreenState extends State<FeedScreen> {
   bool isLoading = true;
   bool isLoasdings = true;
 
+  var searchController = TextEditingController();
+
+  bottomSheet2(context, String txt) {
+    showModalBottomSheet(
+      enableDrag: true,
+      isScrollControlled: true,
+      isDismissible: true,
+      backgroundColor: Colors.black.withOpacity(0),
+      context: context,
+      builder: (BuildContext c) {
+        return Container(
+          color: Colors.transparent,
+          child: Container(
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(8), topLeft: Radius.circular(8))),
+            width: MediaQuery.of(context).size.width,
+            padding: EdgeInsets.symmetric(
+              horizontal: 5,
+              vertical: 10,
+            ),
+            child: Column(
+              children: <Widget>[
+                SizedBox(height: 6),
+                Container(
+                  height: 4,
+                  width: 50,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    color: Colors.black,
+                  ),
+                ),
+                SizedBox(height: 20),
+                TextFormField(
+                  controller: searchController,
+                  decoration: InputDecoration(
+                    // suffixIcon: Icon(
+                    //   FontAwesomeIcons.magnifyingGlass,
+                    //   color: Colors.black54,
+                    // ),
+                    isDense: true,
+                    isCollapsed: true,
+                    filled: true,
+                    contentPadding: EdgeInsets.fromLTRB(
+                      10,
+                      10,
+                      0,
+                      10,
+                    ),
+                    hintStyle: TextStyle(fontWeight: FontWeight.w700),
+                    hintText: 'Search...',
+                    fillColor: Color(0xFFEFEFEF),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                          color: const Color(0xFFD9D8D8), width: 1.5),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(
+                        color: Color(0xFFFFFFFF),
+                        width: 1,
+                      ),
+                    ),
+                  ),
+                  onTap: () {
+                    setState(() {});
+                  },
+                  onFieldSubmitted: (String _) {
+                    setState(() {});
+                    print(_);
+                  },
+                ),
+
+                StreamBuilder(
+                  stream: FirebaseFirestore.instance
+                      .collection('users')
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      physics: ClampingScrollPhysics(),
+                      itemCount: (snapshot.data! as dynamic).docs.length,
+                      itemBuilder: (context, index) => Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Align(
+                            alignment: Alignment.topLeft,
+                            child: Container(
+                              color: Colors.white,
+                              child: ListTile(
+                                trailing: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                        backgroundColor: btnCOlorblue,
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(5))),
+                                    onPressed: () {},
+                                    child: Text(
+                                      "Send",
+                                      style: TextStyle(color: Colors.white),
+                                    )),
+                                title: Text(
+                                    (snapshot.data! as dynamic)
+                                        .docs[index]['username']
+                                        .toString(),
+                                    style: TextStyle(
+                                        color: Color(0xFF000000),
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w700,
+                                        fontFamily: 'Roboto')),
+                                leading: CircleAvatar(
+                                  backgroundImage: NetworkImage(
+                                    (snapshot.data! as dynamic)
+                                        .docs[index]['photoUrl']
+                                        .toString(),
+                                  ),
+                                  radius: 20,
+                                ),
+                                subtitle: Text(
+                                    (snapshot.data! as dynamic)
+                                        .docs[index]['university']
+                                        .toString(),
+                                    style: TextStyle(
+                                        fontSize: 10, fontFamily: 'Roboto')),
+                              ),
+                            )),
+                      ),
+                    );
+                  },
+                )
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   /// Determine the current position of the device.
   ///
   /// When the location services are not enabled or permissions
@@ -297,8 +442,7 @@ class _FeedScreenState extends State<FeedScreen> {
                                             .toString(),
                                         fit: BoxFit.fill) ??
                                     Image.asset("images/logo.jpeg",
-                                        fit: BoxFit.fill
-                                    )),
+                                        fit: BoxFit.fill)),
                           ),
                         ),
                         // imageUrls.map((i) {
@@ -368,83 +512,7 @@ class _FeedScreenState extends State<FeedScreen> {
                         child: PostCard(
                           snap: snapshot.data!.docs[index].data(),
                           onshareingbtnPressed: () {
-                            showModalBottomSheet(
-                                context: context,
-                                builder: (BuildContext ctx) {
-                                  return Container(
-                                    color: Colors.transparent,
-                                    child: Container(
-                                      child: StreamBuilder(
-                                        stream: FirebaseFirestore.instance
-                                            .collection('users')
-                                            .snapshots(),
-                                        builder: (context, snapshot) {
-                                          if (!snapshot.hasData) {
-                                            return const Center(
-                                              child:
-                                                  CircularProgressIndicator(),
-                                            );
-                                          }
-
-                                          return ListView.builder(
-                                            shrinkWrap: true,
-                                            itemCount:
-                                                (snapshot.data! as dynamic)
-                                                    .docs
-                                                    .length,
-                                            itemBuilder: (context, index) =>
-                                                Align(
-                                                    alignment:
-                                                        Alignment.topLeft,
-                                                    child: Container(
-                                                      color: Colors.white,
-                                                      child: Column(
-                                                        children: [
-                                                          CircleAvatar(
-                                                            backgroundImage:
-                                                                NetworkImage(
-                                                              (snapshot.data!
-                                                                      as dynamic)
-                                                                  .docs[index][
-                                                                      'photoUrl']
-                                                                  .toString(),
-                                                            ),
-                                                            radius: 40,
-                                                          ),
-                                                          Text(
-                                                              (snapshot.data!
-                                                                      as dynamic)
-                                                                  .docs[index][
-                                                                      'username']
-                                                                  .toString(),
-                                                              style: TextStyle(
-                                                                  color: Color(
-                                                                      0xFF000000),
-                                                                  fontSize: 15,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w700,
-                                                                  fontFamily:
-                                                                      'Roboto')),
-                                                          // Text(
-                                                          //   (snapshot.data! as dynamic)
-                                                          //       .docs[index]['university']
-                                                          //       .toString(),
-                                                          // )
-                                                        ],
-                                                      ),
-                                                    )),
-                                          );
-                                        },
-                                      ),
-                                      decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.only(
-                                              topRight: Radius.circular(20),
-                                              topLeft: Radius.circular(20))),
-                                    ),
-                                  );
-                                });
+                            bottomSheet2(context, "txt");
                           },
                         ),
                       ),

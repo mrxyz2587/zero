@@ -110,6 +110,13 @@ class _SignupScreenState extends State<SignupScreen> {
       }
     });
   }
+  selectImage(ImageSource imageSource) async {
+    Uint8List im = await pickImage(imageSource);
+    // set state because we need to display the image we selected on the circle avatar
+    setState(() {
+      _image = im;
+    });
+  }
 
   void signUpUser() async {
     setState(() {
@@ -182,13 +189,13 @@ class _SignupScreenState extends State<SignupScreen> {
     // }
   }
 
-  selectImage(ImageSource imageSource) async {
-    Uint8List im = await pickImage(imageSource);
-    // set state because we need to display the image we selected on the circle avatar
-    setState(() {
-      _image = im;
-    });
-  }
+  // selectImage(ImageSource imageSource) async {
+  //   Uint8List im = await pickImage(imageSource);
+  //   // set state because we need to display the image we selected on the circle avatar
+  //   setState(() {
+  //     _image = im;
+  //   });
+  // }
 
   alertBOxNotifiying(context, text) {
     showDialog(

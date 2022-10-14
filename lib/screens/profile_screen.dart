@@ -7,6 +7,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -34,6 +35,8 @@ class ProfileScreen extends StatefulWidget {
   _ProfileScreenState createState() => _ProfileScreenState();
 }
 
+enum options { POSTS, QUOTE, SAVED }
+
 class _ProfileScreenState extends State<ProfileScreen> {
   var userData = {};
   var name;
@@ -56,7 +59,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool isDispSavedPostt = false;
 
   final _controllername = TextEditingController();
-
+  String quoteImageUrl = "";
   @override
   void initState() {
     super.initState();
@@ -64,11 +67,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
     getData();
   }
 
+  Uint8List? _image;
+
+  selectImage(ImageSource imageSource) async {
+    Uint8List im = await pickImage(imageSource);
+    // set state because we need to display the image we selected on the circle avatar
+    setState(() {
+      _image = im;
+    });
+  }
+
   getData() async {
     setState(() {
       isLoading = true;
     });
     try {
+      await FirebaseFirestore.instance
+          .collection("loudduquotes")
+          .doc("quote")
+          .get()
+          .then((value) {
+        setState(() {
+          quoteImageUrl = value.data()!["quoteUrl"].toString();
+          print(quoteImageUrl);
+        });
+      });
       var userSnap = await FirebaseFirestore.instance
           .collection('users')
           .doc(widget.uid)
@@ -104,6 +127,87 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
   }
 
+  bottomSheet2(context, String txt) {
+    showModalBottomSheet(
+      backgroundColor: Colors.black.withOpacity(0),
+      context: context,
+      builder: (BuildContext c) {
+        return Container(
+          color: Colors.transparent,
+          height: 200,
+          child: Container(
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(8), topLeft: Radius.circular(8))),
+            height: MediaQuery.of(context).size.height * 0.2,
+            width: MediaQuery.of(context).size.width,
+            padding: EdgeInsets.symmetric(
+              horizontal: 5,
+              vertical: 10,
+            ),
+            child: Column(
+              children: <Widget>[
+                SizedBox(height: 6),
+                Container(
+                  height: 4,
+                  width: 50,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    color: Colors.black,
+                  ),
+                ),
+                SizedBox(height: 20),
+                Text(
+                  txt,
+                  style: TextStyle(fontSize: 18.0, color: Colors.black54),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          IconButton(
+                            icon: Icon(Icons.camera),
+                            iconSize: 40,
+                            onPressed: () {
+                              selectImage(ImageSource.camera);
+                              Navigator.pop(context);
+                            },
+                          ),
+                          Text('Camera'),
+                        ]),
+                    Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          IconButton(
+                            icon: Icon(Icons.image, semanticLabel: 'Gallery'),
+                            iconSize: 40,
+                            onPressed: () {
+                              selectImage(ImageSource.gallery);
+                              Navigator.pop(context);
+                            },
+                          ),
+                          Text('Gallery'),
+                        ]),
+                  ],
+                )
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  var opt = options.POSTS;
   @override
   Widget build(BuildContext context) {
     final UserProvider userProvider = Provider.of<UserProvider>(context);
@@ -124,7 +228,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Stack(
                   children: [
                     Container(
-                      height: 140,
+                      height: 150,
                       color: Colors.grey.shade200,
                       width: double.infinity,
                       child: Image.network(
@@ -143,7 +247,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child: Stack(
                           children: [
                             CircleAvatar(
-                              maxRadius: 48,
+                              maxRadius: 50,
                               backgroundImage: NetworkImage(
                                 userData['photoUrl'],
                               ),
@@ -153,16 +257,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               Positioned(
                                   right: 0,
                                   bottom: 5,
-                                  child: CircleAvatar(
-                                      backgroundColor: Colors.white,
-                                      child: Center(
-                                        child: Icon(
-                                          FontAwesomeIcons.plus,
-                                          color: Colors.black,
-                                          size: 18,
+                                  child: InkWell(
+                                    onTap: () {
+                                      bottomSheet2(
+                                          context, "Choose Profile Picture");
+                                    },
+                                    child: CircleAvatar(
+                                        backgroundColor: Colors.white,
+                                        child: Center(
+                                          child: Icon(
+                                            FontAwesomeIcons.plus,
+                                            color: Colors.black,
+                                            size: 18,
+                                          ),
                                         ),
-                                      ),
-                                      radius: 12)),
+                                        radius: 12),
+                                  )),
                           ],
                         ),
                       ),
@@ -172,7 +282,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         right: 20,
                         top: 15,
                         child: GestureDetector(
-                          onTap: () {},
+                          onTap: () {
+                            bottomSheet2(context, "Choose Cover Photo");
+                          },
                           child: CircleAvatar(
                             backgroundColor: Colors.white,
                             radius: 18,
@@ -222,156 +334,261 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       borderRadius: BorderRadius.circular(7))),
                               onPressed: () {
                                 showModalBottomSheet(
+                                    backgroundColor:
+                                        Colors.black.withOpacity(0),
                                     context: context,
                                     builder: (BuildContext ctx) {
-                                      return Container(
-                                        color: Colors.black.withOpacity(0.1),
+                                      return Padding(
+                                        padding: EdgeInsets.only(
+                                            bottom: MediaQuery.of(context)
+                                                .viewInsets
+                                                .bottom),
                                         child: Container(
-                                          height: 300,
-                                          decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius: BorderRadius.only(
-                                                  topRight: Radius.circular(5),
-                                                  topLeft: Radius.circular(5))),
-                                          // padding: EdgeInsets.symmetric(
-                                          //   horizontal: 5,
-                                          //   vertical: 10,
-                                          // ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Column(children: [
-                                              Row(
-                                                children: [
-                                                  Text('Name'),
-                                                  SizedBox(width: 30),
-                                                  Container(
-                                                    width: 250,
-                                                    child: TextFormField(
-                                                        controller:
-                                                            _controllername,
-                                                        decoration: InputDecoration(
-                                                            hintText: "",
-                                                            labelText: userData[
-                                                                "username"]),
-                                                        keyboardType:
-                                                            TextInputType.text),
-                                                  ),
-                                                ],
-                                              ),
-                                              SizedBox(
-                                                height: 10,
-                                              ),
-                                              Container(
-                                                height: 4,
-                                                width: 30,
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(5),
-                                                  color: Colors.black45,
-                                                ),
-                                              ),
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.all(15.0),
-                                                child: Row(
+                                          color: Colors.transparent,
+                                          child: Container(
+                                            height: 250,
+                                            decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius: BorderRadius.only(
+                                                    topRight:
+                                                        Radius.circular(10),
+                                                    topLeft:
+                                                        Radius.circular(10))),
+                                            // padding: EdgeInsets.symmetric(
+                                            //   horizontal: 5,
+                                            //   vertical: 10,
+                                            // ),
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(5.0),
+                                              child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceEvenly,
                                                   children: [
-                                                    Text('Bio'),
-                                                    SizedBox(width: 30),
+                                                    SizedBox(height: 10),
                                                     Container(
-                                                      width: 260,
-                                                      child: TextFormField(
-                                                        controller:
-                                                            bioCOntrolee,
-                                                        keyboardType:
-                                                            TextInputType.text,
-                                                        maxLines: 5,
-                                                        maxLength: 50,
-                                                        style: TextStyle(
-                                                          fontFamily: 'Roboto',
-                                                          color: Colors.black45,
-                                                        ),
-                                                        cursorColor:
-                                                            Colors.black38,
-                                                        decoration:
-                                                            InputDecoration(
-                                                          isDense: true,
-                                                          contentPadding:
-                                                              EdgeInsets
-                                                                  .symmetric(
-                                                                      horizontal:
-                                                                          20,
-                                                                      vertical:
-                                                                          20),
-                                                          hintText: "",
-                                                          hintStyle:
-                                                              const TextStyle(
-                                                                  color: Color(
-                                                                      0xFFA3A3A3),
-                                                                  fontSize: 15,
-                                                                  fontFamily:
-                                                                      'Roboto'),
-                                                          fillColor:
-                                                              const Color(
-                                                                  0xFFF2F2F2),
-                                                          filled: true,
-                                                          focusedBorder:
-                                                              OutlineInputBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        8),
-                                                            borderSide: BorderSide(
-                                                                color: const Color(
-                                                                    0xFFD9D8D8),
-                                                                width: 1.5),
-                                                          ),
-                                                          enabledBorder:
-                                                              OutlineInputBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        10),
-                                                            borderSide:
-                                                                BorderSide(
-                                                              color: Color(
-                                                                  0xFFDFDFDF),
-                                                              width: 1,
+                                                      height: 3,
+                                                      width: 37,
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(5),
+                                                        color: Colors.black,
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      height: 5,
+                                                    ),
+                                                    Expanded(
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .symmetric(
+                                                                horizontal:
+                                                                    15.0,
+                                                                vertical: 5),
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Text(
+                                                              'Name',
+                                                              style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w700,
+                                                              ),
                                                             ),
-                                                          ),
+                                                            SizedBox(width: 25),
+                                                            Container(
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .all(7),
+                                                              width: 240,
+                                                              height: 35,
+                                                              child: Align(
+                                                                alignment: Alignment
+                                                                    .centerLeft,
+                                                                child: Text(
+                                                                  userData[
+                                                                      "username"],
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          13,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w700,
+                                                                      fontFamily:
+                                                                          'Roboto'),
+                                                                ),
+                                                              ),
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                color: const Color(
+                                                                    0xFFF2F2F2),
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            8),
+                                                              ),
+                                                            )
+                                                            // Container(
+                                                            //   width: 250,
+                                                            //   child: TextFormField(
+                                                            //       controller:
+                                                            //           _controllername,
+                                                            //       decoration: InputDecoration(
+                                                            //           hintText: "",
+                                                            //           labelText: userData[
+                                                            //               "username"]),
+                                                            //       keyboardType:
+                                                            //           TextInputType.text),
+                                                            // ),
+                                                          ],
                                                         ),
                                                       ),
                                                     ),
-                                                  ],
-                                                ),
-                                              ),
-                                              OutlinedButton(
-                                                style: OutlinedButton.styleFrom(
-                                                    side: BorderSide(
-                                                  color: Colors.lightBlueAccent,
-                                                )),
-                                                onPressed: () {
-                                                  setState(() {
-                                                    final docRef =
-                                                        FirebaseFirestore
-                                                            .instance
-                                                            .collection("users")
-                                                            .doc(widget.uid);
-                                                    final updates =
-                                                        <String, dynamic>{
-                                                      "bio": bioCOntrolee.text
-                                                    };
+                                                    Expanded(
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .symmetric(
+                                                                horizontal:
+                                                                    15.0,
+                                                                vertical: 5),
+                                                        child: Row(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Text(
+                                                              'Bio',
+                                                              style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w700,
+                                                              ),
+                                                            ),
+                                                            SizedBox(
+                                                              width: 40,
+                                                            ),
+                                                            Container(
+                                                              width: 240,
+                                                              child:
+                                                                  TextFormField(
+                                                                controller:
+                                                                    bioCOntrolee,
+                                                                keyboardType:
+                                                                    TextInputType
+                                                                        .text,
+                                                                maxLines: 3,
+                                                                // maxLength: 50,
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontFamily:
+                                                                      'Roboto',
+                                                                  color: Colors
+                                                                      .black45,
+                                                                ),
+                                                                cursorColor:
+                                                                    Colors
+                                                                        .black26,
+                                                                decoration:
+                                                                    InputDecoration(
+                                                                  isDense: true,
+                                                                  contentPadding:
+                                                                      EdgeInsets.symmetric(
+                                                                          horizontal:
+                                                                              20,
+                                                                          vertical:
+                                                                              10),
+                                                                  hintText: "",
+                                                                  hintStyle: const TextStyle(
+                                                                      color: Color(
+                                                                          0xFFA3A3A3),
+                                                                      fontSize:
+                                                                          15,
+                                                                      fontFamily:
+                                                                          'Roboto'),
+                                                                  fillColor:
+                                                                      const Color(
+                                                                          0xFFF2F2F2),
+                                                                  filled: true,
+                                                                  focusedBorder:
+                                                                      OutlineInputBorder(
+                                                                    borderRadius:
+                                                                        BorderRadius
+                                                                            .circular(8),
+                                                                    borderSide: BorderSide(
+                                                                        color: const Color(
+                                                                            0xFFF2F2F2),
+                                                                        width:
+                                                                            1.5),
+                                                                  ),
+                                                                  enabledBorder:
+                                                                      OutlineInputBorder(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            10),
+                                                                    borderSide:
+                                                                        BorderSide(
+                                                                      color: Color(
+                                                                          0xFFF2F2F2),
+                                                                      width: 1,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      child: TextButton(
+                                                        onPressed: () {
+                                                          setState(() {
+                                                            final docRef =
+                                                                FirebaseFirestore
+                                                                    .instance
+                                                                    .collection(
+                                                                        "users")
+                                                                    .doc(widget
+                                                                        .uid);
+                                                            final updates = <
+                                                                String,
+                                                                dynamic>{
+                                                              "bio":
+                                                                  bioCOntrolee
+                                                                      .text
+                                                            };
 
-                                                    docRef.update(updates).then(
-                                                        (value) => print(
-                                                            "DocumentSnapshot successfully updated!"),
-                                                        onError: (e) => print(
-                                                            "Error updating document $e"));
-                                                  });
-                                                  Navigator.pop(context);
-                                                },
-                                                child: Text('Submit'),
-                                              )
-                                            ]),
+                                                            docRef.update(updates).then(
+                                                                (value) => print(
+                                                                    "DocumentSnapshot successfully updated!"),
+                                                                onError: (e) =>
+                                                                    print(
+                                                                        "Error updating document $e"));
+                                                          });
+                                                          Navigator.pop(
+                                                              context);
+                                                        },
+                                                        child: Text('SUBMIT',
+                                                            style: TextStyle(
+                                                                fontSize: 17,
+                                                                color:
+                                                                    btnCOlorblue,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w700)),
+                                                      ),
+                                                    )
+                                                  ]),
+                                            ),
                                           ),
                                         ),
                                       );
@@ -523,14 +740,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   side: BorderSide(
                                       width: 1.2, color: btnCOlorblue),
                                   shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(7))),
+                                      borderRadius: BorderRadius.circular(25))),
                               onPressed: () {},
                               child: Text(
                                 userData['designation'],
                                 style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 12),
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
                               ),
                             ),
                           )),
@@ -554,7 +772,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       width: 1,
                     ),
                     Container(
-                        width: 70,
+                        width: 90,
                         child: Center(
                             child: buildStatColumn(followers, "Followers"))),
                     Container(
@@ -611,6 +829,70 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       ),
                                     ),
                                   )),
+                        );
+                      } else {
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 10.0, bottom: 4),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(2),
+                                  child: Container(
+                                    height: 80,
+                                    width: 80,
+                                    child: ClipRRect(
+                                      child: Image.asset("images/three.png",
+                                          fit: BoxFit.cover),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(2),
+                                  child: Container(
+                                    height: 80,
+                                    width: 80,
+                                    child: ClipRRect(
+                                      child: Image.asset("images/two.png",
+                                          fit: BoxFit.cover),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(2),
+                                  child: Container(
+                                    height: 80,
+                                    width: 80,
+                                    child: ClipRRect(
+                                      child: Image.asset("images/one.png",
+                                          fit: BoxFit.cover),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(2),
+                                  child: Container(
+                                    height: 80,
+                                    width: 80,
+                                    child: ClipRRect(
+                                      child: Image.asset("images/four.png",
+                                          fit: BoxFit.cover),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         );
                       }
                       return Padding(
@@ -676,17 +958,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child: GestureDetector(
                           onTap: () {
                             setState(() {
-                              isDispAllPost = true;
-                              isDispSavedPostt = false;
+                              // isDispAllPost = true;
+                              // isDispSavedPostt = false;
+                              opt = options.POSTS;
                             });
                           },
                           child: Padding(
-                            padding: const EdgeInsets.all(6.0),
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 4.0, horizontal: 6),
                             child: Icon(
                               Icons.image,
-                              color:
-                                  isDispAllPost ? Colors.black : Colors.black54,
+                              color: (opt == options.POSTS)
+                                  ? Colors.black
+                                  : Colors.black54,
                               size: 26,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              opt = options.QUOTE;
+                            });
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6.0, vertical: 4),
+                            child: Icon(
+                              FontAwesomeIcons.blog,
+                              color: (opt == options.QUOTE)
+                                  ? Colors.black
+                                  : Colors.black54,
+                              size: 21,
                             ),
                           ),
                         ),
@@ -696,16 +1001,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           child: GestureDetector(
                             onTap: () {
                               setState(() {
-                                isDispAllPost = false;
-                                isDispSavedPostt = true;
+                                // isDispAllPost = false;
+                                // isDispSavedPostt = true;
+                                opt = options.SAVED;
                                 print('saved pressed');
                               });
                             },
                             child: Padding(
-                              padding: const EdgeInsets.all(6.0),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 6.0, vertical: 4),
                               child: Icon(
                                 FontAwesomeIcons.solidBookmark,
-                                color: isDispSavedPostt
+                                color: (opt == options.SAVED)
                                     ? Colors.black
                                     : Colors.black54,
                                 size: 21,
@@ -714,8 +1021,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ),
                     ]),
-                Divider(height: 1, thickness: 1, color: Colors.black45),
-                if (isDispAllPost)
+                Divider(
+                    height: 1,
+                    thickness: (opt == options.QUOTE) ? 0 : 1,
+                    color: Colors.black45),
+                if (opt == options.POSTS)
                   FutureBuilder(
                     future: FirebaseFirestore.instance
                         .collection('posts')
@@ -869,7 +1179,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       );
                     },
                   ),
-                if (isDispSavedPostt)
+                if (opt == options.QUOTE)
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    color: Color(0xFFF6F6F6),
+                    child: Padding(
+                      padding: const EdgeInsets.all(25.0),
+                      child: Container(
+                          child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Image.network(quoteImageUrl))),
+                    ),
+                  ),
+                if (opt == options.SAVED)
                   FutureBuilder(
                     future: FirebaseFirestore.instance
                         .collection('posts')

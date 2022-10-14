@@ -35,6 +35,20 @@ class _AddPostScreenState extends State<AddPostScreen> {
     super.initState();
   }
 
+  _setImageFromCamera() async {
+    Uint8List file = await pickImage(ImageSource.camera);
+    setState(() {
+      _file = file;
+    });
+  }
+
+  _setImageFromGallery() async {
+    Uint8List file = await pickImage(ImageSource.gallery);
+    setState(() {
+      _file = file;
+    });
+  }
+
   _selectImage(BuildContext parentContext) async {
     return showDialog(
       context: parentContext,
@@ -293,7 +307,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             IconButton(
-                              onPressed: () => _selectImage(context),
+                              onPressed: () => _setImageFromCamera(),
                               icon: Icon(
                                 Icons.camera_alt_rounded,
                                 size: 29,
@@ -301,7 +315,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
                               ),
                             ),
                             IconButton(
-                                onPressed: () => _selectImage(context),
+                                onPressed: () => _setImageFromGallery(),
                                 icon: Icon(
                                   FontAwesomeIcons.solidImage,
                                   color: Color(0xFF9E9E9E),
@@ -309,7 +323,9 @@ class _AddPostScreenState extends State<AddPostScreen> {
                             IconButton(
                                 onPressed: () {},
                                 icon: Icon(
-                                  FontAwesomeIcons.tags,
+                                  Icons.slow_motion_video,
+                                  size: 29,
+                                  color: Color(0xFF9E9E9E),
                                 )),
                             SizedBox(
                               width: 20,
@@ -470,14 +486,14 @@ class _AddPostScreenState extends State<AddPostScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           IconButton(
-                            onPressed: () => _selectImage(context),
+                            onPressed: () => _setImageFromCamera(),
                             icon: Icon(
                               Icons.camera_alt_rounded,
                               size: 29,
                             ),
                           ),
                           IconButton(
-                              onPressed: () => _selectImage(context),
+                              onPressed: () => _setImageFromGallery(),
                               icon: Icon(FontAwesomeIcons.solidImage)),
                           IconButton(
                               onPressed: () async {
@@ -512,8 +528,8 @@ class _AddPostScreenState extends State<AddPostScreen> {
                                 }
                               },
                               icon: Icon(
-                                FontAwesomeIcons.tags,
-                                color: Color(0xFF9E9E9E),
+                                Icons.slow_motion_video,
+                                size: 29,
                               )),
                           SizedBox(
                             width: 20,
