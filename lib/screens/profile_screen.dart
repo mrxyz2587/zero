@@ -35,7 +35,7 @@ class ProfileScreen extends StatefulWidget {
   _ProfileScreenState createState() => _ProfileScreenState();
 }
 
-enum options { POSTS, QUOTE, SAVED }
+enum options { POSTS, QUOTE, SAVED, REEL }
 
 class _ProfileScreenState extends State<ProfileScreen> {
   var userData = {};
@@ -976,27 +976,47 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ),
                       ),
-                      if (FirebaseAuth.instance.currentUser!.uid == widget.uid
-                        Expanded(
-                        child: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              opt = options.QUOTE;
-                            });
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 6.0, vertical: 4),
-                            child: Icon(
-                              FontAwesomeIcons.blog,
-                              color: (opt == options.QUOTE)
-                                  ? Colors.black
-                                  : Colors.black54,
-                              size: 21,
+                      FirebaseAuth.instance.currentUser!.uid == widget.uid
+                          ? Expanded(
+                              child: GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    opt = options.QUOTE;
+                                  });
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 6.0, vertical: 4),
+                                  child: Icon(
+                                    FontAwesomeIcons.blog,
+                                    color: (opt == options.QUOTE)
+                                        ? Colors.black
+                                        : Colors.black54,
+                                    size: 21,
+                                  ),
+                                ),
+                              ),
+                            )
+                          : Expanded(
+                              child: GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    opt = options.REEL;
+                                  });
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 6.0, vertical: 4),
+                                  child: Icon(
+                                    Icons.slow_motion_video,
+                                    color: (opt == options.REEL)
+                                        ? Colors.black
+                                        : Colors.black54,
+                                    size: 21,
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                      ),
                       if (FirebaseAuth.instance.currentUser!.uid == widget.uid)
                         Expanded(
                           child: GestureDetector(
@@ -1346,6 +1366,42 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           );
                         },
+                      );
+                    },
+                  ),
+                if (opt == options.REEL)
+                  FutureBuilder(
+                    future: FirebaseFirestore.instance
+                        .collection('reels')
+                        .where(
+                          'reelId',
+                        )
+                        .get(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+
+                      return GridView.builder(
+                        controller: ScrollController(keepScrollOffset: true),
+                        scrollDirection: Axis.vertical,
+                        shrinkWrap: true,
+                        itemCount: (snapshot.data! as dynamic).docs.length,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          crossAxisSpacing: 1.5,
+                          mainAxisSpacing: 1.5,
+                          childAspectRatio: 1,
+                        ),
+                        itemBuilder: (context, index) => Container(
+                          child: VideoPlayerSearch(
+                            videoUrl: (snapshot.data! as dynamic).docs[index]
+                                ['reelUrl'],
+                          ),
+                        ),
                       );
                     },
                   ),
