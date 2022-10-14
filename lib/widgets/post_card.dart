@@ -191,6 +191,7 @@ class _PostCardState extends State<PostCard> {
       },
     );
   }
+
   bottomSheet3(context, String txt) {
     showModalBottomSheet(
       backgroundColor: Colors.black.withOpacity(0),
@@ -535,7 +536,6 @@ class _PostCardState extends State<PostCard> {
                           onPressed: () {
                             bottomSheet3(context, "txt");
 
-
                             // showDialog(
                             //   useRootNavigator: false,
                             //   context: context,
@@ -573,7 +573,6 @@ class _PostCardState extends State<PostCard> {
                             //               .toList()),
                             //     );
                             //   },
-                            );
                           },
                           icon: const Icon(FontAwesomeIcons.ellipsisVertical),
                         ),
