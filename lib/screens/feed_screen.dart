@@ -41,136 +41,147 @@ class _FeedScreenState extends State<FeedScreen> {
       backgroundColor: Colors.black.withOpacity(0),
       context: context,
       builder: (BuildContext c) {
-        return Container(
-          color: Colors.transparent,
-          child: Container(
-            decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(8), topLeft: Radius.circular(8))),
-            width: MediaQuery.of(context).size.width,
-            padding: EdgeInsets.symmetric(
-              horizontal: 5,
-              vertical: 10,
-            ),
-            child: Column(
-              children: <Widget>[
-                SizedBox(height: 6),
-                Container(
-                  height: 4,
-                  width: 50,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    color: Colors.black,
-                  ),
+        return Column(
+          children: [
+            Expanded(
+                flex: 2,
+                child: SizedBox()),
+            Expanded(
+              flex: 8,
+            child: Container(
+              color: Colors.transparent,
+              child: Container(
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(8), topLeft: Radius.circular(8))),
+                width: MediaQuery.of(context).size.width,
+                padding: EdgeInsets.symmetric(
+                  horizontal: 5,
+                  vertical: 10,
                 ),
-                SizedBox(height: 20),
-                TextFormField(
-                  controller: searchController,
-                  decoration: InputDecoration(
-                    // suffixIcon: Icon(
-                    //   FontAwesomeIcons.magnifyingGlass,
-                    //   color: Colors.black54,
-                    // ),
-                    isDense: true,
-                    isCollapsed: true,
-                    filled: true,
-                    contentPadding: EdgeInsets.fromLTRB(
-                      10,
-                      10,
-                      0,
-                      10,
-                    ),
-                    hintStyle: TextStyle(fontWeight: FontWeight.w700),
-                    hintText: 'Search...',
-                    fillColor: Color(0xFFEFEFEF),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(
-                          color: const Color(0xFFD9D8D8), width: 1.5),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(
-                        color: Color(0xFFFFFFFF),
-                        width: 1,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    SizedBox(height: 6),
+                    Container(
+                      height: 4,
+                      width: 50,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        color: Colors.black,
                       ),
                     ),
-                  ),
-                  onTap: () {
-                    setState(() {});
-                  },
-                  onFieldSubmitted: (String _) {
-                    setState(() {});
-                    print(_);
-                  },
-                ),
+                    SizedBox(height: 20),
+                    TextFormField(
+                      controller: searchController,
+                      decoration: InputDecoration(
+                        // suffixIcon: Icon(
+                        //   FontAwesomeIcons.magnifyingGlass,
+                        //   color: Colors.black54,
+                        // ),
+                        isDense: true,
+                        isCollapsed: true,
+                        filled: true,
+                        contentPadding: EdgeInsets.fromLTRB(
+                          10,
+                          10,
+                          0,
+                          10,
+                        ),
+                        hintStyle: TextStyle(fontWeight: FontWeight.w700),
+                        hintText: 'Search...',
+                        fillColor: Color(0xFFEFEFEF),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(
+                              color: const Color(0xFFD9D8D8), width: 1.5),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Color(0xFFFFFFFF),
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                      onTap: () {
+                        setState(() {});
+                      },
+                      onFieldSubmitted: (String _) {
+                        setState(() {});
+                        print(_);
+                      },
+                    ),
 
-                StreamBuilder(
-                  stream: FirebaseFirestore.instance
-                      .collection('users')
-                      .snapshots(),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    }
+                    StreamBuilder(
+                      stream: FirebaseFirestore.instance
+                          .collection('users')
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
 
-                    return ListView.builder(
-                      shrinkWrap: true,
-                      physics: ClampingScrollPhysics(),
-                      itemCount: (snapshot.data! as dynamic).docs.length,
-                      itemBuilder: (context, index) => Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Align(
-                            alignment: Alignment.topLeft,
-                            child: Container(
-                              color: Colors.white,
-                              child: ListTile(
-                                trailing: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                        backgroundColor: btnCOlorblue,
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(5))),
-                                    onPressed: () {},
-                                    child: Text(
-                                      "Send",
-                                      style: TextStyle(color: Colors.white),
-                                    )),
-                                title: Text(
-                                    (snapshot.data! as dynamic)
-                                        .docs[index]['username']
-                                        .toString(),
-                                    style: TextStyle(
-                                        color: Color(0xFF000000),
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w700,
-                                        fontFamily: 'Roboto')),
-                                leading: CircleAvatar(
-                                  backgroundImage: NetworkImage(
-                                    (snapshot.data! as dynamic)
-                                        .docs[index]['photoUrl']
-                                        .toString(),
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          physics: ClampingScrollPhysics(),
+                          itemCount: (snapshot.data! as dynamic).docs.length,
+                          itemBuilder: (context, index) => Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Align(
+                                alignment: Alignment.topLeft,
+                                child: Container(
+                                  color: Colors.white,
+                                  child: ListTile(
+                                    trailing: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                            backgroundColor: btnCOlorblue,
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(5))),
+                                        onPressed: () {},
+                                        child: Text(
+                                          "Send",
+                                          style: TextStyle(color: Colors.white),
+                                        )),
+                                    title: Text(
+                                        (snapshot.data! as dynamic)
+                                            .docs[index]['username']
+                                            .toString(),
+                                        style: TextStyle(
+                                            color: Color(0xFF000000),
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w700,
+                                            fontFamily: 'Roboto')),
+                                    leading: CircleAvatar(
+                                      backgroundImage: NetworkImage(
+                                        (snapshot.data! as dynamic)
+                                            .docs[index]['photoUrl']
+                                            .toString(),
+                                      ),
+                                      radius: 20,
+                                    ),
+                                    subtitle: Text(
+                                        (snapshot.data! as dynamic)
+                                            .docs[index]['university']
+                                            .toString(),
+                                        style: TextStyle(
+                                            fontSize: 10, fontFamily: 'Roboto')),
                                   ),
-                                  radius: 20,
-                                ),
-                                subtitle: Text(
-                                    (snapshot.data! as dynamic)
-                                        .docs[index]['university']
-                                        .toString(),
-                                    style: TextStyle(
-                                        fontSize: 10, fontFamily: 'Roboto')),
-                              ),
-                            )),
-                      ),
-                    );
-                  },
-                )
-              ],
+                                )),
+                          ),
+                        );
+                      },
+                    )
+                  ],
+                ),
+              ),
             ),
           ),
+        ]
         );
       },
     );
