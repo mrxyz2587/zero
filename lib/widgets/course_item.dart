@@ -4,8 +4,10 @@ import 'package:intl/intl.dart';
 
 class CourseItem extends StatelessWidget {
   final snap;
+  final bool isReg;
   final Function()? onpressed;
-  const CourseItem({Key? key, required this.snap, this.onpressed})
+  const CourseItem(
+      {Key? key, required this.snap, this.onpressed, required this.isReg})
       : super(key: key);
 
   @override
@@ -16,7 +18,9 @@ class CourseItem extends StatelessWidget {
         onTap: onpressed,
         child: Card(
           clipBehavior: Clip.antiAlias,
-          elevation: 3,
+          elevation: 0,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -27,7 +31,7 @@ class CourseItem extends StatelessWidget {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(8.r),
                     child: Image.network(
-                      snap['imageUrl'].toString(),
+                      snap['companyimage'].toString(),
                       height: 90.h,
                       fit: BoxFit.cover,
                     ),
@@ -43,7 +47,7 @@ class CourseItem extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        snap['evetitle'],
+                        snap['certificationname'],
                         textAlign: TextAlign.start,
                         style: TextStyle(
                           fontSize: 16.sp,
@@ -54,12 +58,36 @@ class CourseItem extends StatelessWidget {
                         height: 10.h,
                       ),
                       Text(
-                        snap["evedescc"].toString(),
+                        snap["certificationdescription"].toString(),
                         // 'Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled.',
                         maxLines: 4,
                         style: TextStyle(
                           fontSize: 11.sp,
                         ),
+                      ),
+                      SizedBox(
+                        height: 10.h,
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            snap["certificationlevel"].toString() +
+                                ' | ' +
+                                snap["coursetiming"].toString(),
+                            // 'Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled.',
+                            maxLines: 4,
+                            style: TextStyle(
+                                fontSize: 11.sp, color: Colors.black54),
+                          ),
+                          if (isReg == true)
+                            Text(
+                              "Registered",
+                              style: TextStyle(
+                                  fontSize: 15.sp,
+                                  color: Colors.green,
+                                  fontStyle: FontStyle.italic),
+                            ),
+                        ],
                       ),
                     ],
                   ),

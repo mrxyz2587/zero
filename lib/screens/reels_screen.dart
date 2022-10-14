@@ -12,7 +12,7 @@ import '../utils/utils.dart';
 import '../widgets/like_animation.dart';
 
 class ReelsScreen extends StatefulWidget {
-  const ReelsScreen({Key? key}) : super(key: key);
+  ReelsScreen();
 
   @override
   State<ReelsScreen> createState() => _ReelsScreenState();
@@ -60,110 +60,111 @@ class _ReelsScreenState extends State<ReelsScreen> {
             allowImplicitScrolling: true,
             onPageChanged: (val) {},
             itemCount: snapshot.data!.docs.length,
-            itemBuilder: (ctx, index) => Container(
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width,
-              child: Stack(
-                children: [
-                  VideoPlayerItem(
-                      videoUrl: snapshot.data!.docs[index].data()["reelUrl"]),
-                  Positioned(
-                      top: 20,
-                      left: 10,
-                      child: Row(
+            itemBuilder: (ctx, index) => Stack(
+              children: [
+                Container(
+                  child: VideoPlayerItem(
+                    videoUrl: snapshot.data!.docs[index].data()["reelUrl"],
+                  ),
+                  height: MediaQuery.of(context).size.height,
+                  width: MediaQuery.of(context).size.width,
+                ),
+                Positioned(
+                  top: 30,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8.0, vertical: 10),
+                    child: Row(
+                      children: [
+                        Icon(FontAwesomeIcons.arrowLeft, color: Colors.white),
+                        SizedBox(width: 20),
+                        Text(
+                          "Social Wall",
+                          style: TextStyle(color: Colors.white, fontSize: 20),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Positioned(
+                  right: 30,
+                  bottom: 80,
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.favorite_outlined,
+                        color: Colors.red,
+                        size: 30,
+                      ),
+                      SizedBox(height: 12),
+                      Text(
+                        "126.5K",
+                        style: TextStyle(color: Colors.white, fontSize: 10),
+                      ),
+                      SizedBox(height: 20),
+                      Icon(FontAwesomeIcons.comment,
+                          color: Colors.white, size: 25),
+                      SizedBox(height: 10),
+                      Text(
+                        "126",
+                        style: TextStyle(color: Colors.white, fontSize: 10),
+                      ),
+                      SizedBox(height: 20),
+                      Icon(
+                        FontAwesomeIcons.solidPaperPlane,
+                        color: Colors.white,
+                        size: 22,
+                      ),
+                      SizedBox(height: 10),
+                      Text(
+                        "126",
+                        style: TextStyle(color: Colors.white, fontSize: 10),
+                      ),
+                      SizedBox(height: 20),
+                      InkWell(
+                        onTap: () {},
+                        child: Icon(
+                          Icons.more_vert_rounded,
+                          color: Colors.white,
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                    ],
+                  ),
+                ),
+                Positioned(
+                  left: 25,
+                  bottom: 80,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
                         children: [
-                          IconButton(
-                            onPressed: () {},
-                            icon: Icon(
-                              FontAwesomeIcons.arrowLeft,
-                              color: Colors.white,
-                            ),
-                            color: Colors.transparent,
+                          CircleAvatar(
+                            backgroundImage: AssetImage("images/zero_logo.png"),
+                            radius: 15,
                           ),
-                          SizedBox(
-                            width: 20,
-                          ),
+                          SizedBox(width: 10),
                           Text(
-                            "Social Wall",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700),
-                          )
+                            snapshot.data!.docs[index].data()["username"],
+                            style: TextStyle(color: Colors.white, fontSize: 18),
+                          ),
                         ],
-                      )),
-                  Positioned(
-                      bottom: 20,
-                      right: 20,
-                      child: Column(
-                        children: [
-                          LikeAnimation(
-                            isAnimating: snapshot.data!.docs[index]
-                                .data()['likes']
-                                .contains(userProvider.getUser.uid),
-                            smallLike: true,
-                            child: IconButton(
-                              icon: snapshot.data!.docs[index]
-                                      .data()['likes']
-                                      .contains(userProvider.getUser.uid)
-                                  ? const Icon(
-                                      FontAwesomeIcons.solidHeart,
-                                      color: Colors.red,
-                                    )
-                                  : const Icon(
-                                      FontAwesomeIcons.heart,
-                                      color: Colors.white,
-                                    ),
-                              onPressed: () => FireStoreMethods().likePost(
-                                snapshot.data!.docs[index]
-                                    .data()['reelId']
-                                    .toString(),
-                                userProvider.getUser.uid,
-                                snapshot.data!.docs[index].data()['likes'],
-                              ),
-                            ),
-                          ),
-                          Text(
-                            '${snapshot.data!.docs[index].data()['likes'].length} Likes',
-                            style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white),
-                          ),
-                          SizedBox(width: 30),
-                          IconButton(
-                            color: Colors.transparent,
-                            icon: const Icon(
-                              Icons.comment_outlined,
-                              color: Colors.white,
-                            ),
-                            onPressed: () => Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => ReelsCommentsScreen(
-                                  postId: snapshot.data!.docs[index]
-                                      .data()['reelId']
-                                      .toString(),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Text(
-                            '0 comments',
-                            style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white),
-                          ),
-                          SizedBox(width: 30),
-                          GestureDetector(
-                              child: Image.asset(
-                            'images/share_icons.png',
-                            height: 20,
-                          )),
-                        ],
-                      ))
-                ],
-                // snap: snapshot.data!.docs[index].data(),
-              ),
+                      ),
+                      Container(
+                        width: 250,
+                        child: Text(
+                          "desvkgmb fvmfbdl mbmbgkbm bkmbokgm gkbgbgb  "
+                          " gbgt bg  kr rg rgrgbrgbv rfrgr rgrg",
+                          softWrap: true,
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ],
             ),
           );
         },
@@ -171,3 +172,5 @@ class _ReelsScreenState extends State<ReelsScreen> {
     );
   }
 }
+
+//TODO: double tap like animation,number of likes like button,

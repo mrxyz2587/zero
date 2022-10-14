@@ -25,14 +25,156 @@ class FeedScreen extends StatefulWidget {
 }
 
 class _FeedScreenState extends State<FeedScreen> {
-  List<String> imageUrls = [
-    'https://www.insidesport.in/wp-content/uploads/2021/04/016_WM37_04102021CG_01753-290270b6e5fecca96e9e57bf0cb1fe50.jpg',
-    'https://imgs.search.brave.com/IZojU7PfRbPCArOavEepNV_YqGW8u7kA3pk3GVxPSWc/rs:fit:1200:1200:1/g:ce/aHR0cHM6Ly93d3cu/dGhlbm9sb2d5LmNv/bS93cC1jb250ZW50/L3VwbG9hZHMvMjAx/Ni8wMS82MDg4MzIu/anBn'
-  ];
   double longitude = 0;
   double latitude = 0;
   double distanceInMeters = 0;
   bool isLoading = true;
+  bool isLoasdings = true;
+
+  var searchController = TextEditingController();
+
+  bottomSheet2(context, String txt) {
+    showModalBottomSheet(
+      enableDrag: true,
+      isScrollControlled: true,
+      isDismissible: true,
+      backgroundColor: Colors.black.withOpacity(0),
+      context: context,
+      builder: (BuildContext c) {
+        return Container(
+          color: Colors.transparent,
+          child: Container(
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(8), topLeft: Radius.circular(8))),
+            width: MediaQuery.of(context).size.width,
+            padding: EdgeInsets.symmetric(
+              horizontal: 5,
+              vertical: 10,
+            ),
+            child: Column(
+              children: <Widget>[
+                SizedBox(height: 6),
+                Container(
+                  height: 4,
+                  width: 50,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    color: Colors.black,
+                  ),
+                ),
+                SizedBox(height: 20),
+                TextFormField(
+                  controller: searchController,
+                  decoration: InputDecoration(
+                    // suffixIcon: Icon(
+                    //   FontAwesomeIcons.magnifyingGlass,
+                    //   color: Colors.black54,
+                    // ),
+                    isDense: true,
+                    isCollapsed: true,
+                    filled: true,
+                    contentPadding: EdgeInsets.fromLTRB(
+                      10,
+                      10,
+                      0,
+                      10,
+                    ),
+                    hintStyle: TextStyle(fontWeight: FontWeight.w700),
+                    hintText: 'Search...',
+                    fillColor: Color(0xFFEFEFEF),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                          color: const Color(0xFFD9D8D8), width: 1.5),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(
+                        color: Color(0xFFFFFFFF),
+                        width: 1,
+                      ),
+                    ),
+                  ),
+                  onTap: () {
+                    setState(() {});
+                  },
+                  onFieldSubmitted: (String _) {
+                    setState(() {});
+                    print(_);
+                  },
+                ),
+
+                StreamBuilder(
+                  stream: FirebaseFirestore.instance
+                      .collection('users')
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      physics: ClampingScrollPhysics(),
+                      itemCount: (snapshot.data! as dynamic).docs.length,
+                      itemBuilder: (context, index) => Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Align(
+                            alignment: Alignment.topLeft,
+                            child: Container(
+                              color: Colors.white,
+                              child: ListTile(
+                                trailing: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                        backgroundColor: btnCOlorblue,
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(5))),
+                                    onPressed: () {},
+                                    child: Text(
+                                      "Send",
+                                      style: TextStyle(color: Colors.white),
+                                    )),
+                                title: Text(
+                                    (snapshot.data! as dynamic)
+                                        .docs[index]['username']
+                                        .toString(),
+                                    style: TextStyle(
+                                        color: Color(0xFF000000),
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w700,
+                                        fontFamily: 'Roboto')),
+                                leading: CircleAvatar(
+                                  backgroundImage: NetworkImage(
+                                    (snapshot.data! as dynamic)
+                                        .docs[index]['photoUrl']
+                                        .toString(),
+                                  ),
+                                  radius: 20,
+                                ),
+                                subtitle: Text(
+                                    (snapshot.data! as dynamic)
+                                        .docs[index]['university']
+                                        .toString(),
+                                    style: TextStyle(
+                                        fontSize: 10, fontFamily: 'Roboto')),
+                              ),
+                            )),
+                      ),
+                    );
+                  },
+                )
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 
   /// Determine the current position of the device.
   ///
@@ -79,6 +221,8 @@ class _FeedScreenState extends State<FeedScreen> {
   @override
   void initState() {
     _determinePosition();
+    getData();
+
     // TODO: implement initState
     // getLocation();
     super.initState();
@@ -117,6 +261,17 @@ class _FeedScreenState extends State<FeedScreen> {
   }
 
   int i = 0;
+  void getData() async {
+    var userSnap = await FirebaseFirestore.instance
+        .collection('users')
+        .get()
+        .then((value) {
+      setState(() {
+        isLoasdings = false;
+      });
+    });
+  }
+
   void getdistance() async {
     await FirebaseFirestore.instance
         .collection("users")
@@ -147,11 +302,18 @@ class _FeedScreenState extends State<FeedScreen> {
     final UserProvider userProvider = Provider.of<UserProvider>(context);
     getLocation();
 
-    return Scaffold(
-      backgroundColor:
-          width > webScreenSize ? webBackgroundColor : Color(0xFFEFEFEF),
-      appBar: (userProvider.getUser.username.isNotEmpty)
-          ? AppBar(
+    return isLoasdings
+        ? Scaffold(
+            backgroundColor: Colors.white,
+            body: Center(
+                child: CircularProgressIndicator(
+              color: Colors.grey.shade300,
+              strokeWidth: 1.5,
+            )),
+          )
+        : Scaffold(
+            backgroundColor: Color(0xFFEFEFEF),
+            appBar: AppBar(
               backgroundColor: mobileBackgroundColor,
               centerTitle: true,
               leading: GestureDetector(
@@ -204,15 +366,15 @@ class _FeedScreenState extends State<FeedScreen> {
               actions: [
                 IconButton(
                   icon: const Icon(
-                    FontAwesomeIcons.magnifyingGlass,
+                    FontAwesomeIcons.solidBell,
                     color: Colors.black,
                     size: 18,
                   ),
                   onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => SearchScreen()));
+                    // Navigator.push(
+                    //     context,
+                    //     MaterialPageRoute(
+                    //         builder: (context) => N()));
                   },
                 ),
                 IconButton(
@@ -227,10 +389,8 @@ class _FeedScreenState extends State<FeedScreen> {
                   },
                 ),
               ],
-            )
-          : AppBar(),
-      body: (userProvider.getUser.username.isNotEmpty)
-          ? ListView(
+            ),
+            body: ListView(
               children: [
                 StreamBuilder(
                   stream: FirebaseFirestore.instance
@@ -277,10 +437,12 @@ class _FeedScreenState extends State<FeedScreen> {
                             child: ClipRRect(
                                 borderRadius: BorderRadius.circular(10),
                                 child: Image.network(
-                                    snapshot.data!.docs[itemIndex]
-                                        .data()["imageUrl"]
-                                        .toString(),
-                                    fit: BoxFit.fill)),
+                                        snapshot.data!.docs[itemIndex]
+                                            .data()["imageUrl"]
+                                            .toString(),
+                                        fit: BoxFit.fill) ??
+                                    Image.asset("images/logo.jpeg",
+                                        fit: BoxFit.fill)),
                           ),
                         ),
                         // imageUrls.map((i) {
@@ -349,6 +511,9 @@ class _FeedScreenState extends State<FeedScreen> {
                         ),
                         child: PostCard(
                           snap: snapshot.data!.docs[index].data(),
+                          onshareingbtnPressed: () {
+                            bottomSheet2(context, "txt");
+                          },
                         ),
                       ),
                     );
@@ -356,11 +521,11 @@ class _FeedScreenState extends State<FeedScreen> {
                 )
               ],
             )
-          : Center(
-              child: CircularProgressIndicator(
-              color: Colors.grey.shade300,
-              strokeWidth: 1.5,
-            )),
-    );
+            // : Center(
+            //     child: CircularProgressIndicator(
+            //     color: Colors.grey.shade300,
+            //     strokeWidth: 1.5,
+            //   )),
+            );
   }
 }

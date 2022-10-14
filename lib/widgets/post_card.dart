@@ -17,10 +17,10 @@ import 'package:provider/provider.dart';
 
 class PostCard extends StatefulWidget {
   final snap;
-  const PostCard({
-    Key? key,
-    required this.snap,
-  }) : super(key: key);
+  final Function()? onshareingbtnPressed;
+  const PostCard(
+      {Key? key, required this.snap, required this.onshareingbtnPressed})
+      : super(key: key);
 
   @override
   State<PostCard> createState() => _PostCardState();
@@ -34,6 +34,162 @@ class _PostCardState extends State<PostCard> {
   void initState() {
     super.initState();
     fetchCommentLen();
+  }
+
+  bottomSheet2(context, String txt) {
+    showModalBottomSheet(
+      backgroundColor: Colors.black.withOpacity(0),
+      context: context,
+      builder: (BuildContext c) {
+        return Container(
+          color: Colors.transparent,
+          child: Container(
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(8), topLeft: Radius.circular(8))),
+            height: MediaQuery.of(context).size.height * 0.35,
+            width: MediaQuery.of(context).size.width,
+            padding: EdgeInsets.symmetric(
+              horizontal: 5,
+              vertical: 10,
+            ),
+            child: Column(
+              children: <Widget>[
+                SizedBox(height: 6),
+                Container(
+                  height: 4,
+                  width: 50,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    color: Colors.black,
+                  ),
+                ),
+                SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                border: Border.all(
+                                  color: Colors.black87,
+                                ),
+                                borderRadius: BorderRadius.circular(25)),
+                            child: Padding(
+                              padding: const EdgeInsets.all(15.0),
+                              child: Icon(
+                                FontAwesomeIcons.solidPaperPlane,
+                                size: 18,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text('Chat',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFF000000),
+                                  fontSize: 13,
+                                )),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(width: 18),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                border: Border.all(
+                                  color: Colors.black87,
+                                ),
+                                borderRadius: BorderRadius.circular(25)),
+                            child: Padding(
+                              padding: const EdgeInsets.all(15.0),
+                              child: Icon(
+                                FontAwesomeIcons.shareNodes,
+                                size: 18,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text('Share',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFF000000),
+                                  fontSize: 13,
+                                )),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(width: 18),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                border: Border.all(
+                                  color: Colors.black87,
+                                ),
+                                borderRadius: BorderRadius.circular(25)),
+                            child: Padding(
+                              padding: const EdgeInsets.all(15.0),
+                              child: Icon(
+                                FontAwesomeIcons.link,
+                                size: 18,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text('Link',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    color: Color(0xFF000000),
+                                    fontSize: 13)),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                Divider(thickness: 0.5, color: Colors.black12),
+                ListTile(
+                  title: Text('Edit',
+                      style: TextStyle(color: Color(0xFF000000), fontSize: 17)),
+                ),
+                ListTile(
+                  title: Text('Delete',
+                      style: TextStyle(color: Color(0xFF000000), fontSize: 17)),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   fetchCommentLen() async {
@@ -176,6 +332,52 @@ class _PostCardState extends State<PostCard> {
                   widget.snap['uid'].toString() == user.uid
                       ? IconButton(
                           onPressed: () {
+                            bottomSheet2(context, "txt");
+                            // showDialog(
+                            //   useRootNavigator: false,
+                            //   context: context,
+                            //   builder: (context) {
+                            //     return Dialog(
+                            //       child: ListView(
+                            //           padding: const EdgeInsets.symmetric(
+                            //               vertical: 16),
+                            //           shrinkWrap: true,
+                            //           children: [
+                            //             'Delete',
+                            //             'Edit',
+                            //             'Share..',
+                            //             'Copy Link',
+                            //             'Share',
+                            //           ]
+                            //               .map(
+                            //                 (e) => InkWell(
+                            //                     child: Container(
+                            //                       padding: const EdgeInsets
+                            //                               .symmetric(
+                            //                           vertical: 12,
+                            //                           horizontal: 16),
+                            //                       child: Text(e),
+                            //                     ),
+                            //                     onTap: () {
+                            //                       if (e == "Delete") {
+                            //                         deletePost(
+                            //                           widget.snap['postId']
+                            //                               .toString(),
+                            //                         );
+                            //                       }
+                            //                       // remove the dialog box
+                            //                       Navigator.of(context).pop();
+                            //                     }),
+                            //               )
+                            //               .toList()),
+                            //     );
+                            //   },
+                            // );
+                          },
+                          icon: const Icon(FontAwesomeIcons.ellipsisVertical),
+                        )
+                      : IconButton(
+                          onPressed: () {
                             showDialog(
                               useRootNavigator: false,
                               context: context,
@@ -186,7 +388,9 @@ class _PostCardState extends State<PostCard> {
                                           vertical: 16),
                                       shrinkWrap: true,
                                       children: [
-                                        'Delete',
+                                        'Share..',
+                                        'Copy Link',
+                                        'Share',
                                       ]
                                           .map(
                                             (e) => InkWell(
@@ -198,10 +402,12 @@ class _PostCardState extends State<PostCard> {
                                                   child: Text(e),
                                                 ),
                                                 onTap: () {
-                                                  deletePost(
-                                                    widget.snap['postId']
-                                                        .toString(),
-                                                  );
+                                                  if (e == "Delete") {
+                                                    deletePost(
+                                                      widget.snap['postId']
+                                                          .toString(),
+                                                    );
+                                                  }
                                                   // remove the dialog box
                                                   Navigator.of(context).pop();
                                                 }),
@@ -212,8 +418,7 @@ class _PostCardState extends State<PostCard> {
                             );
                           },
                           icon: const Icon(FontAwesomeIcons.ellipsisVertical),
-                        )
-                      : Container(),
+                        ),
                 ],
               ),
             ),
@@ -237,7 +442,6 @@ class _PostCardState extends State<PostCard> {
                   // ),
                 ),
               ),
-
             GestureDetector(
               onDoubleTap: () {
                 FireStoreMethods().likePost(
@@ -322,10 +526,11 @@ class _PostCardState extends State<PostCard> {
                   ),
                   SizedBox(width: 12),
                   GestureDetector(
+                      onTap: widget.onshareingbtnPressed,
                       child: Image.asset(
-                    'images/share_icons.png',
-                    height: 20,
-                  )),
+                        'images/share_icons.png',
+                        height: 20,
+                      )),
                   Expanded(child: SizedBox()),
                   GestureDetector(
                     onTap: () => Navigator.of(context).push(

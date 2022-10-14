@@ -8,6 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:zero_fin/screens/Mentorship.dart';
+import 'package:zero_fin/screens/allcourses.dart';
+import 'package:zero_fin/screens/examCrackers.dart';
+import 'package:zero_fin/screens/inernship_screen.dart';
 
 import '../models/events_model.dart';
 import '../resources/firestore_methods.dart';
@@ -52,8 +56,13 @@ class _Course_screenState extends State<Course_screen> {
                     Padding(
                       padding: const EdgeInsets.only(
                           right: 40, top: 30, bottom: 20, left: 40),
-                      child: RaisedButton(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
                         padding: EdgeInsets.all(15),
+                       backgroundColor: Color(0xFF262626),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50)),
+                        ),
                         onPressed: () async {
                           FilePickerResult? result = await FilePicker.platform
                               .pickFiles(
@@ -61,6 +70,7 @@ class _Course_screenState extends State<Course_screen> {
                                   allowCompression: true,
                                   type: FileType.custom,
                                   allowedExtensions: ["pdf"]);
+
                           if (result != null) {
                             File c = File(result.files.single.path.toString());
 
@@ -125,9 +135,9 @@ class _Course_screenState extends State<Course_screen> {
                                 style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold)),
-                        color: Color(0xFF262626),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(50)),
+                        // color: Color(0xFF262626),
+                        // shape: RoundedRectangleBorder(
+                        //     borderRadius: BorderRadius.circular(50)),
                       ),
                     ),
                     Padding(
@@ -135,124 +145,163 @@ class _Course_screenState extends State<Course_screen> {
                       child: GridView(
                         controller: ScrollController(keepScrollOffset: true),
                         children: [
-                          Card(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Expanded(
-                                    flex: 2,
-                                    child: Image.asset(
-                                      'images/exam.jpeg',
-                                    )),
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 15.0),
-                                  child: Text(
-                                    'Exam Crackers',
-                                    style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w700,
-                                        fontFamily: 'Comfortaa'),
-                                  ),
-                                )
-                              ],
-                            ),
-                            color: Colors.white,
-                            elevation: 2,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(5),
-                              ),
-                            ),
-                          ),
-                          Card(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Expanded(
-                                    flex: 2,
-                                    child: Image.asset(
-                                      'images/certification.jpeg',
-                                    )),
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 15.0),
-                                  child: Text(
-                                    'Certification',
-                                    style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w700,
-                                        fontFamily: 'Comfortaa'),
-                                  ),
-                                )
-                              ],
-                            ),
-                            color: Colors.white,
-                            elevation: 2,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(5),
-                              ),
-                            ),
-                          ),
-                          Card(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Expanded(
-                                    flex: 2,
-                                    child: Image.asset(
-                                      'images/internship.jpeg',
-                                    )),
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 15.0),
-                                  child: Text(
-                                    'Internship',
-                                    style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w700,
-                                        fontFamily: 'Comfortaa'),
-                                  ),
-                                )
-                              ],
-                            ),
-                            color: Colors.white,
-                            elevation: 2,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(5),
-                              ),
-                            ),
-                          ),
-                          Card(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Expanded(
-                                    flex: 2,
-                                    child: Image.asset(
-                                      'images/mentores.jpeg',
-                                    )),
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 15.0),
-                                  child: Text(
-                                    'Mentorship',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      fontFamily: 'Comfortaa',
-                                      fontSize: 15,
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => ExamCrackers()));
+                            },
+                            child: Card(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                      flex: 2,
+                                      child: Image.asset(
+                                        'images/exam.jpeg',
+                                      )),
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.only(bottom: 15.0),
+                                    child: Text(
+                                      'Exam Crackers',
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w700,
+                                          fontFamily: 'Comfortaa'),
                                     ),
-                                  ),
-                                )
-                              ],
+                                  )
+                                ],
+                              ),
+                              color: Colors.white,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(5),
+                                ),
+                              ),
                             ),
-                            color: Colors.white,
-                            elevation: 2,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(5),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          CertificationCOurses()));
+                            },
+                            child: Card(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                      flex: 2,
+                                      child: Image.asset(
+                                        'images/certification.jpeg',
+                                      )),
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.only(bottom: 15.0),
+                                    child: Text(
+                                      'Certification',
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w700,
+                                          fontFamily: 'Comfortaa'),
+                                    ),
+                                  )
+                                ],
+                              ),
+                              color: Colors.white,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(5),
+                                ),
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          InternshipScreen()));
+                            },
+                            child: Card(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                      flex: 2,
+                                      child: Image.asset(
+                                        'images/internship.jpeg',
+                                      )),
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.only(bottom: 15.0),
+                                    child: Text(
+                                      'Internship',
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w700,
+                                          fontFamily: 'Comfortaa'),
+                                    ),
+                                  )
+                                ],
+                              ),
+                              color: Colors.white,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(5),
+                                ),
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          MentorshipCourses()));
+                            },
+                            child: Card(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                      flex: 2,
+                                      child: Image.asset(
+                                        'images/mentores.jpeg',
+                                      )),
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.only(bottom: 15.0),
+                                    child: Text(
+                                      'Mentorship',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        fontFamily: 'Comfortaa',
+                                        fontSize: 15,
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                              color: Colors.white,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(5),
+                                ),
                               ),
                             ),
                           ),

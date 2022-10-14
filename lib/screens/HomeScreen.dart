@@ -2,7 +2,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:zero_fin/screens/search_screen.dart';
 import 'package:zero_fin/utils/colors.dart';
 
-import '/Authenticate/Methods.dart';
 import '/Screens/ChatRoom.dart';
 import '/group_chats/group_chat_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -143,10 +142,11 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                     ),
                   ),
                 ),
-                RaisedButton(
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(5)),
-                  color: Colors.black87,
+                  backgroundColor: Colors.black87,),
                   onPressed: onSearch,
                   child: Text("Search", style: TextStyle(color: Colors.white)),
                 ),

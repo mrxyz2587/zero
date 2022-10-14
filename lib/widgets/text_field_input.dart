@@ -27,10 +27,9 @@ class TextFieldInput extends StatelessWidget {
           color: Colors.black45,
         ),
         keyboardType: textInputType,
-        showCursor: false,
+        cursorColor: Colors.black38,
         obscureText: isPass,
         decoration: InputDecoration(
-          enabled: true,
           isDense: true,
           contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
           hintText: hintText,
