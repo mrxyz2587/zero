@@ -41,7 +41,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   var userData = {};
   var name;
   OverlayEntry? _popupDialog;
-  // final TextEditingController _nameControlee = TextEditingController();
+  // final TextEditingController _nameControl ee = TextEditingController();
   final TextEditingController bioCOntrolee = TextEditingController();
   var postData = {};
   int postLen = 0;
@@ -976,7 +976,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ),
                       ),
-                      Expanded(
+                      if (FirebaseAuth.instance.currentUser!.uid == widget.uid
+                        Expanded(
                         child: GestureDetector(
                           onTap: () {
                             setState(() {
