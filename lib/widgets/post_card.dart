@@ -191,6 +191,161 @@ class _PostCardState extends State<PostCard> {
       },
     );
   }
+  bottomSheet3(context, String txt) {
+    showModalBottomSheet(
+      backgroundColor: Colors.black.withOpacity(0),
+      context: context,
+      builder: (BuildContext c) {
+        return Container(
+          color: Colors.transparent,
+          child: Container(
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(8), topLeft: Radius.circular(8))),
+            height: MediaQuery.of(context).size.height * 0.35,
+            width: MediaQuery.of(context).size.width,
+            padding: EdgeInsets.symmetric(
+              horizontal: 5,
+              vertical: 10,
+            ),
+            child: Column(
+              children: <Widget>[
+                SizedBox(height: 6),
+                Container(
+                  height: 4,
+                  width: 50,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    color: Colors.black,
+                  ),
+                ),
+                SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                border: Border.all(
+                                  color: Colors.black87,
+                                ),
+                                borderRadius: BorderRadius.circular(25)),
+                            child: Padding(
+                              padding: const EdgeInsets.all(15.0),
+                              child: Icon(
+                                FontAwesomeIcons.solidPaperPlane,
+                                size: 18,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text('Chat',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFF000000),
+                                  fontSize: 13,
+                                )),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(width: 18),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                border: Border.all(
+                                  color: Colors.black87,
+                                ),
+                                borderRadius: BorderRadius.circular(25)),
+                            child: Padding(
+                              padding: const EdgeInsets.all(15.0),
+                              child: Icon(
+                                FontAwesomeIcons.shareNodes,
+                                size: 18,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text('Share',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFF000000),
+                                  fontSize: 13,
+                                )),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(width: 18),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                border: Border.all(
+                                  color: Colors.black87,
+                                ),
+                                borderRadius: BorderRadius.circular(25)),
+                            child: Padding(
+                              padding: const EdgeInsets.all(15.0),
+                              child: Icon(
+                                FontAwesomeIcons.link,
+                                size: 18,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text('Link',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    color: Color(0xFF000000),
+                                    fontSize: 13)),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                Divider(thickness: 0.5, color: Colors.black12),
+                ListTile(
+                  title: Text('Hide',
+                      style: TextStyle(color: Color(0xFF000000), fontSize: 17)),
+                ),
+                // ListTile(
+                //   title: Text('Delete',
+                //       style: TextStyle(color: Color(0xFF000000), fontSize: 17)),
+                // ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 
   fetchCommentLen() async {
     try {
@@ -378,43 +533,46 @@ class _PostCardState extends State<PostCard> {
                         )
                       : IconButton(
                           onPressed: () {
-                            showDialog(
-                              useRootNavigator: false,
-                              context: context,
-                              builder: (context) {
-                                return Dialog(
-                                  child: ListView(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 16),
-                                      shrinkWrap: true,
-                                      children: [
-                                        'Share..',
-                                        'Copy Link',
-                                        'Share',
-                                      ]
-                                          .map(
-                                            (e) => InkWell(
-                                                child: Container(
-                                                  padding: const EdgeInsets
-                                                          .symmetric(
-                                                      vertical: 12,
-                                                      horizontal: 16),
-                                                  child: Text(e),
-                                                ),
-                                                onTap: () {
-                                                  if (e == "Delete") {
-                                                    deletePost(
-                                                      widget.snap['postId']
-                                                          .toString(),
-                                                    );
-                                                  }
-                                                  // remove the dialog box
-                                                  Navigator.of(context).pop();
-                                                }),
-                                          )
-                                          .toList()),
-                                );
-                              },
+                            bottomSheet3(context, "txt");
+
+
+                            // showDialog(
+                            //   useRootNavigator: false,
+                            //   context: context,
+                            //   builder: (context) {
+                            //     return Dialog(
+                            //       child: ListView(
+                            //           padding: const EdgeInsets.symmetric(
+                            //               vertical: 16),
+                            //           shrinkWrap: true,
+                            //           children: [
+                            //             'Share..',
+                            //             'Copy Link',
+                            //             'Share',
+                            //           ]
+                            //               .map(
+                            //                 (e) => InkWell(
+                            //                     child: Container(
+                            //                       padding: const EdgeInsets
+                            //                               .symmetric(
+                            //                           vertical: 12,
+                            //                           horizontal: 16),
+                            //                       child: Text(e),
+                            //                     ),
+                            //                     onTap: () {
+                            //                       if (e == "Delete") {
+                            //                         deletePost(
+                            //                           widget.snap['postId']
+                            //                               .toString(),
+                            //                         );
+                            //                       }
+                            //                       // remove the dialog box
+                            //                       Navigator.of(context).pop();
+                            //                     }),
+                            //               )
+                            //               .toList()),
+                            //     );
+                            //   },
                             );
                           },
                           icon: const Icon(FontAwesomeIcons.ellipsisVertical),
