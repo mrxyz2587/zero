@@ -50,6 +50,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
     final User user = Provider.of<UserProvider>(context).getUser;
 
     return Scaffold(
+      backgroundColor: Color(0xFFEFEFEF),
       appBar: AppBar(
         elevation: 2,
         leading: IconButton(
@@ -81,12 +82,10 @@ class _CommentsScreenState extends State<CommentsScreen> {
             AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(
-              child: Center(
-                  child: CircularProgressIndicator(
-                color: Colors.grey.shade200,
-                strokeWidth: 1.5,
-              )),
-            );
+                child: CircularProgressIndicator(
+              color: Colors.white,
+              strokeWidth: 1.5,
+            ));
           }
 
           return ListView.builder(
