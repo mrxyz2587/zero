@@ -1,5 +1,5 @@
+import 'package:data_connection_checker_tv/data_connection_checker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 
 import '/responsive/mobile_screen_layout.dart';
 import '/responsive/responsive_layout.dart';
@@ -7,7 +7,6 @@ import '/responsive/web_screen_layout.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:zero_fin/screens/login_screen.dart';
-import 'constants.dart';
 
 class Splash extends StatefulWidget {
   static const id = '/SplashScreen';
@@ -18,43 +17,81 @@ class Splash extends StatefulWidget {
 class _SplashState extends State<Splash> {
   void initState() {
     super.initState();
-    Timer(
-      Duration(seconds: 5),
-      () {
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) {
-          return StreamBuilder(
-            stream: FirebaseAuth.instance.authStateChanges(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.active) {
-                // Checking if the snapshot has any data or not
-                if (snapshot.hasData) {
-                  // if snapshot has data which means user is logged in then we check the width of screen and accordingly display the screen layout
-                  return const ResponsiveLayout(
-                    mobileScreenLayout: MobileScreenLayout(),
-                    webScreenLayout: WebScreenLayout(),
-                  );
-                } else if (snapshot.hasError) {
-                  return Center(
-                    child: Text('${snapshot.error}'),
-                  );
-                }
-              }
+    process();
+  }
 
-              // means connection to future hasnt been made yet
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(
-                  child: CircularProgressIndicator(),
+/*
+* Void process first checks the network state of the mobile and then accordingly pushes the user to next screen
+* or pritns a snackbar this  method is called in initstate. In timer function we also check that user isalready logged in or not
+* using snapshot.ConnectionState
+*
+* */
+  void process() async {
+    await DataConnectionChecker().onStatusChange.listen((event) {
+      switch (event) {
+        case DataConnectionStatus.connected:
+          Timer(
+            Duration(seconds: 5),
+            () {
+              Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (context) {
+                return StreamBuilder(
+                  stream: FirebaseAuth.instance.authStateChanges(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.active) {
+                      // Checking if the snapshot has any data or not
+                      if (snapshot.hasData) {
+                        // if snapshot has data which means user is logged in then we check the width of screen and accordingly display the screen layout
+                        return const ResponsiveLayout(
+                          mobileScreenLayout: MobileScreenLayout(),
+                          webScreenLayout: WebScreenLayout(),
+                        );
+                      } else if (snapshot.hasError) {
+                        return Center(
+                          child: Text('${snapshot.error}'),
+                        );
+                      }
+                    }
+
+                    // means connection to future hasnt been made yet
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+
+                    return LoginScreen();
+                  },
                 );
-              }
-
-              return LoginScreen();
+              }));
+              dispose();
             },
           );
-        }));
-        dispose();
-      },
-    );
+          break;
+        case DataConnectionStatus.disconnected:
+          print('You are disconnected from the internet.');
+          break;
+      }
+      // if (DataConnectionStatus.connected ==) {
+      // }
+      // if (DataConnectionStatus.disconnected == true) {
+      //   setState(() {
+      //     Builder(
+      //       builder: (BuildContext context) => SnackBar(
+      //         content: Text("Please CheckYour Network"),
+      //       ),
+      //     );
+      //   });
+      // }
+    });
+
+    bool result = await DataConnectionChecker().hasConnection;
+    if (result == true) {
+    } else {
+      print('No internet :( Reason:');
+
+      print(DataConnectionChecker().connectionStatus);
+    }
   }
 
   @override
@@ -94,27 +131,6 @@ class _SplashState extends State<Splash> {
             Padding(
               padding: const EdgeInsets.only(bottom: 20),
               child: Image.asset('images/capture.PNG', height: 30, width: 50),
-              // child: Row(
-              //   mainAxisAlignment: MainAxisAlignment.center,
-              //   crossAxisAlignment: CrossAxisAlignment.end,
-              //   children: [
-              //     Padding(
-              //       padding: const EdgeInsets.all(0),
-              //       child: Image.asset('images/logo.jpeg', height: 40),
-              //     ),
-              //     Padding(
-              //       padding: const EdgeInsets.only(bottom: 8, left: 0.5),
-              //       child: Text(
-              //         'ERO',
-              //         style: TextStyle(
-              //             color: Color(0xFF000000),
-              //             fontSize: 20,
-              //             fontWeight: FontWeight.w700,
-              //             fontFamily: 'Comfortaa'),
-              //       ),
-              //     ),
-              //   ],
-              // ),
             ),
           ],
         ),
