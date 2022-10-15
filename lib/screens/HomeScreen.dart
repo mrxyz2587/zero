@@ -77,7 +77,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: Color(0xFFEFEFEF),
+      backgroundColor: Colors.white,
       appBar: AppBar(
         elevation: 2,
         backgroundColor: Colors.white,
@@ -124,22 +124,46 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                 SizedBox(
                   height: 10,
                 ),
-                Container(
-                  height: size.height / 16,
-                  width: size.width,
-                  alignment: Alignment.center,
-                  child: Container(
-                    height: size.height / 16,
-                    width: size.width / 1.05,
-                    child: TextField(
-                      controller: _search,
-                      decoration: InputDecoration(
-                        hintText: "Search",
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
+                Padding(
+                  padding: const EdgeInsets.only(right: 15,left: 15),
+                  child: TextFormField(
+                    decoration: InputDecoration(
+                      // suffixIcon: Icon(
+                      //   FontAwesomeIcons.magnifyingGlass,
+                      //   color: Colors.black54,
+                      // ),
+                      isDense: true,
+                      isCollapsed: true,
+                      filled: true,
+                      contentPadding: EdgeInsets.fromLTRB(
+                        10,
+                        10,
+                        0,
+                        10,
+                      ),
+                      hintStyle: TextStyle(fontWeight: FontWeight.w700),
+                      hintText: 'Search...',
+                      fillColor: Color(0xFFEFEFEF),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(
+                            color: const Color(0xFFD9D8D8), width: 1.5),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(
+                          color: Color(0xFFFFFFFF),
+                          width: 1,
                         ),
                       ),
                     ),
+                    onTap: () {
+                      setState(() {});
+                    },
+                    onFieldSubmitted: (String _) {
+                      setState(() {});
+                      print(_);
+                    },
                   ),
                 ),
                 ElevatedButton(

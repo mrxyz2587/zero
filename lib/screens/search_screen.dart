@@ -33,14 +33,13 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: Color(0xFFEFEFEF),
         appBar: AppBar(
           elevation: 0.5,
           backgroundColor: mobileBackgroundColor,
@@ -66,7 +65,7 @@ class _SearchScreenState extends State<SearchScreen> {
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
                 borderSide:
-                    BorderSide(color: const Color(0xFFD9D8D8), width: 1.5),
+                    BorderSide(color: Color(0xFFFFFFFF), width: 1),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
@@ -315,22 +314,95 @@ class _SearchScreenState extends State<SearchScreen> {
                                 ),
                               ),
                             ),
-                            child: ListTile(
-                              focusColor: Colors.white,
-                              leading: CircleAvatar(
-                                backgroundImage: NetworkImage(
-                                  (snapshot.data! as dynamic).docs[index]
-                                      ['photoUrl'],
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 20,left: 20),
+                              child: Card(
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  side: BorderSide(
+                                    color: Theme.of(context).colorScheme.outline,
+                                  ),
+                                  borderRadius: const BorderRadius.all(Radius.circular(12)),
                                 ),
-                                radius: 16,
-                              ),
-                              subtitle: Text(
-                                (snapshot.data! as dynamic).docs[index]
-                                    ['distance'],
-                              ),
-                              title: Text(
-                                (snapshot.data! as dynamic).docs[index]
-                                    ['username'],
+                                child: Expanded(
+                                  child: Row(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(left: 20),
+                                        child: CircleAvatar(
+                                          backgroundImage: NetworkImage(
+                                            (snapshot.data! as dynamic)
+                                                .docs[index]['photoUrl']
+                                                .toString(),
+                                          ),
+                                          radius: 20,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: 3,
+                                      ),
+                                      Expanded(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(12.0),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                  (snapshot.data! as dynamic)
+                                                      .docs[index]['username']
+                                                      .toString(),
+                                                  style: TextStyle(
+                                                      color: Color(0xFF000000),
+                                                      fontSize: 15,
+                                                      fontWeight: FontWeight.w700,
+                                                      fontFamily: 'Roboto')),
+                                              SizedBox(
+                                                height: 3,
+                                              ),
+                                              Text(
+                                                  (snapshot.data! as dynamic)
+                                                      .docs[index]['university']
+                                                      .toString(),
+                                                  style: TextStyle(
+                                                      color: Colors.black54,
+                                                      fontSize: 13, fontFamily: 'Roboto')
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(right: 13),
+                                        child: Row(
+                                          children: [
+                                            IconButton(
+                                              style: ElevatedButton.styleFrom(
+                                                  backgroundColor: btnCOlorblue,
+                                                  minimumSize: Size(50, 12),
+                                                  shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                      BorderRadius.circular(7))),
+                                              onPressed: () {},  //TODO 2. button action
+                                              icon: Icon(FontAwesomeIcons.userPlus,size: 20,),),
+                                            SizedBox(
+                                              width: 10,
+                                            ),
+                                            IconButton(
+                                              style: ElevatedButton.styleFrom(
+                                                  backgroundColor: btnCOlorblue,
+                                                  minimumSize: Size(50, 12),
+                                                  shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                      BorderRadius.circular(7))),
+                                              onPressed: () {},  //TODO 2. button action
+                                              icon: Icon(FontAwesomeIcons.solidPaperPlane,size: 20,),),
+                                          ],),
+                                      )
+                                    ],
+                                  ),
+                                ),
+
                               ),
                             ),
                           );

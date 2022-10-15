@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:zero_fin/screens/edit_post_screen.dart';
 import '../screens/profile_screen.dart';
 import '/models/user.dart' as model;
 import '/providers/user_provider.dart';
@@ -186,7 +185,217 @@ class _PostCardState extends State<PostCard> {
       },
     );
   }
+  bottomSheetforlike(context, String txt) {
+    showModalBottomSheet(
+      enableDrag: true,
+      isScrollControlled: true,
+      isDismissible: true,
+      backgroundColor: Colors.black.withOpacity(0),
+      context: context,
+      builder: (BuildContext c) {
+        return Container(
 
+          color: Colors.transparent,
+          child: Container(
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(8), topLeft: Radius.circular(8))),
+            width: MediaQuery.of(context).size.width,
+            height: 700,
+            padding: EdgeInsets.symmetric(
+              horizontal: 5,
+              vertical: 8,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                SizedBox(height: 6),
+                Container(
+                  height: 4,
+                  width: 50,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    color: Colors.black,
+                  ),
+                ),
+                SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextFormField(
+                    controller: searchController,
+                    decoration: InputDecoration(
+                      // suffixIcon: Icon(
+                      //   FontAwesomeIcons.magnifyingGlass,
+                      //   color: Colors.black54,
+                      // ),
+                      isDense: true,
+                      isCollapsed: true,
+                      filled: true,
+                      contentPadding: EdgeInsets.fromLTRB(
+                        10,
+                        10,
+                        0,
+                        10,
+                      ),
+                      hintStyle: TextStyle(fontWeight: FontWeight.w700),
+                      hintText: 'Search...',
+                      fillColor: Color(0xFFEFEFEF),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(
+                            color: const Color(0xFFD9D8D8), width: 1.5),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(
+                          color: Color(0xFFFFFFFF),
+                          width: 1,
+                        ),
+                      ),
+                    ),
+                    onTap: () {
+                      setState(() {});
+                    },
+                    onFieldSubmitted: (String _) {
+                      setState(() {});
+                      print(_);
+                    },
+                  ),
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 14),
+                    child: Text('Liked by',style: TextStyle(fontWeight: FontWeight.w700,fontSize: 15),),
+                  ),
+                  Padding( //TODO Wanted to use positioned widgit to make this at corner.
+                    padding: const EdgeInsets.only(left: 240.0),
+                    child: Text('12 likes',style: TextStyle(fontSize: 15)),
+                  ),
+                ],),
+                Divider(
+                  height: 20,
+                  thickness: 2,
+                  indent: 15,
+                  endIndent: 15,
+                  color: Color(0xFFD9D8D8),
+                ),
+                StreamBuilder(
+                  stream: FirebaseFirestore.instance
+                      .collection('users')
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      physics: ClampingScrollPhysics(),
+                      itemCount: (snapshot.data! as dynamic).docs.length,
+                      itemBuilder: (context, index) => Align(
+                          child: Container(
+                            color: Colors.white,
+                            child: SizedBox(
+                              height: 60,
+                              child: Container(
+                                child: Expanded(
+                                  child: Row(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(left: 20),
+                                        child: CircleAvatar(
+                                          backgroundImage: NetworkImage(
+                                            (snapshot.data! as dynamic)
+                                                .docs[index]['photoUrl']
+                                                .toString(),
+                                          ),
+                                          radius: 20,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: 3,
+                                      ),
+                                      Expanded(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(12.0),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                  (snapshot.data! as dynamic)
+                                                      .docs[index]['username']
+                                                      .toString(),
+                                                  style: TextStyle(
+                                                      color: Color(0xFF000000),
+                                                      fontSize: 15,
+                                                      fontWeight: FontWeight.w700,
+                                                      fontFamily: 'Roboto')),
+                                              SizedBox(
+                                                height: 3,
+                                              ),
+                                              Text(
+                                                  (snapshot.data! as dynamic)
+                                                      .docs[index]['university']
+                                                      .toString(),
+                                                  style: TextStyle(
+                                                    color: Colors.black54,
+                                                      fontSize: 13, fontFamily: 'Roboto')
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(right: 13),
+                                        child: Row(
+                                          children: [
+                                          IconButton(
+                                            style: ElevatedButton.styleFrom(
+                                                backgroundColor: btnCOlorblue,
+                                                minimumSize: Size(50, 12),
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                    BorderRadius.circular(7))),
+                                            onPressed: () {},  //TODO 2. button action
+                                            icon: Icon(FontAwesomeIcons.userPlus,size: 20,),),
+                                          SizedBox(
+                                            width: 10,
+                                          ),
+                                          IconButton(
+                                            style: ElevatedButton.styleFrom(
+                                                backgroundColor: btnCOlorblue,
+                                                minimumSize: Size(50, 12),
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                    BorderRadius.circular(7))),
+                                            onPressed: () {},  //TODO 2. button action
+                                            icon: Icon(FontAwesomeIcons.solidPaperPlane,size: 20,),),
+                                        ],),
+                                      )
+                                    ],
+                                  ),
+                                ),
+
+                              ),
+                            ),
+                          )),
+                    );
+                  },
+                )
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
   bottomSheetforownthreedot(context, String txt) {
     showModalBottomSheet(
       backgroundColor: Colors.black.withOpacity(0),
@@ -333,22 +542,10 @@ class _PostCardState extends State<PostCard> {
                 ),
                 Divider(thickness: 0.5, color: Colors.black12),
                 ListTile(
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => EditPostScreen(
-                                  postId: widget.snap["postId"],
-                                  postUrl: widget.snap["postUrl"],
-                                  postDescription: widget.snap["description"],
-                                )));
-                  },
                   title: Text('Edit',
                       style: TextStyle(color: Color(0xFF000000), fontSize: 17)),
                 ),
                 ListTile(
-                  onTap: () => deletePost(widget.snap["postId"]),
                   title: Text('Delete',
                       style: TextStyle(color: Color(0xFF000000), fontSize: 17)),
                 ),
@@ -921,10 +1118,15 @@ class _PostCardState extends State<PostCard> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text(
-                    '${widget.snap['likes'].length} Likes',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                  InkWell(onTap:(){
+                    bottomSheetforlike(context, 'txt');
+                  },
+                    child: Text(
+                      '${widget.snap['likes'].length} Likes',
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                    ),
                   ),
+
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
                     child: Container(

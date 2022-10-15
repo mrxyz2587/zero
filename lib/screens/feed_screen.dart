@@ -33,7 +33,7 @@ class _FeedScreenState extends State<FeedScreen> {
 
   var searchController = TextEditingController();
 
-  bottomSheet2(context, String txt) {
+  bottomSheetforshare(context, String txt) {
       showModalBottomSheet(
       enableDrag: true,
       isScrollControlled: true,
@@ -520,7 +520,7 @@ class _FeedScreenState extends State<FeedScreen> {
                         child: PostCard(
                           snap: snapshot.data!.docs[index].data(),
                           onshareingbtnPressed: () {
-                            bottomSheet2(context, "txt");
+                            bottomSheetforshare(context, "txt");
                           },
                         ),
                       ),

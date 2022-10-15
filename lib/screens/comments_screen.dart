@@ -100,6 +100,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
       bottomNavigationBar: SafeArea(
         child: Container(
           height: kToolbarHeight,
+          color: Colors.white,
           margin:
               EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
           padding: const EdgeInsets.only(left: 16, right: 8),
@@ -131,8 +132,9 @@ class _CommentsScreenState extends State<CommentsScreen> {
                   padding:
                       const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                   child: const Text(
-                    'Post',
-                    style: TextStyle(color: Colors.blue),
+                    'POST',
+                    style: TextStyle(color: Colors.blue,
+                    fontWeight: FontWeight.w700),
                   ),
                 ),
               )
