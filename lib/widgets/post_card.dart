@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:zero_fin/screens/edit_post_screen.dart';
 import '../screens/profile_screen.dart';
 import '/models/user.dart' as model;
 import '/providers/user_provider.dart';
@@ -332,10 +333,22 @@ class _PostCardState extends State<PostCard> {
                 ),
                 Divider(thickness: 0.5, color: Colors.black12),
                 ListTile(
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => EditPostScreen(
+                                  postId: widget.snap["postId"],
+                                  postUrl: widget.snap["postUrl"],
+                                  postDescription: widget.snap["description"],
+                                )));
+                  },
                   title: Text('Edit',
                       style: TextStyle(color: Color(0xFF000000), fontSize: 17)),
                 ),
                 ListTile(
+                  onTap: () => deletePost(widget.snap["postId"]),
                   title: Text('Delete',
                       style: TextStyle(color: Color(0xFF000000), fontSize: 17)),
                 ),
