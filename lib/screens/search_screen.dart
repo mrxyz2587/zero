@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -28,13 +28,108 @@ class _SearchScreenState extends State<SearchScreen> {
   double distanceInMeters = 0;
   bool isLoading = true;
   String selectedText = " ";
+  double otherlongitude = 0;
+  double otherlatitude = 0;
 
   bool isTrue = false;
+  Timer? timer;
+  bool canShowUserNearBy = false;
 
   @override
   void initState() {
     super.initState();
+    timer = Timer.periodic(Duration(seconds: 5), (timer) {
+      getLocation();
+    });
   }
+
+  Future<Position> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // Test if location services are enabled.
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      // Location services are not enabled don't continue
+      // accessing the position and request users of the
+      // App to enable the location services.
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        // Permissions are denied, next time you could try
+        // requesting permissions again (this is also where
+        // Android's shouldShowRequestPermissionRationale
+        // returned true. According to Android guidelines
+        // your App should show an explanatory UI now.
+        return Future.error('Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      // Permissions are denied forever, handle appropriately.
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+
+    // When we reach here, permissions are granted and we can
+    // continue accessing the position of the device.
+    return await Geolocator.getCurrentPosition();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    timer!.cancel();
+  }
+
+  @override
+  void getLocation() async {
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    final LocationSettings locationSettings = LocationSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: 100,
+    );
+    StreamSubscription<Position> positionStream =
+        Geolocator.getPositionStream(locationSettings: locationSettings)
+            .listen((Position? position) async {
+      print(position == null
+          ? 'Unknown'
+          : ' this is locs ${position.latitude.toString()}, ${position.longitude.toString()}');
+      if (position != null) {
+        setState(() {
+          longitude = position.longitude;
+          latitude = position.latitude;
+        });
+        await FirebaseFirestore.instance
+            .collection("users")
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .update(<String, String>{
+          "longCoordinates": longitude.toString(),
+          "latitudeCoordinates": latitude.toString(),
+        });
+        print(longitude.toString() + " locas " + latitude.toString());
+      }
+    });
+    isLoading = false;
+  }
+
+  int i = 0;
+  double calculateDistance(lat1, lon1, lat2, lon2) {
+    var p = 0.017453292519943295;
+    var c = cos;
+    var a = 0.5 -
+        c((lat2 - lat1) * p) / 2 +
+        c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p)) / 2;
+    return 12742 * asin(sqrt(a));
+  }
+
+  void getdistance() async {}
 
   @override
   Widget build(BuildContext context) {
@@ -64,8 +159,7 @@ class _SearchScreenState extends State<SearchScreen> {
               fillColor: Color(0xFFEFEFEF),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide:
-                    BorderSide(color: Color(0xFFFFFFFF), width: 1),
+                borderSide: BorderSide(color: Color(0xFFFFFFFF), width: 1),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
@@ -315,20 +409,24 @@ class _SearchScreenState extends State<SearchScreen> {
                               ),
                             ),
                             child: Padding(
-                              padding: const EdgeInsets.only(right: 20,left: 20),
+                              padding:
+                                  const EdgeInsets.only(right: 20, left: 20),
                               child: Card(
                                 elevation: 0,
                                 shape: RoundedRectangleBorder(
                                   side: BorderSide(
-                                    color: Theme.of(context).colorScheme.outline,
+                                    color:
+                                        Theme.of(context).colorScheme.outline,
                                   ),
-                                  borderRadius: const BorderRadius.all(Radius.circular(12)),
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(12)),
                                 ),
                                 child: Expanded(
                                   child: Row(
                                     children: [
                                       Padding(
-                                        padding: const EdgeInsets.only(left: 20),
+                                        padding:
+                                            const EdgeInsets.only(left: 20),
                                         child: CircleAvatar(
                                           backgroundImage: NetworkImage(
                                             (snapshot.data! as dynamic)
@@ -345,8 +443,10 @@ class _SearchScreenState extends State<SearchScreen> {
                                         child: Padding(
                                           padding: const EdgeInsets.all(12.0),
                                           child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
                                             children: [
                                               Text(
                                                   (snapshot.data! as dynamic)
@@ -355,7 +455,8 @@ class _SearchScreenState extends State<SearchScreen> {
                                                   style: TextStyle(
                                                       color: Color(0xFF000000),
                                                       fontSize: 15,
-                                                      fontWeight: FontWeight.w700,
+                                                      fontWeight:
+                                                          FontWeight.w700,
                                                       fontFamily: 'Roboto')),
                                               SizedBox(
                                                 height: 3,
@@ -366,14 +467,15 @@ class _SearchScreenState extends State<SearchScreen> {
                                                       .toString(),
                                                   style: TextStyle(
                                                       color: Colors.black54,
-                                                      fontSize: 13, fontFamily: 'Roboto')
-                                              ),
+                                                      fontSize: 13,
+                                                      fontFamily: 'Roboto')),
                                             ],
                                           ),
                                         ),
                                       ),
                                       Padding(
-                                        padding: const EdgeInsets.only(right: 13),
+                                        padding:
+                                            const EdgeInsets.only(right: 13),
                                         child: Row(
                                           children: [
                                             IconButton(
@@ -382,9 +484,15 @@ class _SearchScreenState extends State<SearchScreen> {
                                                   minimumSize: Size(50, 12),
                                                   shape: RoundedRectangleBorder(
                                                       borderRadius:
-                                                      BorderRadius.circular(7))),
-                                              onPressed: () {},  //TODO 2. button action
-                                              icon: Icon(FontAwesomeIcons.userPlus,size: 20,),),
+                                                          BorderRadius.circular(
+                                                              7))),
+                                              onPressed:
+                                                  () {}, //TODO 2. button action
+                                              icon: Icon(
+                                                FontAwesomeIcons.userPlus,
+                                                size: 20,
+                                              ),
+                                            ),
                                             SizedBox(
                                               width: 10,
                                             ),
@@ -394,15 +502,22 @@ class _SearchScreenState extends State<SearchScreen> {
                                                   minimumSize: Size(50, 12),
                                                   shape: RoundedRectangleBorder(
                                                       borderRadius:
-                                                      BorderRadius.circular(7))),
-                                              onPressed: () {},  //TODO 2. button action
-                                              icon: Icon(FontAwesomeIcons.solidPaperPlane,size: 20,),),
-                                          ],),
+                                                          BorderRadius.circular(
+                                                              7))),
+                                              onPressed:
+                                                  () {}, //TODO 2. button action
+                                              icon: Icon(
+                                                FontAwesomeIcons
+                                                    .solidPaperPlane,
+                                                size: 20,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       )
                                     ],
                                   ),
                                 ),
-
                               ),
                             ),
                           );
@@ -463,7 +578,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                   ),
                                   subtitle: Text(
                                     (snapshot.data! as dynamic).docs[index]
-                                        ['distance'],
+                                        ['university'],
                                   ),
                                   title: Text(
                                     (snapshot.data! as dynamic).docs[index]
@@ -499,6 +614,9 @@ class _SearchScreenState extends State<SearchScreen> {
                       StreamBuilder(
                         stream: FirebaseFirestore.instance
                             .collection('users')
+                            .where("uid",
+                                isNotEqualTo:
+                                    FirebaseAuth.instance.currentUser!.uid)
                             .snapshots(),
                         builder: (context, snapshot) {
                           if (!snapshot.hasData) {
@@ -518,74 +636,113 @@ class _SearchScreenState extends State<SearchScreen> {
                               shrinkWrap: true,
                               itemCount:
                                   (snapshot.data! as dynamic).docs.length,
-                              itemBuilder: (context, index) => (double.parse(
-                                          (snapshot.data! as dynamic)
-                                              .docs[index]['distance']
-                                              .toString()) <=
-                                      50)
-                                  ? Align(
-                                      alignment: Alignment.topLeft,
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(
-                                            top: 10, left: 20.0, bottom: 5),
-                                        child: Container(
-                                          color: Colors.white,
-                                          padding: EdgeInsets.all(4),
-                                          child: Column(
-                                            children: [
-                                              Stack(
+                              itemBuilder: (context, index) {
+                                FirebaseFirestore.instance
+                                    .collection("users")
+                                    .where("uid",
+                                        isNotEqualTo: FirebaseAuth
+                                            .instance.currentUser!.uid)
+                                    .get()
+                                    .then((value) {
+                                  for (var docs in value.docs) {
+                                    if (docs.data()["uid"].toString() !=
+                                        FirebaseAuth.instance.currentUser!.uid
+                                            .toString()) {
+                                      otherlatitude = double.parse(
+                                          docs.data()['latitudeCoordinates']);
+                                      otherlongitude = double.parse(
+                                          docs.data()['longCoordinates']);
+                                      print(otherlongitude.toString() +
+                                          "  " +
+                                          otherlatitude.toString());
+
+                                      print(longitude.toString() +
+                                          " my " +
+                                          latitude.toString());
+                                      distanceInMeters = calculateDistance(
+                                          latitude,
+                                          longitude,
+                                          otherlatitude,
+                                          otherlongitude);
+
+                                      if (distanceInMeters < 100) {
+                                        return Align(
+                                          alignment: Alignment.topLeft,
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                top: 10, left: 20.0, bottom: 5),
+                                            child: Container(
+                                              color: Colors.white,
+                                              padding: EdgeInsets.all(4),
+                                              child: Column(
                                                 children: [
-                                                  CircleAvatar(
-                                                    backgroundImage:
-                                                        NetworkImage(
+                                                  Stack(
+                                                    children: [
+                                                      CircleAvatar(
+                                                        backgroundImage:
+                                                            NetworkImage(
+                                                          (snapshot.data!
+                                                                  as dynamic)
+                                                              .docs[index]
+                                                                  ['photoUrl']
+                                                              .toString(),
+                                                        ),
+                                                        radius: 30,
+                                                      ),
+                                                      Positioned(
+                                                        bottom: 3,
+                                                        right: 6,
+                                                        child: Container(
+                                                          decoration: BoxDecoration(
+                                                              color:
+                                                                  btnCOlorblue,
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          10),
+                                                              border: Border.all(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  width: 1)),
+                                                          constraints:
+                                                              BoxConstraints
+                                                                  .tight(Size
+                                                                      .fromRadius(
+                                                                          5)),
+                                                        ),
+                                                      )
+                                                    ],
+                                                  ),
+                                                  SizedBox(
+                                                    height: 8,
+                                                  ),
+                                                  Text(
                                                       (snapshot.data!
                                                               as dynamic)
                                                           .docs[index]
-                                                              ['photoUrl']
+                                                              ['username']
                                                           .toString(),
-                                                    ),
-                                                    radius: 30,
-                                                  ),
-                                                  Positioned(
-                                                    bottom: 3,
-                                                    right: 6,
-                                                    child: Container(
-                                                      decoration: BoxDecoration(
-                                                          color: btnCOlorblue,
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(10),
-                                                          border: Border.all(
-                                                              color:
-                                                                  Colors.white,
-                                                              width: 1)),
-                                                      constraints:
-                                                          BoxConstraints.tight(
-                                                              Size.fromRadius(
-                                                                  5)),
-                                                    ),
-                                                  )
+                                                      style: TextStyle(
+                                                          color:
+                                                              Color(0xFF000000),
+                                                          fontSize: 10,
+                                                          fontWeight:
+                                                              FontWeight.w700,
+                                                          fontFamily:
+                                                              'Roboto')),
                                                 ],
                                               ),
-                                              SizedBox(
-                                                height: 8,
-                                              ),
-                                              Text(
-                                                  (snapshot.data! as dynamic)
-                                                      .docs[index]['username']
-                                                      .toString(),
-                                                  style: TextStyle(
-                                                      color: Color(0xFF000000),
-                                                      fontSize: 10,
-                                                      fontWeight:
-                                                          FontWeight.w700,
-                                                      fontFamily: 'Roboto')),
-                                            ],
+                                            ),
                                           ),
-                                        ),
-                                      ),
-                                    )
-                                  : Container(),
+                                        );
+                                      }
+                                      print("distance$distanceInMeters  $i");
+                                      i++;
+                                    }
+                                  }
+                                });
+                                return Container();
+                              },
                             ),
                           );
                         },

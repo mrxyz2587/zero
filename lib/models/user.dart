@@ -12,7 +12,6 @@ class User {
   final String university;
   final List followers;
   final List following;
-  final String distance;
   final String longCoordinates;
   final String latitudeCoordinates;
 
@@ -20,7 +19,6 @@ class User {
       {required this.username,
       required this.uid,
       required this.photoUrl,
-      required this.distance,
       required this.email,
       required this.designation,
       required this.department,
@@ -47,7 +45,6 @@ class User {
         following: snapshot["following"],
         bio: snapshot["bio"],
         university: snapshot["university"],
-        distance: snapshot['distance'],
         longCoordinates: snapshot['longCoordinates'],
         latitudeCoordinates: snapshot['latitudeCoordinates']);
   }
@@ -64,7 +61,6 @@ class User {
         "following": following,
         "bio": bio,
         "university": university,
-        "distance": distance,
         "longCoordinates": longCoordinates,
         "latitudeCoordinates": latitudeCoordinates
       };

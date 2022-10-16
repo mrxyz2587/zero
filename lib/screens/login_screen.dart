@@ -404,8 +404,8 @@ class _LoginScreenState extends State<LoginScreen> {
         .then((event) {
       for (var docs in event.docs) {
         if (docs.data()['email'].toString() != _emailController.text) {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => SignupScreen()));
+          // Navigator.push(
+          //     context, MaterialPageRoute(builder: (context) => SignupScreen()));
         }
       }
     });

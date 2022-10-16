@@ -27,6 +27,9 @@ class FeedScreen extends StatefulWidget {
 class _FeedScreenState extends State<FeedScreen> {
   double longitude = 0;
   double latitude = 0;
+  double otherlongitude = 0;
+  double otherlatitude = 0;
+
   double distanceInMeters = 0;
   bool isLoading = true;
   bool isLoasdings = true;
@@ -34,7 +37,7 @@ class _FeedScreenState extends State<FeedScreen> {
   var searchController = TextEditingController();
 
   bottomSheetforshare(context, String txt) {
-      showModalBottomSheet(
+    showModalBottomSheet(
       enableDrag: true,
       isScrollControlled: true,
       isDismissible: true,
@@ -42,7 +45,6 @@ class _FeedScreenState extends State<FeedScreen> {
       context: context,
       builder: (BuildContext c) {
         return Container(
-
           color: Colors.transparent,
           child: Container(
             decoration: BoxDecoration(
@@ -111,7 +113,6 @@ class _FeedScreenState extends State<FeedScreen> {
                     },
                   ),
                 ),
-
                 StreamBuilder(
                   stream: FirebaseFirestore.instance
                       .collection('users')
@@ -144,8 +145,9 @@ class _FeedScreenState extends State<FeedScreen> {
                                     onPressed: () {},
                                     child: Text(
                                       "Send",
-                                      style: TextStyle(color: Colors.white,
-                                      fontWeight: FontWeight.w700),
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w700),
                                     )),
                                 title: Text(
                                     (snapshot.data! as dynamic)
@@ -232,7 +234,7 @@ class _FeedScreenState extends State<FeedScreen> {
     getData();
 
     // TODO: implement initState
-    // getLocation();
+    getLocation();
     super.initState();
   }
 
@@ -258,7 +260,6 @@ class _FeedScreenState extends State<FeedScreen> {
             .update(<String, String>{
           "longCoordinates": longitude.toString(),
           "latitudeCoordinates": latitude.toString(),
-          "distance": distanceInMeters.toString()
         });
         print(longitude.toString() + "" + latitude.toString());
       }
@@ -269,6 +270,28 @@ class _FeedScreenState extends State<FeedScreen> {
   }
 
   int i = 0;
+
+  void getdistance() async {
+    await FirebaseFirestore.instance
+        .collection("users")
+        .where("uid", isNotEqualTo: FirebaseAuth.instance.currentUser!.uid)
+        .get()
+        .then((value) {
+      for (var docs in value.docs) {
+        if (docs.data()["uid"].toString() !=
+            FirebaseAuth.instance.currentUser!.uid.toString()) {
+          otherlatitude = double.parse(docs.data()['latitudeCoordinates']);
+          otherlongitude = double.parse(docs.data()['longCoordinates']);
+          print(otherlongitude.toString() + otherlatitude.toString());
+          distanceInMeters = Geolocator.distanceBetween(
+              latitude, longitude, otherlatitude, otherlongitude);
+          print("distance$distanceInMeters  $i");
+          i++;
+        }
+      }
+    });
+  }
+
   void getData() async {
     var userSnap = await FirebaseFirestore.instance
         .collection('users')
@@ -280,35 +303,10 @@ class _FeedScreenState extends State<FeedScreen> {
     });
   }
 
-  void getdistance() async {
-    await FirebaseFirestore.instance
-        .collection("users")
-        .where("uid", isNotEqualTo: FirebaseAuth.instance.currentUser!.uid)
-        .get()
-        .then((value) {
-      for (var docs in value.docs) {
-        var lats = double.parse(docs.data()['latitudeCoordinates']);
-        var long = double.parse(docs.data()['longCoordinates']);
-        print(lats.toString() + long.toString());
-        distanceInMeters =
-            Geolocator.distanceBetween(latitude, longitude, lats, long);
-
-        print("distance$distanceInMeters  $i");
-        i++;
-        FirebaseFirestore.instance
-            .collection("users")
-            .doc(docs.data()["uid"])
-            .update(<String, dynamic>{"distance": distanceInMeters.toString()});
-        distanceInMeters = 0;
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final UserProvider userProvider = Provider.of<UserProvider>(context);
-    getLocation();
 
     return isLoasdings
         ? Scaffold(

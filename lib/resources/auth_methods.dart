@@ -60,7 +60,6 @@ class AuthMethods {
             followers: [],
             following: [],
             university: university,
-            distance: "",
             latitudeCoordinates: "",
             longCoordinates: "",
             bio: "Heyy I am also a zero");
