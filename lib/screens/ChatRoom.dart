@@ -9,15 +9,25 @@ import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 import 'package:zero_fin/utils/colors.dart';
 
-class ChatRoom extends StatelessWidget {
-  var userMap;
-  final String chatRoomId;
+class ChatRoom extends StatefulWidget {
+  final String otUsername;
+  final otUid;
 
-  ChatRoom({required this.chatRoomId, required this.userMap});
+  ChatRoom({required this.otUsername, required this.otUid});
 
+  @override
+  State<ChatRoom> createState() => _ChatRoomState();
+}
+
+class _ChatRoomState extends State<ChatRoom> {
   final TextEditingController _message = TextEditingController();
+
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  CollectionReference chats = FirebaseFirestore.instance.collection("chatroom");
+  final currentUid = FirebaseAuth.instance.currentUser!.uid;
+  var chatDocId;
 
   File? imageFile;
 
@@ -32,13 +42,32 @@ class ChatRoom extends StatelessWidget {
     });
   }
 
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    chats
+        .where("users", isEqualTo: {currentUid: null, widget.otUid: null})
+        .limit(1)
+        .get()
+        .then((value) {
+          if (value.docs.isNotEmpty) {
+            chatDocId = value.docs.single.id.toString();
+          } else {
+            chats.add({
+              "users": {currentUid: null, widget.otUid: null}
+            }).then((value) => {chatDocId = value.toString()});
+          }
+        });
+  }
+
   Future uploadImage() async {
     String fileName = Uuid().v1();
     int status = 1;
 
     await _firestore
         .collection('chatroom')
-        .doc(chatRoomId)
+        .doc(chatDocId)
         .collection('chats')
         .doc(fileName)
         .set({
@@ -54,7 +83,7 @@ class ChatRoom extends StatelessWidget {
     var uploadTask = await ref.putFile(imageFile!).catchError((error) async {
       await _firestore
           .collection('chatroom')
-          .doc(chatRoomId)
+          .doc(chatDocId)
           .collection('chats')
           .doc(fileName)
           .delete();
@@ -67,7 +96,7 @@ class ChatRoom extends StatelessWidget {
 
       await _firestore
           .collection('chatroom')
-          .doc(chatRoomId)
+          .doc(chatDocId)
           .collection('chats')
           .doc(fileName)
           .update({"message": imageUrl});
@@ -88,7 +117,7 @@ class ChatRoom extends StatelessWidget {
       _message.clear();
       await _firestore
           .collection('chatroom')
-          .doc(chatRoomId)
+          .doc(chatDocId)
           .collection('chats')
           .add(messages);
     } else {
@@ -96,125 +125,11 @@ class ChatRoom extends StatelessWidget {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-
-    return Scaffold(
-      backgroundColor: Color(0xFFEFEFEF),
-      appBar: AppBar(
-        // title: Text(
-        //   userMap['username'].toString(),
-        //   style: TextStyle(color: Colors.black),
-        // ),
-        backgroundColor: Colors.white,
-        leading: IconButton(
-          padding: EdgeInsets.all(0),
-          icon: Icon(
-            FontAwesomeIcons.chevronLeft,
-            size: 25,
-            color: Colors.black87,
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        title: StreamBuilder<DocumentSnapshot>(
-          stream:
-              _firestore.collection("users").doc(userMap['uid']).snapshots(),
-          builder: (context, snapshot) {
-            if (snapshot.data != null) {
-              return Container(
-                child: Column(
-                  children: [
-                    Text(snapshot.data!['username']),
-                    Text(snapshot.data!['status'],
-                        style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF000000),
-                            fontSize: 19)),
-                  ],
-                ),
-              );
-            } else {
-              return Container();
-            }
-          },
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              height: size.height / 1.25,
-              width: size.width,
-              child: StreamBuilder<QuerySnapshot>(
-                stream: _firestore
-                    .collection('chatroom')
-                    .doc(chatRoomId)
-                    .collection('chats')
-                    .orderBy("time", descending: false)
-                    .snapshots(),
-                builder: (BuildContext context,
-                    AsyncSnapshot<QuerySnapshot> snapshot) {
-                  if (snapshot.data != null) {
-                    return ListView.builder(
-                      itemCount: snapshot.data!.docs.length,
-                      itemBuilder: (context, index) {
-                        Map<String, dynamic> map = snapshot.data!.docs[index]
-                            .data() as Map<String, dynamic>;
-                        return messages(size, map, context);
-                      },
-                    );
-                  } else {
-                    return Container();
-                  }
-                },
-              ),
-            ),
-            Container(
-              height: size.height / 10,
-              width: size.width,
-              alignment: Alignment.center,
-              child: Container(
-                height: size.height / 12,
-                width: size.width / 1.1,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      height: size.height / 17,
-                      width: size.width / 1.3,
-                      child: TextField(
-                        controller: _message,
-                        decoration: InputDecoration(
-                            suffixIcon: IconButton(
-                              onPressed: () => getImage(),
-                              icon: Icon(Icons.photo),
-                            ),
-                            hintText: "Send Message",
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            )),
-                      ),
-                    ),
-                    IconButton(
-                        icon: Icon(Icons.send), onPressed: onSendMessage),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget messages(Size size, Map<String, dynamic> map, BuildContext context) {
     return map['type'] == "text"
         ? Container(
             width: size.width,
-            alignment: map['sendby'] == _auth.currentUser!.displayName
+            alignment: map['sendby'] == _auth.currentUser!.uid
                 ? Alignment.centerRight
                 : Alignment.centerLeft,
             child: Container(
@@ -263,6 +178,107 @@ class ChatRoom extends StatelessWidget {
               ),
             ),
           );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+
+    return Scaffold(
+      backgroundColor: Color(0xFFEFEFEF),
+      appBar: AppBar(
+        title: Text(
+          widget.otUsername.toString(),
+          style: TextStyle(color: Colors.black),
+        ),
+        backgroundColor: Colors.white,
+        leading: IconButton(
+          padding: EdgeInsets.all(0),
+          icon: Icon(
+            FontAwesomeIcons.chevronLeft,
+            size: 25,
+            color: Colors.black87,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(
+              height: size.height / 1.25,
+              width: size.width,
+              child: StreamBuilder(
+                stream: _firestore
+                    .collection('chatroom')
+                    .doc(chatDocId)
+                    .collection('chats')
+                    .orderBy("time", descending: false)
+                    .snapshots(),
+                builder: (BuildContext context,
+                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(
+                        child: CircularProgressIndicator(
+                      color: Colors.grey.shade300,
+                      strokeWidth: 1.5,
+                    ));
+                  }
+
+                  if (snapshot.data == null) {
+                    return Container();
+                  }
+                  return ListView.builder(
+                    itemCount: snapshot.data!.docs.length,
+                    itemBuilder: (context, index) {
+                      Map<String, dynamic> map = snapshot.data!.docs[index]
+                          .data() as Map<String, dynamic>;
+                      return messages(size, map, context);
+                    },
+                  );
+                },
+              ),
+            ),
+            Container(
+              height: size.height / 10,
+              width: size.width,
+              alignment: Alignment.center,
+              child: Container(
+                height: size.height / 12,
+                width: size.width / 1.1,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      height: size.height / 17,
+                      width: size.width / 1.3,
+                      child: TextField(
+                        enabled: true,
+                        autofocus: true,
+                        controller: _message,
+                        decoration: InputDecoration(
+                            suffixIcon: IconButton(
+                              onPressed: () => getImage(),
+                              icon: Icon(Icons.photo),
+                            ),
+                            hintText: "Send Message",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            )),
+                      ),
+                    ),
+                    IconButton(
+                        icon: Icon(Icons.send), onPressed: onSendMessage),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 

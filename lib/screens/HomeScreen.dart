@@ -182,8 +182,10 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                 //   height: size.height / 30,
                 // ),
                 ,
-                FutureBuilder(
-                  future: FirebaseFirestore.instance.collection('users').get(),
+                StreamBuilder(
+                  stream: FirebaseFirestore.instance
+                      .collection('users')
+                      .snapshots(),
                   builder: (context,
                       AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
                           snapshot) {
@@ -198,15 +200,13 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                       itemCount: snapshot.data!.docs.length,
                       itemBuilder: (ctx, index) => ListTile(
                         onTap: () async {
-                          String roomId = await chatRoomId(
-                            _auth.currentUser!.uid,
-                            userMap!['username'],
-                          );
-
                           await Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (_) => ChatRoom(
-                                  chatRoomId: roomId, userMap: userMap),
+                                otUsername: snapshot.data!.docs[index]
+                                    .data()["username"],
+                                otUid: snapshot.data!.docs[index].data()["uid"],
+                              ),
                             ),
                           );
                         },
