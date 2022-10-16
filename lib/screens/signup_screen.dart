@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:zero_fin/screens/email_verification.dart';
 import '../widgets/selection_container.dart' as sc;
 import '/resources/auth_methods.dart';
 import '/responsive/mobile_screen_layout.dart';
@@ -110,6 +111,7 @@ class _SignupScreenState extends State<SignupScreen> {
       }
     });
   }
+
   selectImage(ImageSource imageSource) async {
     Uint8List im = await pickImage(imageSource);
     // set state because we need to display the image we selected on the circle avatar
@@ -139,13 +141,10 @@ class _SignupScreenState extends State<SignupScreen> {
         _isLoading = false;
       });
       // navigate to the home screen
+
       Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(
-            builder: (context) => const ResponsiveLayout(
-              mobileScreenLayout: MobileScreenLayout(),
-              webScreenLayout: WebScreenLayout(),
-            ),
-          ),
+              builder: (context) => const EmailVerificationScreen()),
           (route) => false);
     } else {
       setState(() {
@@ -300,8 +299,6 @@ class _SignupScreenState extends State<SignupScreen> {
       },
     );
   }
-
-  void presentDatePicker(context) {}
 
   @override
   Widget build(BuildContext context) {
@@ -557,7 +554,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         builder: (context) => AlertDialog(
                               scrollable: false,
                               backgroundColor: Colors.white,
-                              title: Text("text"),
+                              title: Text("Checking data"),
                               content: LinearProgressIndicator(
                                 color: Colors.blue,
                               ),
