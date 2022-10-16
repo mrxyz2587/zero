@@ -123,111 +123,109 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
               children: [
                 SizedBox(
                   height: 10,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(right: 15,left: 15),
-                  child: TextFormField(
-                    decoration: InputDecoration(
-                      // suffixIcon: Icon(
-                      //   FontAwesomeIcons.magnifyingGlass,
-                      //   color: Colors.black54,
-                      // ),
-                      isDense: true,
-                      isCollapsed: true,
-                      filled: true,
-                      contentPadding: EdgeInsets.fromLTRB(
-                        10,
-                        10,
-                        0,
-                        10,
-                      ),
-                      hintStyle: TextStyle(fontWeight: FontWeight.w700),
-                      hintText: 'Search...',
-                      fillColor: Color(0xFFEFEFEF),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(
-                            color: const Color(0xFFD9D8D8), width: 1.5),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(
-                          color: Color(0xFFFFFFFF),
-                          width: 1,
-                        ),
-                      ),
-                    ),
-                    onTap: () {
-                      setState(() {});
-                    },
-                    onFieldSubmitted: (String _) {
-                      setState(() {});
-                      print(_);
-                    },
-                  ),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5)),
-                  backgroundColor: Colors.black87,),
-                  onPressed: onSearch,
-                  child: Text("Search", style: TextStyle(color: Colors.white)),
-                ),
-                SizedBox(
-                  height: size.height / 30,
-                ),
-                userMap != null
-                    ? FutureBuilder(
-                        future: FirebaseFirestore.instance
-                            .collection('users')
-                            .get(),
-                        builder: (context,
-                            AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
-                                snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          }
-                          return ListView.builder(
-                            shrinkWrap: true,
-                            controller:
-                                ScrollController(keepScrollOffset: true),
-                            itemCount: snapshot.data!.docs.length,
-                            itemBuilder: (ctx, index) => ListTile(
-                              onTap: () async {
-                                String roomId = await chatRoomId(
-                                  _auth.currentUser!.uid,
-                                  userMap!['username'],
-                                );
+                )
+                // ),
+                // Padding(
+                //   padding: const EdgeInsets.only(right: 15,left: 15),
+                //   child: TextFormField(
+                //     decoration: InputDecoration(
+                //       // suffixIcon: Icon(
+                //       //   FontAwesomeIcons.magnifyingGlass,
+                //       //   color: Colors.black54,
+                //       // ),
+                //       isDense: true,
+                //       isCollapsed: true,
+                //       filled: true,
+                //       contentPadding: EdgeInsets.fromLTRB(
+                //         10,
+                //         10,
+                //         0,
+                //         10,
+                //       ),
+                //       hintStyle: TextStyle(fontWeight: FontWeight.w700),
+                //       hintText: 'Search...',
+                //       fillColor: Color(0xFFEFEFEF),
+                //       focusedBorder: OutlineInputBorder(
+                //         borderRadius: BorderRadius.circular(8),
+                //         borderSide: BorderSide(
+                //             color: const Color(0xFFD9D8D8), width: 1.5),
+                //       ),
+                //       enabledBorder: OutlineInputBorder(
+                //         borderRadius: BorderRadius.circular(10),
+                //         borderSide: BorderSide(
+                //           color: Color(0xFFFFFFFF),
+                //           width: 1,
+                //         ),
+                //       ),
+                //     ),
+                //     onTap: () {
+                //       setState(() {});
+                //     },
+                //     onFieldSubmitted: (String _) {
+                //       setState(() {
+                //
+                //
+                //       });
+                //       print(_);
+                //     },
+                //   ),
+                // ),
+                // ElevatedButton(
+                //   style: ElevatedButton.styleFrom(
+                //   shape: RoundedRectangleBorder(
+                //       borderRadius: BorderRadius.circular(5)),
+                //   backgroundColor: Colors.black87,),
+                //   onPressed: onSearch,
+                //   child: Text("Search", style: TextStyle(color: Colors.white)),
+                // ),
+                // SizedBox(
+                //   height: size.height / 30,
+                // ),
+                ,
+                FutureBuilder(
+                  future: FirebaseFirestore.instance.collection('users').get(),
+                  builder: (context,
+                      AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
+                          snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      controller: ScrollController(keepScrollOffset: true),
+                      itemCount: snapshot.data!.docs.length,
+                      itemBuilder: (ctx, index) => ListTile(
+                        onTap: () async {
+                          String roomId = await chatRoomId(
+                            _auth.currentUser!.uid,
+                            userMap!['username'],
+                          );
 
-                                await Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (_) => ChatRoom(
-                                        chatRoomId: roomId, userMap: userMap),
-                                  ),
-                                );
-                              },
-                              leading:
-                                  Icon(Icons.account_box, color: Colors.black),
-                              title: Text(
-                                snapshot.data!.docs[index].data()["username"],
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              subtitle: Text(
-                                  snapshot.data!.docs[index].data()["email"]),
-                              trailing: Icon(Icons.chat, color: Colors.black),
+                          await Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => ChatRoom(
+                                  chatRoomId: roomId, userMap: userMap),
                             ),
                           );
                         },
-                      )
-                    : Center(child: Container()),
+                        leading: Icon(Icons.account_box, color: Colors.black),
+                        title: Text(
+                          snapshot.data!.docs[index].data()["username"],
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        subtitle:
+                            Text(snapshot.data!.docs[index].data()["email"]),
+                        trailing: Icon(Icons.chat, color: Colors.black),
+                      ),
+                    );
+                  },
+                ),
               ],
             ),
     );
