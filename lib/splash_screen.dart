@@ -1,5 +1,6 @@
 import 'package:data_connection_checker_tv/data_connection_checker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:zero_fin/screens/email_verification.dart';
 
 import '/responsive/mobile_screen_layout.dart';
 import '/responsive/responsive_layout.dart';
@@ -42,10 +43,12 @@ class _SplashState extends State<Splash> {
                       // Checking if the snapshot has any data or not
                       if (snapshot.hasData) {
                         // if snapshot has data which means user is logged in then we check the width of screen and accordingly display the screen layout
-                        return const ResponsiveLayout(
-                          mobileScreenLayout: MobileScreenLayout(),
-                          webScreenLayout: WebScreenLayout(),
-                        );
+                        if (FirebaseAuth.instance.currentUser!.emailVerified) {
+                          return ResponsiveLayout(
+                              mobileScreenLayout: MobileScreenLayout(),
+                              webScreenLayout: WebScreenLayout());
+                        }
+                        return EmailVerificationScreen();
                       } else if (snapshot.hasError) {
                         return Center(
                           child: Text('${snapshot.error}'),
