@@ -125,61 +125,6 @@ class _ChatRoomState extends State<ChatRoom> {
     }
   }
 
-  Widget messages(Size size, Map<String, dynamic> map, BuildContext context) {
-    return map['type'] == "text"
-        ? Container(
-            width: size.width,
-            alignment: map['sendby'] == _auth.currentUser!.uid
-                ? Alignment.centerRight
-                : Alignment.centerLeft,
-            child: Container(
-              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 14),
-              margin: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                color: btnCOlorblue,
-              ),
-              child: Text(
-                map['message'],
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          )
-        : Container(
-            height: size.height / 2.5,
-            width: size.width,
-            padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-            alignment: map['sendby'] == _auth.currentUser!.displayName
-                ? Alignment.centerRight
-                : Alignment.centerLeft,
-            child: InkWell(
-              onTap: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => ShowImage(
-                    imageUrl: map['message'],
-                  ),
-                ),
-              ),
-              child: Container(
-                height: size.height / 2.5,
-                width: size.width / 2,
-                decoration: BoxDecoration(border: Border.all()),
-                alignment: map['message'] != "" ? null : Alignment.center,
-                child: map['message'] != ""
-                    ? Image.network(
-                        map['message'],
-                        fit: BoxFit.cover,
-                      )
-                    : CircularProgressIndicator(),
-              ),
-            ),
-          );
-  }
-
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -222,20 +167,75 @@ class _ChatRoomState extends State<ChatRoom> {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Center(
                         child: CircularProgressIndicator(
-                      color: Colors.grey.shade300,
-                      strokeWidth: 1.5,
+                      color: Colors.blue,
+                      strokeWidth: 5.5,
                     ));
                   }
 
-                  if (snapshot.data == null) {
-                    return Container();
-                  }
                   return ListView.builder(
                     itemCount: snapshot.data!.docs.length,
                     itemBuilder: (context, index) {
                       Map<String, dynamic> map = snapshot.data!.docs[index]
                           .data() as Map<String, dynamic>;
-                      return messages(size, map, context);
+                      return map['type'] == "text"
+                          ? Container(
+                              width: size.width,
+                              alignment: map['sendby'] == _auth.currentUser!.uid
+                                  ? Alignment.centerRight
+                                  : Alignment.centerLeft,
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 14),
+                                margin: EdgeInsets.symmetric(
+                                    vertical: 5, horizontal: 8),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15),
+                                  color: btnCOlorblue,
+                                ),
+                                child: Text(
+                                  map['message'],
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            )
+                          : Container(
+                              height: size.height / 2.5,
+                              width: size.width,
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 5, horizontal: 5),
+                              alignment: map['sendby'] ==
+                                      _auth.currentUser!.displayName
+                                  ? Alignment.centerRight
+                                  : Alignment.centerLeft,
+                              child: InkWell(
+                                onTap: () => Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (_) => ShowImage(
+                                      imageUrl: map['message'],
+                                    ),
+                                  ),
+                                ),
+                                child: Container(
+                                  height: size.height / 2.5,
+                                  width: size.width / 2,
+                                  decoration:
+                                      BoxDecoration(border: Border.all()),
+                                  alignment: map['message'] != ""
+                                      ? null
+                                      : Alignment.center,
+                                  child: map['message'] != ""
+                                      ? Image.network(
+                                          map['message'],
+                                          fit: BoxFit.cover,
+                                        )
+                                      : CircularProgressIndicator(),
+                                ),
+                              ),
+                            );
                     },
                   );
                 },
