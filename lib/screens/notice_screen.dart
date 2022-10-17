@@ -41,7 +41,7 @@ class _NoticeScreenState extends State<NoticeScreen> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(18.0),
-                      child: Text('UNIVERSITY NOTICES (3)',style: TextStyle(fontSize: 16,fontWeight: FontWeight.w700,fontFamily: 'Roboto'),),
+                      child: Text('UNIVERSITY NOTICES (3)',style: TextStyle(fontSize: 15,fontWeight: FontWeight.w700,fontFamily: 'Roboto'),),
                     ),
                     Card(
                       margin: const EdgeInsets.only(bottom: 10.0,right: 18.0,left: 18),
@@ -59,9 +59,9 @@ class _NoticeScreenState extends State<NoticeScreen> {
                           children: [
                             Padding(
                               padding:
-                              const EdgeInsets.only(left: 20),
+                              const EdgeInsets.only(left: 12),
                               child: Container(
-                                  height: 50,
+                                  height: 48,
                                   decoration: BoxDecoration(borderRadius: BorderRadius.circular(5)),
                                   child: Image.asset('images/Quantumlogo.png')),
                             ),
@@ -139,9 +139,9 @@ class _NoticeScreenState extends State<NoticeScreen> {
                           children: [
                             Padding(
                               padding:
-                              const EdgeInsets.only(left: 20),
+                              const EdgeInsets.only(left: 12),
                               child: Container(
-                                  height: 50,
+                                  height: 48,
                                   decoration: BoxDecoration(borderRadius: BorderRadius.circular(5)),
                                   child: Image.asset('images/Quantumlogo.png')),
                             ),
@@ -219,9 +219,9 @@ class _NoticeScreenState extends State<NoticeScreen> {
                           children: [
                             Padding(
                               padding:
-                              const EdgeInsets.only(left: 20),
+                              const EdgeInsets.only(left: 12),
                               child: Container(
-                                  height: 50,
+                                  height: 48,
                                   decoration: BoxDecoration(borderRadius: BorderRadius.circular(5)),
                                   child: Image.asset('images/Quantumlogo.png')),
                             ),
@@ -295,15 +295,61 @@ class _NoticeScreenState extends State<NoticeScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text("ACTIVITY",style: TextStyle(fontSize: 16,fontWeight: FontWeight.w700,fontFamily: 'Roboto')),
+                            Text("ACTIVITY",style: TextStyle(fontSize: 15,fontWeight: FontWeight.w700,fontFamily: 'Roboto')),
                             Container(
                               child: Padding(
-                                padding: const EdgeInsets.only(top:18.0),
+                                padding: const EdgeInsets.only(top:18.0,left: 15,right: 15),
                                 child: Row(
                                   children: [
-                                    CircleAvatar(),
+                                    CircleAvatar(backgroundImage:
+                                    NetworkImage(
+                                        "https://images.unsplash.com/photo-1597466765990-64ad1c35dafc"),
+                                      radius: 20,),
                                     SizedBox(width: 20),
-                                    Text('Rohit Raj liked your post',style: TextStyle(fontSize: 14,fontWeight: FontWeight.w700,fontFamily: 'Roboto'))
+                                    Container(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Text('Rohit Raj ',style: TextStyle(fontWeight: FontWeight.w700)),
+                                              Text('liked your post'),
+                                            ],
+                                          ),
+                                          SizedBox(height: 3,),
+                                          Text('1hr ago',style: TextStyle(fontSize: 12,color: Colors.grey,fontStyle: FontStyle.italic))
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(width: 80),
+                                    Icon(Icons.circle,color: btnCOlorblue, size: 10,)
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Container(
+                              child: Padding(
+                                padding: const EdgeInsets.only(top:18.0,left: 15),
+                                child: Row(
+                                  children: [
+                                    CircleAvatar(backgroundImage:
+                                    NetworkImage(
+                                        "https://images.unsplash.com/photo-1597466765990-64ad1c35dafc"),
+                                      radius: 20,),
+                                    SizedBox(width: 20),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Text('Rohit Raj ',style: TextStyle(fontWeight: FontWeight.w700)),
+                                            Text('liked your post.'),
+                                          ],
+                                        ),
+                                        SizedBox(height: 3,),
+                                        Text('1hr ago',style: TextStyle(fontSize: 12,color: Colors.grey,fontStyle: FontStyle.italic))
+                                      ],
+                                    )
                                   ],
                                 ),
                               ),
@@ -311,7 +357,7 @@ class _NoticeScreenState extends State<NoticeScreen> {
                           ],
                         ),
                       ),
-                    )
+                    ),
                   ]
                 ));
           });
