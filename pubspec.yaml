@@ -62,8 +62,6 @@ dependencies:
   data_connection_checker_tv: ^0.3.5-nullsafety
   open_mail_app: ^0.4.5
   flutter_chat_bubble: ^2.0.0
-
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
