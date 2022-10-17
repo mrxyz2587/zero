@@ -3,7 +3,11 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_chat_bubble/bubble_type.dart';
+import 'package:flutter_chat_bubble/chat_bubble.dart';
+import 'package:flutter_chat_bubble/clippers/chat_bubble_clipper_1.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
@@ -12,8 +16,13 @@ import 'package:zero_fin/utils/colors.dart';
 class ChatRoom extends StatefulWidget {
   final String otUsername;
   final otUid;
-
-  ChatRoom({required this.otUsername, required this.otUid});
+  final String profilePic;
+  final status;
+  ChatRoom(
+      {required this.otUsername,
+      required this.otUid,
+      required this.profilePic,
+      required this.status});
 
   @override
   State<ChatRoom> createState() => _ChatRoomState();
@@ -71,7 +80,7 @@ class _ChatRoomState extends State<ChatRoom> {
         .collection('chats')
         .doc(fileName)
         .set({
-      "sendby": _auth.currentUser!.displayName,
+      "sendby": _auth.currentUser!.uid,
       "message": "",
       "type": "img",
       "time": FieldValue.serverTimestamp(),
@@ -125,23 +134,153 @@ class _ChatRoomState extends State<ChatRoom> {
     }
   }
 
+  Widget messages(Size size, Map<String, dynamic> map, BuildContext context) {
+    return map['type'] == "text"
+        ? Container(
+            width: size.width,
+
+            child: ChatBubble(
+              elevation: 0,
+              clipper: map['sendby'] == _auth.currentUser!.uid
+                  ? ChatBubbleClipper1(type: BubbleType.sendBubble, radius: 10)
+                  : ChatBubbleClipper1(
+                      type: BubbleType.receiverBubble, radius: 12),
+              alignment: map['sendby'] == _auth.currentUser!.uid
+                  ? Alignment.centerRight
+                  : Alignment.centerLeft,
+              margin: EdgeInsets.only(top: 20),
+              backGroundColor: Colors.grey.shade100,
+              child: Container(
+                constraints: BoxConstraints(
+                  maxWidth: MediaQuery.of(context).size.width * 0.7,
+                ),
+                child: Text(
+                  map['message'],
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black87,
+                  ),
+                ),
+              ),
+            ),
+            // child: Container(
+            //   padding: EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+            //   margin: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
+            //   decoration: BoxDecoration(
+            //     borderRadius: BorderRadius.circular(15),
+            //     color: btnCOlorblue,
+            //   ),
+            //   child: Text(
+            //     map['message'],
+            //     style: TextStyle(
+            //       fontSize: 16,
+            //       fontWeight: FontWeight.w500,
+            //       color: Colors.white,
+            //     ),
+            //   ),
+            // ),
+          )
+        : Container(
+            height: size.height / 2.5,
+            width: size.width,
+            padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+            child: InkWell(
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => ShowImage(
+                    imageUrl: map['message'],
+                  ),
+                ),
+              ),
+              child: ChatBubble(
+                elevation: 0,
+                alignment: map['sendby'] == _auth.currentUser!.uid
+                    ? Alignment.centerRight
+                    : Alignment.centerLeft,
+
+                clipper: map['sendby'] == _auth.currentUser!.uid
+                    ? ChatBubbleClipper1(
+                        type: BubbleType.sendBubble, radius: 10, nipRadius: 2)
+                    : ChatBubbleClipper1(
+                        type: BubbleType.receiverBubble,
+                        radius: 10,
+                        nipRadius: 2),
+                // alignment: map['message'] != "" ? null : Alignment.centerRight,
+                margin: EdgeInsets.only(top: 20),
+                backGroundColor: map['sendby'] == _auth.currentUser!.uid
+                    ? btnCOlorblue
+                    : Colors.grey.shade100,
+                child: map['message'] != ""
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.network(
+                          map['message'],
+                          fit: BoxFit.fill,
+                        ),
+                      )
+                    : CircularProgressIndicator(),
+              ),
+              // child: Container(
+              //   height: size.height / 2.5,
+              //   width: size.width / 2,
+              //   decoration: BoxDecoration(border: Border.all(),borderRadius: BorderRadius.circular(15)),
+              //   alignment: map['message'] != "" ? null : Alignment.centerRight,
+              //   child: map['message'] != ""
+              //       ? Image.network(
+              //           map['message'],
+              //           fit: BoxFit.cover,
+              //         )
+              //       : CircularProgressIndicator(),
+              // ),
+            ),
+          );
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: Color(0xFFEFEFEF),
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(
-          widget.otUsername.toString(),
-          style: TextStyle(color: Colors.black),
+        elevation: 1,
+        title: Transform.translate(
+          offset: Offset(-20, 0),
+          child: Row(
+            children: [
+              CircleAvatar(
+                  radius: 14, backgroundImage: NetworkImage(widget.profilePic)),
+              SizedBox(
+                width: 15,
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.otUsername.toString(),
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 16),
+                  ),
+                  SizedBox(
+                    height: 3,
+                  ),
+                  Text(
+                    widget.status.toString(),
+                    style: TextStyle(color: Colors.black54, fontSize: 12),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
         backgroundColor: Colors.white,
         leading: IconButton(
-          padding: EdgeInsets.all(0),
           icon: Icon(
             FontAwesomeIcons.chevronLeft,
-            size: 25,
+            size: 22,
             color: Colors.black87,
           ),
           onPressed: () {
@@ -153,8 +292,7 @@ class _ChatRoomState extends State<ChatRoom> {
         child: Column(
           children: [
             Container(
-              height: size.height / 1.25,
-              width: size.width,
+              height: size.height / 1.20,
               child: StreamBuilder(
                 stream: _firestore
                     .collection('chatroom')
@@ -241,37 +379,59 @@ class _ChatRoomState extends State<ChatRoom> {
                 },
               ),
             ),
-            Container(
-              height: size.height / 10,
-              width: size.width,
-              alignment: Alignment.center,
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4),
               child: Container(
-                height: size.height / 12,
-                width: size.width / 1.1,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      height: size.height / 17,
-                      width: size.width / 1.3,
-                      child: TextField(
-                        enabled: true,
-                        autofocus: true,
-                        controller: _message,
-                        decoration: InputDecoration(
-                            suffixIcon: IconButton(
-                              onPressed: () => getImage(),
-                              icon: Icon(Icons.photo),
-                            ),
-                            hintText: "Send Message",
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            )),
+                height: size.height / 17,
+                width: size.width,
+                decoration: BoxDecoration(color: Colors.white),
+                child: Container(
+                  padding: EdgeInsets.zero,
+                  width: size.width / 2,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(left: 18.0),
+                        child: Icon(CupertinoIcons.smiley_fill),
                       ),
-                    ),
-                    IconButton(
-                        icon: Icon(Icons.send), onPressed: onSendMessage),
-                  ],
+                      Expanded(
+                        child: TextField(
+                          onChanged: (value) {},
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.symmetric(
+                                vertical: 10.0, horizontal: 20.0),
+                            hintText: 'Type your message here...',
+                            border: InputBorder.none,
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 5.0),
+                        child: Row(children: [
+                          Icon(
+                            CupertinoIcons.mic_fill,
+                            size: 22,
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          IconButton(
+                            icon: Icon(
+                              FontAwesomeIcons.solidImage,
+                              size: 20,
+                            ),
+                            onPressed: () => getImage(),
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          IconButton(
+                              icon: Icon(Icons.send), onPressed: onSendMessage),
+                        ]),
+                      )
+                    ],
+                  ),
                 ),
               ),
             ),

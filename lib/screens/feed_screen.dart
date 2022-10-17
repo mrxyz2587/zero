@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +15,7 @@ import '/utils/colors.dart';
 import '/utils/global_variable.dart';
 import '/widgets/post_card.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'notice_screen.dart';
 
 class FeedScreen extends StatefulWidget {
   const FeedScreen({Key? key}) : super(key: key);
@@ -377,10 +377,9 @@ class _FeedScreenState extends State<FeedScreen> {
                     size: 18,
                   ),
                   onPressed: () {
-                    // Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //         builder: (context) => N()));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => NoticeScreen()));
                   },
                 ),
                 IconButton(
