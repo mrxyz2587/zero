@@ -18,7 +18,11 @@ class ChatRoom extends StatefulWidget {
   final otUid;
   final String profilePic;
   final status;
-   ChatRoom({required this.otUsername, required this.otUid, required this.profilePic, required this.status});
+  ChatRoom(
+      {required this.otUsername,
+      required this.otUid,
+      required this.profilePic,
+      required this.status});
 
   @override
   State<ChatRoom> createState() => _ChatRoomState();
@@ -135,11 +139,12 @@ class _ChatRoomState extends State<ChatRoom> {
         ? Container(
             width: size.width,
 
-            child:   ChatBubble(
+            child: ChatBubble(
               elevation: 0,
-              clipper: map['sendby'] == _auth.currentUser!.uid?
-              ChatBubbleClipper1(type: BubbleType.sendBubble,radius: 10)
-                  :ChatBubbleClipper1(type: BubbleType.receiverBubble,radius: 12),
+              clipper: map['sendby'] == _auth.currentUser!.uid
+                  ? ChatBubbleClipper1(type: BubbleType.sendBubble, radius: 10)
+                  : ChatBubbleClipper1(
+                      type: BubbleType.receiverBubble, radius: 12),
               alignment: map['sendby'] == _auth.currentUser!.uid
                   ? Alignment.centerRight
                   : Alignment.centerLeft,
@@ -150,16 +155,15 @@ class _ChatRoomState extends State<ChatRoom> {
                   maxWidth: MediaQuery.of(context).size.width * 0.7,
                 ),
                 child: Text(
-                      map['message'],
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black87,
-                      ),
-                    ),
+                  map['message'],
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black87,
+                  ),
+                ),
               ),
-            )
-      ,
+            ),
             // child: Container(
             //   padding: EdgeInsets.symmetric(vertical: 10, horizontal: 14),
             //   margin: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
@@ -179,9 +183,8 @@ class _ChatRoomState extends State<ChatRoom> {
           )
         : Container(
             height: size.height / 2.5,
-      width: size.width,
-      padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-
+            width: size.width,
+            padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
             child: InkWell(
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(
@@ -190,33 +193,34 @@ class _ChatRoomState extends State<ChatRoom> {
                   ),
                 ),
               ),
-child: ChatBubble(
-   elevation: 0,
-  alignment: map['sendby'] == _auth.currentUser!.uid
-      ? Alignment.centerRight
-      : Alignment.centerLeft,
+              child: ChatBubble(
+                elevation: 0,
+                alignment: map['sendby'] == _auth.currentUser!.uid
+                    ? Alignment.centerRight
+                    : Alignment.centerLeft,
 
-
-  clipper: map['sendby'] == _auth.currentUser!.uid?
-  ChatBubbleClipper1(type: BubbleType.sendBubble,radius: 10,nipRadius: 2):
-  ChatBubbleClipper1(type: BubbleType.receiverBubble,radius: 10,nipRadius: 2),
-   // alignment: map['message'] != "" ? null : Alignment.centerRight,
-  margin: EdgeInsets.only(top: 20),
-  backGroundColor: map['sendby'] == _auth.currentUser!.uid
-      ?btnCOlorblue:Colors.grey.shade100,
-  child: map['message'] != ""
-? ClipRRect(
-    borderRadius: BorderRadius.circular(10),
-  child:   Image.network(
-
-  map['message'],
-
-    fit: BoxFit.fill,
-  
-  ),
-)
+                clipper: map['sendby'] == _auth.currentUser!.uid
+                    ? ChatBubbleClipper1(
+                        type: BubbleType.sendBubble, radius: 10, nipRadius: 2)
+                    : ChatBubbleClipper1(
+                        type: BubbleType.receiverBubble,
+                        radius: 10,
+                        nipRadius: 2),
+                // alignment: map['message'] != "" ? null : Alignment.centerRight,
+                margin: EdgeInsets.only(top: 20),
+                backGroundColor: map['sendby'] == _auth.currentUser!.uid
+                    ? btnCOlorblue
+                    : Colors.grey.shade100,
+                child: map['message'] != ""
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.network(
+                          map['message'],
+                          fit: BoxFit.fill,
+                        ),
+                      )
                     : CircularProgressIndicator(),
-),
+              ),
               // child: Container(
               //   height: size.height / 2.5,
               //   width: size.width / 2,
@@ -245,22 +249,28 @@ child: ChatBubble(
           offset: Offset(-20, 0),
           child: Row(
             children: [
-              CircleAvatar( radius: 14,backgroundImage: NetworkImage(widget.profilePic)),
-              SizedBox(width: 15,),
+              CircleAvatar(
+                  radius: 14, backgroundImage: NetworkImage(widget.profilePic)),
+              SizedBox(
+                width: 15,
+              ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-
                   Text(
                     widget.otUsername.toString(),
-                    style: TextStyle(color: Colors.black,fontWeight: FontWeight.w700,fontSize: 16),
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 16),
                   ),
-                  SizedBox(height: 3,),
+                  SizedBox(
+                    height: 3,
+                  ),
                   Text(
                     widget.status.toString(),
-                    style: TextStyle(color: Colors.black54,fontSize: 12),
+                    style: TextStyle(color: Colors.black54, fontSize: 12),
                   ),
-
                 ],
               ),
             ],
@@ -282,7 +292,7 @@ child: ChatBubble(
         child: Column(
           children: [
             Container(
-              height: size.height/1.20,
+              height: size.height / 1.20,
               child: StreamBuilder(
                 stream: _firestore
                     .collection('chatroom')
@@ -295,20 +305,75 @@ child: ChatBubble(
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Center(
                         child: CircularProgressIndicator(
-                      color: Colors.grey.shade300,
-                      strokeWidth: 1.5,
+                      color: Colors.blue,
+                      strokeWidth: 5.5,
                     ));
                   }
 
-                  if (snapshot.data == null) {
-                    return Container();
-                  }
                   return ListView.builder(
                     itemCount: snapshot.data!.docs.length,
                     itemBuilder: (context, index) {
                       Map<String, dynamic> map = snapshot.data!.docs[index]
                           .data() as Map<String, dynamic>;
-                      return messages(size, map, context);
+                      return map['type'] == "text"
+                          ? Container(
+                              width: size.width,
+                              alignment: map['sendby'] == _auth.currentUser!.uid
+                                  ? Alignment.centerRight
+                                  : Alignment.centerLeft,
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 14),
+                                margin: EdgeInsets.symmetric(
+                                    vertical: 5, horizontal: 8),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15),
+                                  color: btnCOlorblue,
+                                ),
+                                child: Text(
+                                  map['message'],
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            )
+                          : Container(
+                              height: size.height / 2.5,
+                              width: size.width,
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 5, horizontal: 5),
+                              alignment: map['sendby'] ==
+                                      _auth.currentUser!.displayName
+                                  ? Alignment.centerRight
+                                  : Alignment.centerLeft,
+                              child: InkWell(
+                                onTap: () => Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (_) => ShowImage(
+                                      imageUrl: map['message'],
+                                    ),
+                                  ),
+                                ),
+                                child: Container(
+                                  height: size.height / 2.5,
+                                  width: size.width / 2,
+                                  decoration:
+                                      BoxDecoration(border: Border.all()),
+                                  alignment: map['message'] != ""
+                                      ? null
+                                      : Alignment.center,
+                                  child: map['message'] != ""
+                                      ? Image.network(
+                                          map['message'],
+                                          fit: BoxFit.cover,
+                                        )
+                                      : CircularProgressIndicator(),
+                                ),
+                              ),
+                            );
                     },
                   );
                 },
@@ -316,7 +381,8 @@ child: ChatBubble(
             ),
             Padding(
               padding: const EdgeInsets.only(bottom: 4),
-              child: Container(height: size.height/17,
+              child: Container(
+                height: size.height / 17,
                 width: size.width,
                 decoration: BoxDecoration(color: Colors.white),
                 child: Container(
@@ -331,11 +397,10 @@ child: ChatBubble(
                       ),
                       Expanded(
                         child: TextField(
-                          onChanged: (value) {
-
-                          },
+                          onChanged: (value) {},
                           decoration: InputDecoration(
-                            contentPadding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+                            contentPadding: EdgeInsets.symmetric(
+                                vertical: 10.0, horizontal: 20.0),
                             hintText: 'Type your message here...',
                             border: InputBorder.none,
                           ),
@@ -343,17 +408,27 @@ child: ChatBubble(
                       ),
                       Padding(
                         padding: const EdgeInsets.only(right: 5.0),
-                        child: Row(
-                            children:[
-                              Icon(CupertinoIcons.mic_fill,size: 22,),
-                              SizedBox(width: 10,),
-                              IconButton(icon: Icon(FontAwesomeIcons.solidImage,size: 20,),onPressed: () => getImage(),),
-                              SizedBox(width: 10,),
-                              IconButton(
-                                  icon: Icon(Icons.send), onPressed:(){
-                                onSendMessage();
-                              }),
-                            ]),
+                        child: Row(children: [
+                          Icon(
+                            CupertinoIcons.mic_fill,
+                            size: 22,
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          IconButton(
+                            icon: Icon(
+                              FontAwesomeIcons.solidImage,
+                              size: 20,
+                            ),
+                            onPressed: () => getImage(),
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          IconButton(
+                              icon: Icon(Icons.send), onPressed: onSendMessage),
+                        ]),
                       )
                     ],
                   ),
