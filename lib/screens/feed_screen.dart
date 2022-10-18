@@ -395,7 +395,9 @@ class _FeedScreenState extends State<FeedScreen> {
                 ),
               ],
             ),
+
             body: ListView(
+              physics: BouncingScrollPhysics(),
               children: [
                 StreamBuilder(
                   stream: FirebaseFirestore.instance
@@ -505,6 +507,7 @@ class _FeedScreenState extends State<FeedScreen> {
                       ));
                     }
                     return ListView.builder(
+
                       shrinkWrap: true,
                       controller: ScrollController(keepScrollOffset: true),
                       scrollDirection: Axis.vertical,

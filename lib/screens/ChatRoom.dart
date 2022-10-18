@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
+import 'package:expandable_text/expandable_text.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
@@ -179,7 +181,7 @@ class _ChatRoomState extends State<ChatRoom> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    ExpandableText(
                       map['message'],
                       style: TextStyle(
                         fontSize: 16,
@@ -187,7 +189,10 @@ class _ChatRoomState extends State<ChatRoom> {
                         color: map['sendby'] == _auth.currentUser!.uid
                             ? Colors.white
                             : Colors.black87,
-                      ),
+                      ),expandText: 'more',
+                      collapseText: 'hide',
+                      linkColor: Colors.grey,
+                      maxLines: 15,
                     ),
                     SizedBox(height: 3,),
                     Text("12:06 pm",style: TextStyle(fontSize: 9,fontStyle: FontStyle.italic,color: Colors.grey.shade700),)
@@ -329,6 +334,51 @@ class _ChatRoomState extends State<ChatRoom> {
               children: [
                 Image.asset("images/chat_bg.png",
                     fit: BoxFit.cover, height: size.height, width: size.width),
+                emojiShow
+                    ? Container(
+                  alignment: Alignment.center,
+                  height: MediaQuery.of(context).size.height ,
+                  child: EmojiPicker(
+
+                    onBackspacePressed: () {
+                      // Do something when the user taps the backspace button (optional)
+                    },
+                    textEditingController: _message, // pass here the same [TextEditingController] that is connected to your input field, usually a [TextFormField]
+                    config: Config(
+                      columns: 7,
+                      emojiSizeMax: 32 *
+                          (Platform.isIOS
+                              ? 1.30
+                              : 1.0), // Issue: https://github.com/flutter/flutter/issues/28894
+                      verticalSpacing: 0,
+                      horizontalSpacing: 0,
+                      gridPadding: EdgeInsets.zero,
+                      initCategory: Category.RECENT,
+                      bgColor: Color(0xFFF2F2F2),
+                      indicatorColor: Colors.blue,
+                      iconColor: Colors.grey,
+                      iconColorSelected: Colors.blue,
+                      backspaceColor: Colors.blue,
+                      skinToneDialogBgColor: Colors.white,
+                      skinToneIndicatorColor: Colors.grey,
+                      enableSkinTones: true,
+                      showRecentsTab: true,
+                      recentsLimit: 28,
+                      noRecents: const Text(
+                        'No Recents',
+                        style: TextStyle(
+                            fontSize: 20, color: Colors.black26),
+                        textAlign: TextAlign.center,
+                      ), // Needs to be const Widget
+                      loadingIndicator: const SizedBox
+                          .shrink(), // Needs to be const Widget
+                      tabIndicatorAnimDuration: kTabScrollDuration,
+                      categoryIcons: const CategoryIcons(),
+                      buttonMode: ButtonMode.MATERIAL,
+                    ),
+                  ),
+                )
+                    : Container(),
                 StreamBuilder(
                   stream: _firestore
                       .collection('chatroom')
@@ -405,7 +455,8 @@ class _ChatRoomState extends State<ChatRoom> {
                               ),
                             ),
                           ),
-                          Row(children: [
+                          Row(
+                              children: [
                             IconButton(
                               onPressed: () {},
                               icon: Icon(
@@ -454,50 +505,7 @@ class _ChatRoomState extends State<ChatRoom> {
                     ),
                   ),
                 ),
-                // emojiShow
-                //     ? Container(
-                //         height: MediaQuery.of(context).size.height / 5,
-                //         child: EmojiPicker(
-                //           onBackspacePressed: () {
-                //             // Do something when the user taps the backspace button (optional)
-                //           },
-                //           textEditingController:
-                //               _message, // pass here the same [TextEditingController] that is connected to your input field, usually a [TextFormField]
-                //           config: Config(
-                //             columns: 7,
-                //             emojiSizeMax: 32 *
-                //                 (Platform.isIOS
-                //                     ? 1.30
-                //                     : 1.0), // Issue: https://github.com/flutter/flutter/issues/28894
-                //             verticalSpacing: 0,
-                //             horizontalSpacing: 0,
-                //             gridPadding: EdgeInsets.zero,
-                //             initCategory: Category.RECENT,
-                //             bgColor: Color(0xFFF2F2F2),
-                //             indicatorColor: Colors.blue,
-                //             iconColor: Colors.grey,
-                //             iconColorSelected: Colors.blue,
-                //             backspaceColor: Colors.blue,
-                //             skinToneDialogBgColor: Colors.white,
-                //             skinToneIndicatorColor: Colors.grey,
-                //             enableSkinTones: true,
-                //             showRecentsTab: true,
-                //             recentsLimit: 28,
-                //             noRecents: const Text(
-                //               'No Recents',
-                //               style: TextStyle(
-                //                   fontSize: 20, color: Colors.black26),
-                //               textAlign: TextAlign.center,
-                //             ), // Needs to be const Widget
-                //             loadingIndicator: const SizedBox
-                //                 .shrink(), // Needs to be const Widget
-                //             tabIndicatorAnimDuration: kTabScrollDuration,
-                //             categoryIcons: const CategoryIcons(),
-                //             buttonMode: ButtonMode.MATERIAL,
-                //           ),
-                //         ),
-                //       )
-                //     : Container()
+
               ],
             ),
           );
