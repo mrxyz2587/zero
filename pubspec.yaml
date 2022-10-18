@@ -62,8 +62,14 @@ dependencies:
   data_connection_checker_tv: ^0.3.5-nullsafety
   open_mail_app: ^0.4.5
   flutter_chat_bubble: ^2.0.0
+<<<<<<< HEAD
   emoji_picker_flutter: ^1.5.0
 
+=======
+  audioplayers: ^0.20.1
+  firebase_messaging: ^13.1.0
+  flutter_local_notifications: ^12.0.2
+>>>>>>> dba8fa052a1c8557f69081aa26d9dad317abc7fd
 dev_dependencies:
   flutter_test:
     sdk: flutter
