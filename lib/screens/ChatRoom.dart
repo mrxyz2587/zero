@@ -11,7 +11,11 @@ import 'package:flutter_chat_bubble/clippers/chat_bubble_clipper_5.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
+import 'package:zero_fin/screens/profile_screen.dart';
 import 'package:zero_fin/utils/colors.dart';
+import 'dart:math' as math;
+import 'package:intl/intl.dart';
+
 
 class ChatRoom extends StatefulWidget {
   final String otUsername;
@@ -154,17 +158,17 @@ class _ChatRoomState extends State<ChatRoom> {
     return map['type'] == "text"
         ? Container(
             width: size.width,
-
+            padding: EdgeInsets.symmetric(horizontal: 8),
             child: ChatBubble(
               elevation: 0,
               clipper: map['sendby'] == _auth.currentUser!.uid
-                  ? ChatBubbleClipper1(type: BubbleType.sendBubble, radius: 10)
+                  ? ChatBubbleClipper1(type: BubbleType.sendBubble, radius: 10,nipHeight: 8,nipWidth: 8)
                   : ChatBubbleClipper1(
-                      type: BubbleType.receiverBubble, radius: 12),
+                      type: BubbleType.receiverBubble, radius: 10,nipHeight: 8,nipWidth: 8),
               alignment: map['sendby'] == _auth.currentUser!.uid
                   ? Alignment.centerRight
                   : Alignment.centerLeft,
-              margin: EdgeInsets.only(top: 20),
+              margin: EdgeInsets.only(top: 6),
               backGroundColor: map['sendby'] == _auth.currentUser!.uid
                   ? btnCOlorblue
                   : Colors.white,
@@ -172,15 +176,22 @@ class _ChatRoomState extends State<ChatRoom> {
                 constraints: BoxConstraints(
                   maxWidth: MediaQuery.of(context).size.width * 0.7,
                 ),
-                child: Text(
-                  map['message'],
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: map['sendby'] == _auth.currentUser!.uid
-                        ? Colors.white
-                        : Colors.black87,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      map['message'],
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: map['sendby'] == _auth.currentUser!.uid
+                            ? Colors.white
+                            : Colors.black87,
+                      ),
+                    ),
+                    SizedBox(height: 3,),
+                    Text("12:06 pm",style: TextStyle(fontSize: 9,fontStyle: FontStyle.italic,color: Colors.grey.shade700),)
+                  ],
                 ),
               ),
             ),
@@ -251,51 +262,67 @@ class _ChatRoomState extends State<ChatRoom> {
     return isLoasdings
         ? Scaffold()
         : Scaffold(
-            backgroundColor: Colors.grey.shade100,
-            appBar: AppBar(
-              elevation: 1,
-              title: Transform.translate(
-                offset: Offset(-20, 0),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                        radius: 14,
-                        backgroundImage: NetworkImage(widget.profilePic)),
-                    SizedBox(
-                      width: 15,
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+            backgroundColor: Color(0xFF000000),
+            appBar: PreferredSize(
+              preferredSize: Size.fromHeight(65.0),
+              child: AppBar(
+                shape:  RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(
+                    bottom: Radius.circular(20),
+                  ),
+                ),
+                backgroundColor: Colors.white,
+                elevation: 1,
+                title: Transform.translate(
+                  offset: Offset(-20, 5),
+                  child: InkWell(
+                    onTap: (){
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=>ProfileScreen(uid: widget.otUid)));
+                    },
+                    child: Row(
                       children: [
-                        Text(
-                          widget.otUsername.toString(),
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 16),
-                        ),
+                        CircleAvatar(
+                            radius: 18,
+                            backgroundImage: NetworkImage(widget.profilePic)),
                         SizedBox(
-                          height: 3,
+                          width: 15,
                         ),
-                        Text(
-                          widget.status.toString(),
-                          style: TextStyle(color: Colors.black54, fontSize: 12),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              widget.otUsername.toString(),
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 16),
+                            ),
+                            SizedBox(
+                              height: 3,
+                            ),
+                            Text(
+                              widget.status.toString(),
+                              style: TextStyle(color: Colors.black54, fontSize: 12),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
-              backgroundColor: Colors.white,
-              leading: IconButton(
-                icon: Icon(
-                  FontAwesomeIcons.chevronLeft,
-                  size: 22,
-                  color: Colors.black87,
+                leading: Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: IconButton(
+                    icon: Icon(
+                      FontAwesomeIcons.chevronLeft,
+                      size: 22,
+                      color: Colors.black87,
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
                 ),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
               ),
             ),
             body: Stack(
@@ -340,9 +367,9 @@ class _ChatRoomState extends State<ChatRoom> {
                   width: size.width,
                   alignment: Alignment.bottomCenter,
                   child: Container(
-                    height: size.height / 17,
+                    height: size.height / 15.5,
                     width: size.width,
-                    decoration: BoxDecoration(color: Colors.white),
+                    decoration: BoxDecoration(color: Colors.white,borderRadius: BorderRadius.only(topLeft: Radius.circular(20),topRight: Radius.circular(20))),
                     child: Container(
                       padding: EdgeInsets.zero,
                       width: size.width,
@@ -373,43 +400,55 @@ class _ChatRoomState extends State<ChatRoom> {
                                 contentPadding: EdgeInsets.symmetric(
                                     vertical: 10.0, horizontal: 20.0),
                                 hintMaxLines: 1,
-                                hintText: 'Type your message here...',
+                                hintText: 'Message...',
                                 border: InputBorder.none,
                               ),
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 5.0),
-                            child: Row(children: [
-                              IconButton(
-                                onPressed: () {},
-                                icon: Icon(
-                                  CupertinoIcons.mic_fill,
-                                  size: 22,
+                          Row(children: [
+                            IconButton(
+                              onPressed: () {},
+                              icon: Icon(
+                                CupertinoIcons.mic_fill,
+                                size: 22,
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(
+                                FontAwesomeIcons.solidImage,
+                                size: 20,
+                              ),
+                              onPressed: () => getImage(),
+                            ),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(0, 8, 14, 8),
+                              child: SizedBox(
+                                height: 40,
+                                width: 40,
+                                child: DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(25),
+                                    color: btnCOlorblue,
+                                  ),
+                                  child: Container(
+                                    child: Transform.rotate(
+                                      angle: 45 * math.pi / 180,
+                                      child: IconButton(
+                                          icon: Icon(FontAwesomeIcons.solidPaperPlane,color: Colors.white,size: 15,),
+                                          onPressed: () {
+                                            setState(() {
+                                              onSendMessage();
+                                            });
+                                          }),
+                                    ),
+                                  ),
                                 ),
                               ),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              IconButton(
-                                icon: Icon(
-                                  FontAwesomeIcons.solidImage,
-                                  size: 20,
-                                ),
-                                onPressed: () => getImage(),
-                              ),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              IconButton(
-                                  icon: Icon(Icons.send),
-                                  onPressed: () {
-                                    setState(() {
-                                      onSendMessage();
-                                    });
-                                  }),
-                            ]),
-                          )
+                            ),
+                          ])
                         ],
                       ),
                     ),
