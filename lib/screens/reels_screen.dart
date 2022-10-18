@@ -39,6 +39,8 @@ class _ReelsScreenState extends State<ReelsScreen> {
   //   setState(() {});
   // }
   var searchController = TextEditingController();
+
+  bool isLikeAnimating = false;
   bottomSheet2(context, String txt) {
     showModalBottomSheet(
       enableDrag: true,
@@ -48,7 +50,6 @@ class _ReelsScreenState extends State<ReelsScreen> {
       context: context,
       builder: (BuildContext c) {
         return Container(
-
           color: Colors.transparent,
           child: Container(
             decoration: BoxDecoration(
@@ -117,7 +118,6 @@ class _ReelsScreenState extends State<ReelsScreen> {
                     },
                   ),
                 ),
-
                 StreamBuilder(
                   stream: FirebaseFirestore.instance
                       .collection('users')
@@ -146,13 +146,14 @@ class _ReelsScreenState extends State<ReelsScreen> {
                                         minimumSize: Size(75, 12),
                                         shape: RoundedRectangleBorder(
                                             borderRadius:
-                                            BorderRadius.circular(8))),
+                                                BorderRadius.circular(8))),
                                     onPressed: () {
                                       Navigator.pop(context);
                                     },
                                     child: Text(
                                       "Send",
-                                      style: TextStyle(color: Colors.white,
+                                      style: TextStyle(
+                                          color: Colors.white,
                                           fontWeight: FontWeight.w700),
                                     )),
                                 title: Text(
@@ -191,6 +192,7 @@ class _ReelsScreenState extends State<ReelsScreen> {
       },
     );
   }
+
   bottomSheet4(context, String txt) {
     showModalBottomSheet(
       backgroundColor: Colors.black.withOpacity(0),
@@ -206,7 +208,6 @@ class _ReelsScreenState extends State<ReelsScreen> {
                 topLeft: Radius.circular(8),
               ),
             ),
-
             width: MediaQuery.of(context).size.width,
             padding: EdgeInsets.symmetric(
               horizontal: 5,
@@ -380,12 +381,46 @@ class _ReelsScreenState extends State<ReelsScreen> {
             itemCount: snapshot.data!.docs.length,
             itemBuilder: (ctx, index) => Stack(
               children: [
-                Container(
-                  child: VideoPlayerItem(
-                    videoUrl: snapshot.data!.docs[index].data()["reelUrl"],
-                  ),
-                  height: MediaQuery.of(context).size.height,
-                  width: MediaQuery.of(context).size.width,
+                GestureDetector(
+                  onDoubleTap: () {
+                    FireStoreMethods().likeReel(
+                      snapshot.data!.docs[index].data()['reelId'].toString(),
+                      snapshot.data!.docs[index].data()['uid'].toString(),
+                      snapshot.data!.docs[index].data()['likes'],
+                    );
+                    setState(() {
+                      isLikeAnimating = true;
+                    });
+                  },
+                  child: Stack(children: [
+                    Container(
+                      child: VideoPlayerItem(
+                        videoUrl: snapshot.data!.docs[index].data()["reelUrl"],
+                      ),
+                      height: MediaQuery.of(context).size.height,
+                      width: MediaQuery.of(context).size.width,
+                    ),
+                    AnimatedOpacity(
+                      duration: const Duration(milliseconds: 200),
+                      opacity: isLikeAnimating ? 1 : 0,
+                      child: LikeAnimation(
+                        isAnimating: isLikeAnimating,
+                        child: const Icon(
+                          Icons.favorite,
+                          color: Colors.white,
+                          size: 100,
+                        ),
+                        duration: const Duration(
+                          milliseconds: 400,
+                        ),
+                        onEnd: () {
+                          setState(() {
+                            isLikeAnimating = false;
+                          });
+                        },
+                      ),
+                    ),
+                  ]),
                 ),
                 Positioned(
                   top: 30,
@@ -393,7 +428,7 @@ class _ReelsScreenState extends State<ReelsScreen> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 8.0, vertical: 10),
                     child: Padding(
-                      padding: EdgeInsets.only(top: 8,left: 5),
+                      padding: EdgeInsets.only(top: 8, left: 5),
                       child: Row(
                         children: [
                           Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -412,11 +447,30 @@ class _ReelsScreenState extends State<ReelsScreen> {
                   bottom: 20,
                   child: Column(
                     children: [
-                      InkWell(
-                        child: Icon(
-                          Icons.favorite_outlined,
-                          color: Colors.red,
-                          size: 35,
+                      LikeAnimation(
+                        isAnimating: snapshot.data!.docs[index]
+                            .data()['likes']
+                            .contains(snapshot.data!.docs[index].data()['uid']),
+                        smallLike: true,
+                        child: IconButton(
+                          icon: snapshot.data!.docs[index]
+                                  .data()['likes']
+                                  .contains(
+                                      snapshot.data!.docs[index].data()['uid'])
+                              ? const Icon(
+                                  FontAwesomeIcons.solidHeart,
+                                  color: Colors.red,
+                                )
+                              : const Icon(
+                                  FontAwesomeIcons.heart,
+                                ),
+                          onPressed: () => FireStoreMethods().likeReel(
+                            snapshot.data!.docs[index]
+                                .data()['reelId']
+                                .toString(),
+                            snapshot.data!.docs[index].data()['uid'].toString(),
+                            snapshot.data!.docs[index].data()['likes'],
+                          ),
                         ),
                       ),
                       SizedBox(height: 12),
@@ -426,6 +480,16 @@ class _ReelsScreenState extends State<ReelsScreen> {
                       ),
                       SizedBox(height: 20),
                       InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ReelsCommentsScreen(
+                                  postId: snapshot.data!.docs[index]
+                                      .data()["reelId"]),
+                            ),
+                          );
+                        },
                         child: Icon(FontAwesomeIcons.comment,
                             color: Colors.white, size: 32),
                       ),
@@ -436,7 +500,7 @@ class _ReelsScreenState extends State<ReelsScreen> {
                       ),
                       SizedBox(height: 20),
                       InkWell(
-                        onTap: (){
+                        onTap: () {
                           bottomSheet2(context, 'txt');
                         },
                         child: Icon(
@@ -481,23 +545,27 @@ class _ReelsScreenState extends State<ReelsScreen> {
                           SizedBox(width: 8),
                           Text(
                             snapshot.data!.docs[index].data()["username"],
-                            style: TextStyle(color: Colors.white, fontSize: 16,
-                              fontWeight: FontWeight.w700),
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700),
                           ),
                           SizedBox(width: 20),
                           OutlinedButton(
-                            onPressed: (){},
+                            onPressed: () {},
                             child: const Text(
                               'Follow',
                               style: TextStyle(
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white
-                              ),
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white),
                             ),
                             style: OutlinedButton.styleFrom(
-                              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+                              shape: const RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10))),
                               side: BorderSide(color: Colors.white, width: 2),
-                            ),),
+                            ),
+                          ),
                         ],
                       ),
                       SizedBox(
@@ -513,7 +581,8 @@ class _ReelsScreenState extends State<ReelsScreen> {
                           linkColor: Colors.grey,
                           // text: TextSpan(
                           //   text: ' ${widget.snap['description']}',
-                          style: TextStyle(color: Colors.white, fontFamily: 'Roboto'),
+                          style: TextStyle(
+                              color: Colors.white, fontFamily: 'Roboto'),
                           // ),
                         ),
                       )

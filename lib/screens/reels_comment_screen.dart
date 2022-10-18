@@ -75,7 +75,7 @@ class _ReelsCommentsScreenState extends State<ReelsCommentsScreen> {
         stream: FirebaseFirestore.instance
             .collection('reels')
             .doc(widget.postId)
-            .collection('reelscomments')
+            .collection('comments')
             .snapshots(),
         builder: (context,
             AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {

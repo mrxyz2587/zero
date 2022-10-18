@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -7,11 +6,17 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_bubble/bubble_type.dart';
 import 'package:flutter_chat_bubble/chat_bubble.dart';
+
 import 'package:flutter_chat_bubble/clippers/chat_bubble_clipper_1.dart';
+import 'package:flutter_chat_bubble/clippers/chat_bubble_clipper_5.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
+import 'package:zero_fin/screens/profile_screen.dart';
 import 'package:zero_fin/utils/colors.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'dart:math' as math;
+import 'package:intl/intl.dart';
 
 class ChatRoom extends StatefulWidget {
   final String otUsername;
@@ -40,6 +45,16 @@ class _ChatRoomState extends State<ChatRoom> {
 
   File? imageFile;
 
+  bool isLoasdings = true;
+
+  bool emojiShow = false;
+  static AudioCache player = AudioCache();
+
+  void playSound(String sound) {
+    final player = AudioCache();
+    player.play(sound);
+  }
+
   Future getImage() async {
     ImagePicker _picker = ImagePicker();
 
@@ -55,6 +70,7 @@ class _ChatRoomState extends State<ChatRoom> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    getData();
     chats
         .where("users", isEqualTo: {currentUid: null, widget.otUid: null})
         .limit(1)
@@ -68,6 +84,17 @@ class _ChatRoomState extends State<ChatRoom> {
             }).then((value) => {chatDocId = value.toString()});
           }
         });
+  }
+
+  void getData() async {
+    var userSnap = await FirebaseFirestore.instance
+        .collection('users')
+        .get()
+        .then((value) {
+      setState(() {
+        isLoasdings = false;
+      });
+    });
   }
 
   Future uploadImage() async {
@@ -138,29 +165,55 @@ class _ChatRoomState extends State<ChatRoom> {
     return map['type'] == "text"
         ? Container(
             width: size.width,
-
+            padding: EdgeInsets.symmetric(horizontal: 8),
             child: ChatBubble(
               elevation: 0,
               clipper: map['sendby'] == _auth.currentUser!.uid
-                  ? ChatBubbleClipper1(type: BubbleType.sendBubble, radius: 10)
+                  ? ChatBubbleClipper1(
+                      type: BubbleType.sendBubble,
+                      radius: 10,
+                      nipHeight: 8,
+                      nipWidth: 8)
                   : ChatBubbleClipper1(
-                      type: BubbleType.receiverBubble, radius: 12),
+                      type: BubbleType.receiverBubble,
+                      radius: 10,
+                      nipHeight: 8,
+                      nipWidth: 8),
               alignment: map['sendby'] == _auth.currentUser!.uid
                   ? Alignment.centerRight
                   : Alignment.centerLeft,
-              margin: EdgeInsets.only(top: 20),
-              backGroundColor: Colors.grey.shade100,
+              margin: EdgeInsets.only(top: 6),
+              backGroundColor: map['sendby'] == _auth.currentUser!.uid
+                  ? btnCOlorblue
+                  : Colors.white,
               child: Container(
                 constraints: BoxConstraints(
                   maxWidth: MediaQuery.of(context).size.width * 0.7,
                 ),
-                child: Text(
-                  map['message'],
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black87,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      map['message'],
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: map['sendby'] == _auth.currentUser!.uid
+                            ? Colors.white
+                            : Colors.black87,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 3,
+                    ),
+                    Text(
+                      "12:06 pm",
+                      style: TextStyle(
+                          fontSize: 9,
+                          fontStyle: FontStyle.italic,
+                          color: Colors.grey.shade700),
+                    )
+                  ],
                 ),
               ),
             ),
@@ -184,7 +237,10 @@ class _ChatRoomState extends State<ChatRoom> {
         : Container(
             height: size.height / 2.5,
             width: size.width,
-            padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+            padding: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
+            alignment: map['sendby'] == _auth.currentUser!.uid
+                ? Alignment.centerRight
+                : Alignment.centerLeft,
             child: InkWell(
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(
@@ -193,46 +249,30 @@ class _ChatRoomState extends State<ChatRoom> {
                   ),
                 ),
               ),
-              child: ChatBubble(
-                elevation: 0,
-                alignment: map['sendby'] == _auth.currentUser!.uid
-                    ? Alignment.centerRight
-                    : Alignment.centerLeft,
-
-                clipper: map['sendby'] == _auth.currentUser!.uid
-                    ? ChatBubbleClipper1(
-                        type: BubbleType.sendBubble, radius: 10, nipRadius: 2)
-                    : ChatBubbleClipper1(
-                        type: BubbleType.receiverBubble,
-                        radius: 10,
-                        nipRadius: 2),
-                // alignment: map['message'] != "" ? null : Alignment.centerRight,
-                margin: EdgeInsets.only(top: 20),
-                backGroundColor: map['sendby'] == _auth.currentUser!.uid
-                    ? btnCOlorblue
-                    : Colors.grey.shade100,
+              child: Container(
+                padding: EdgeInsets.all(4),
+                height: size.height / 2.5,
+                width: size.width / 2,
+                constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.width / 2,
+                  maxWidth: MediaQuery.of(context).size.width * 0.7,
+                ),
+                decoration: BoxDecoration(
+                    color: map['sendby'] == _auth.currentUser!.uid
+                        ? btnCOlorblue
+                        : Colors.white,
+                    borderRadius: BorderRadius.circular(10)),
+                alignment: map['message'] != "" ? null : Alignment.center,
                 child: map['message'] != ""
                     ? ClipRRect(
                         borderRadius: BorderRadius.circular(10),
                         child: Image.network(
                           map['message'],
-                          fit: BoxFit.fill,
+                          fit: BoxFit.cover,
                         ),
                       )
                     : CircularProgressIndicator(),
               ),
-              // child: Container(
-              //   height: size.height / 2.5,
-              //   width: size.width / 2,
-              //   decoration: BoxDecoration(border: Border.all(),borderRadius: BorderRadius.circular(15)),
-              //   alignment: map['message'] != "" ? null : Alignment.centerRight,
-              //   child: map['message'] != ""
-              //       ? Image.network(
-              //           map['message'],
-              //           fit: BoxFit.cover,
-              //         )
-              //       : CircularProgressIndicator(),
-              // ),
             ),
           );
   }
@@ -240,205 +280,263 @@ class _ChatRoomState extends State<ChatRoom> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        elevation: 1,
-        title: Transform.translate(
-          offset: Offset(-20, 0),
-          child: Row(
-            children: [
-              CircleAvatar(
-                  radius: 14, backgroundImage: NetworkImage(widget.profilePic)),
-              SizedBox(
-                width: 15,
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.otUsername.toString(),
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 16),
+    return isLoasdings
+        ? Scaffold()
+        : Scaffold(
+            backgroundColor: Color(0xFF000000),
+            appBar: PreferredSize(
+              preferredSize: Size.fromHeight(65.0),
+              child: AppBar(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(
+                    bottom: Radius.circular(20),
                   ),
-                  SizedBox(
-                    height: 3,
-                  ),
-                  Text(
-                    widget.status.toString(),
-                    style: TextStyle(color: Colors.black54, fontSize: 12),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-        backgroundColor: Colors.white,
-        leading: IconButton(
-          icon: Icon(
-            FontAwesomeIcons.chevronLeft,
-            size: 22,
-            color: Colors.black87,
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              height: size.height / 1.20,
-              child: StreamBuilder(
-                stream: _firestore
-                    .collection('chatroom')
-                    .doc(chatDocId)
-                    .collection('chats')
-                    .orderBy("time", descending: false)
-                    .snapshots(),
-                builder: (BuildContext context,
-                    AsyncSnapshot<QuerySnapshot> snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(
-                        child: CircularProgressIndicator(
-                      color: Colors.blue,
-                      strokeWidth: 5.5,
-                    ));
-                  }
-
-                  return ListView.builder(
-                    itemCount: snapshot.data!.docs.length,
-                    itemBuilder: (context, index) {
-                      Map<String, dynamic> map = snapshot.data!.docs[index]
-                          .data() as Map<String, dynamic>;
-                      return map['type'] == "text"
-                          ? Container(
-                              width: size.width,
-                              alignment: map['sendby'] == _auth.currentUser!.uid
-                                  ? Alignment.centerRight
-                                  : Alignment.centerLeft,
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                    vertical: 10, horizontal: 14),
-                                margin: EdgeInsets.symmetric(
-                                    vertical: 5, horizontal: 8),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(15),
-                                  color: btnCOlorblue,
-                                ),
-                                child: Text(
-                                  map['message'],
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            )
-                          : Container(
-                              height: size.height / 2.5,
-                              width: size.width,
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 5, horizontal: 5),
-                              alignment: map['sendby'] ==
-                                      _auth.currentUser!.displayName
-                                  ? Alignment.centerRight
-                                  : Alignment.centerLeft,
-                              child: InkWell(
-                                onTap: () => Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (_) => ShowImage(
-                                      imageUrl: map['message'],
-                                    ),
-                                  ),
-                                ),
-                                child: Container(
-                                  height: size.height / 2.5,
-                                  width: size.width / 2,
-                                  decoration:
-                                      BoxDecoration(border: Border.all()),
-                                  alignment: map['message'] != ""
-                                      ? null
-                                      : Alignment.center,
-                                  child: map['message'] != ""
-                                      ? Image.network(
-                                          map['message'],
-                                          fit: BoxFit.cover,
-                                        )
-                                      : CircularProgressIndicator(),
-                                ),
-                              ),
-                            );
+                ),
+                backgroundColor: Colors.white,
+                elevation: 1,
+                title: Transform.translate(
+                  offset: Offset(-20, 5),
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  ProfileScreen(uid: widget.otUid)));
                     },
-                  );
-                },
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 4),
-              child: Container(
-                height: size.height / 17,
-                width: size.width,
-                decoration: BoxDecoration(color: Colors.white),
-                child: Container(
-                  padding: EdgeInsets.zero,
-                  width: size.width / 2,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.only(left: 18.0),
-                        child: Icon(CupertinoIcons.smiley_fill),
-                      ),
-                      Expanded(
-                        child: TextField(
-                          onChanged: (value) {},
-                          decoration: InputDecoration(
-                            contentPadding: EdgeInsets.symmetric(
-                                vertical: 10.0, horizontal: 20.0),
-                            hintText: 'Type your message here...',
-                            border: InputBorder.none,
-                          ),
+                    child: Row(
+                      children: [
+                        CircleAvatar(
+                            radius: 18,
+                            backgroundImage: NetworkImage(widget.profilePic)),
+                        SizedBox(
+                          width: 15,
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(right: 5.0),
-                        child: Row(children: [
-                          Icon(
-                            CupertinoIcons.mic_fill,
-                            size: 22,
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          IconButton(
-                            icon: Icon(
-                              FontAwesomeIcons.solidImage,
-                              size: 20,
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              widget.otUsername.toString(),
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 16),
                             ),
-                            onPressed: () => getImage(),
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          IconButton(
-                              icon: Icon(Icons.send), onPressed: onSendMessage),
-                        ]),
-                      )
-                    ],
+                            SizedBox(
+                              height: 3,
+                            ),
+                            Text(
+                              widget.status.toString(),
+                              style: TextStyle(
+                                  color: Colors.black54, fontSize: 12),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                leading: Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: IconButton(
+                    icon: Icon(
+                      FontAwesomeIcons.chevronLeft,
+                      size: 22,
+                      color: Colors.black87,
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
                   ),
                 ),
               ),
             ),
-          ],
-        ),
-      ),
-    );
+            body: Stack(
+              children: [
+                Image.asset("images/chat_bg.png",
+                    fit: BoxFit.cover, height: size.height, width: size.width),
+                StreamBuilder(
+                  stream: _firestore
+                      .collection('chatroom')
+                      .doc(chatDocId)
+                      .collection('chats')
+                      .orderBy("time", descending: true)
+                      .snapshots(),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(
+                          child: CircularProgressIndicator(
+                        color: Colors.blue,
+                        strokeWidth: 5.5,
+                      ));
+                    }
+
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 56.0),
+                      child: ListView.builder(
+                        itemCount: snapshot.data!.docs.length,
+                        shrinkWrap: true,
+                        reverse: true,
+                        physics: BouncingScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          Map<String, dynamic> map = snapshot.data!.docs[index]
+                              .data() as Map<String, dynamic>;
+                          print(snapshot.data!.docs[index].data().toString());
+                          return messages(size, map, context);
+                        },
+                      ),
+                    );
+                  },
+                ),
+                Container(
+                  width: size.width,
+                  alignment: Alignment.bottomCenter,
+                  child: Container(
+                    height: size.height / 15.5,
+                    width: size.width,
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(20),
+                            topRight: Radius.circular(20))),
+                    child: Container(
+                      padding: EdgeInsets.zero,
+                      width: size.width,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.only(left: 18.0),
+                            child: GestureDetector(
+                                onTap: () {
+                                  print("ema");
+                                  setState(() {
+                                    emojiShow = !emojiShow;
+                                  });
+                                },
+                                child: Icon(CupertinoIcons.smiley_fill)),
+                          ),
+                          Expanded(
+                            child: TextField(
+                              controller: _message,
+                              onTap: () {
+                                print("tapped");
+                              },
+                              minLines: 1,
+                              maxLines: 50,
+                              keyboardType: TextInputType.multiline,
+                              decoration: InputDecoration(
+                                contentPadding: EdgeInsets.symmetric(
+                                    vertical: 10.0, horizontal: 20.0),
+                                hintMaxLines: 1,
+                                hintText: 'Message...',
+                                border: InputBorder.none,
+                              ),
+                            ),
+                          ),
+                          Row(children: [
+                            IconButton(
+                              onPressed: () {},
+                              icon: Icon(
+                                CupertinoIcons.mic_fill,
+                                size: 22,
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(
+                                FontAwesomeIcons.solidImage,
+                                size: 20,
+                              ),
+                              onPressed: () => getImage(),
+                            ),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(0, 8, 14, 8),
+                              child: SizedBox(
+                                height: 40,
+                                width: 40,
+                                child: DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(25),
+                                    color: btnCOlorblue,
+                                  ),
+                                  child: Container(
+                                    child: Transform.rotate(
+                                      angle: 45 * math.pi / 180,
+                                      child: IconButton(
+                                          icon: Icon(
+                                            FontAwesomeIcons.solidPaperPlane,
+                                            color: Colors.white,
+                                            size: 15,
+                                          ),
+                                          onPressed: () {
+                                            setState(() {
+                                              onSendMessage();
+
+                                              playSound("chat_send.wav");
+                                            });
+                                          }),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ])
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                // emojiShow
+                //     ? Container(
+                //         height: MediaQuery.of(context).size.height / 5,
+                //         child: EmojiPicker(
+                //           onBackspacePressed: () {
+                //             // Do something when the user taps the backspace button (optional)
+                //           },
+                //           textEditingController:
+                //               _message, // pass here the same [TextEditingController] that is connected to your input field, usually a [TextFormField]
+                //           config: Config(
+                //             columns: 7,
+                //             emojiSizeMax: 32 *
+                //                 (Platform.isIOS
+                //                     ? 1.30
+                //                     : 1.0), // Issue: https://github.com/flutter/flutter/issues/28894
+                //             verticalSpacing: 0,
+                //             horizontalSpacing: 0,
+                //             gridPadding: EdgeInsets.zero,
+                //             initCategory: Category.RECENT,
+                //             bgColor: Color(0xFFF2F2F2),
+                //             indicatorColor: Colors.blue,
+                //             iconColor: Colors.grey,
+                //             iconColorSelected: Colors.blue,
+                //             backspaceColor: Colors.blue,
+                //             skinToneDialogBgColor: Colors.white,
+                //             skinToneIndicatorColor: Colors.grey,
+                //             enableSkinTones: true,
+                //             showRecentsTab: true,
+                //             recentsLimit: 28,
+                //             noRecents: const Text(
+                //               'No Recents',
+                //               style: TextStyle(
+                //                   fontSize: 20, color: Colors.black26),
+                //               textAlign: TextAlign.center,
+                //             ), // Needs to be const Widget
+                //             loadingIndicator: const SizedBox
+                //                 .shrink(), // Needs to be const Widget
+                //             tabIndicatorAnimDuration: kTabScrollDuration,
+                //             categoryIcons: const CategoryIcons(),
+                //             buttonMode: ButtonMode.MATERIAL,
+                //           ),
+                //         ),
+                //       )
+                //     : Container()
+              ],
+            ),
+          );
   }
 }
 
