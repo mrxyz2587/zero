@@ -6,12 +6,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_bubble/bubble_type.dart';
 import 'package:flutter_chat_bubble/chat_bubble.dart';
+
 import 'package:flutter_chat_bubble/clippers/chat_bubble_clipper_1.dart';
 import 'package:flutter_chat_bubble/clippers/chat_bubble_clipper_5.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 import 'package:zero_fin/utils/colors.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class ChatRoom extends StatefulWidget {
   final String otUsername;
@@ -43,6 +45,12 @@ class _ChatRoomState extends State<ChatRoom> {
   bool isLoasdings = true;
 
   bool emojiShow = false;
+  static AudioCache player = AudioCache();
+
+  void playSound(String sound) {
+    final player = AudioCache();
+    player.play(sound);
+  }
 
   Future getImage() async {
     ImagePicker _picker = ImagePicker();
@@ -247,7 +255,6 @@ class _ChatRoomState extends State<ChatRoom> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-
     return isLoasdings
         ? Scaffold()
         : Scaffold(
@@ -406,6 +413,7 @@ class _ChatRoomState extends State<ChatRoom> {
                                   onPressed: () {
                                     setState(() {
                                       onSendMessage();
+                                      playSound("chat_send.wav");
                                     });
                                   }),
                             ]),

@@ -116,17 +116,17 @@ class FireStoreMethods {
     return res;
   }
 
-  Future<String> likeReel(String postId, String uid, List likes) async {
+  Future<String> likeReel(String reelId, String uid, List likes) async {
     String res = "Some error occurred";
     try {
       if (likes.contains(uid)) {
         // if the likes list contains the user uid, we need to remove it
-        _firestore.collection('reel').doc(postId).update({
+        _firestore.collection('reels').doc(reelId).update({
           'likes': FieldValue.arrayRemove([uid])
         });
       } else {
         // else we need to add uid to the likes array
-        _firestore.collection('posts').doc(postId).update({
+        _firestore.collection('reels').doc(reelId).update({
           'likes': FieldValue.arrayUnion([uid])
         });
       }
@@ -191,7 +191,7 @@ class FireStoreMethods {
     return res;
   }
 
-  Future<String> reelsComment(String postId, String text, String uid,
+  Future<String> reelsComment(String reelsId, String text, String uid,
       String name, String profilePic) async {
     String res = "Some error occurred";
     try {
@@ -200,7 +200,7 @@ class FireStoreMethods {
         String commentId = const Uuid().v1();
         _firestore
             .collection('reels')
-            .doc(postId)
+            .doc(reelsId)
             .collection('comments')
             .doc(commentId)
             .set({
