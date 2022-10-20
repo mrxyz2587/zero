@@ -128,7 +128,9 @@ class _EditPostScreenState extends State<EditPostScreen> {
                                 BorderSide(width: 1.2, color: Colors.lightBlue),
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(5))),
-                        onPressed: () {},
+                        onPressed: () {
+
+                        },
                         child: Text(
                           'Edit Privacy',
                           style: TextStyle(
@@ -181,7 +183,7 @@ class _EditPostScreenState extends State<EditPostScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
