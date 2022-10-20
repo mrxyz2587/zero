@@ -357,8 +357,8 @@ class _ChatRoomState extends State<ChatRoom> {
                     fit: BoxFit.cover, height: size.height, width: size.width),
                 StreamBuilder(
                   stream: _firestore
-                      .collection('chatroom')
-                      .doc(chatDocId)
+                      .collection('users')
+                      .doc(currentUid)
                       .collection('chats')
                       .orderBy("time", descending: true)
                       .snapshots(),
@@ -473,11 +473,8 @@ class _ChatRoomState extends State<ChatRoom> {
                                             size: 15,
                                           ),
                                           onPressed: () {
-                                            setState(() {
-                                              onSendMessage();
-
-                                              playSound("chat_send.wav");
-                                            });
+                                            onSendMessage();
+                                            playSound("chat_send.wav");
                                           }),
                                     ),
                                   ),

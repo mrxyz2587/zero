@@ -12,6 +12,7 @@ import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:zero_fin/resources/storage_methods.dart';
+import 'package:zero_fin/screens/followers_follower_screen.dart';
 import 'package:zero_fin/screens/profile_posts_display.dart';
 import 'package:zero_fin/widgets/text_field_input.dart';
 import '../providers/user_provider.dart';
@@ -764,26 +765,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     Container(
                         width: 70,
-                        child:
-                            Center(child: buildStatColumn(postLen, "Posts"))),
+                        child: Center(
+                            child: buildStatColumn(postLen, "Posts", () {}))),
                     Container(
                       height: 50,
                       color: Colors.black54,
                       width: 1,
                     ),
                     Container(
-                        width: 90,
-                        child: Center(
-                            child: buildStatColumn(followers, "Followers"))),
+                      width: 90,
+                      child: Center(
+                        child: buildStatColumn(
+                          followers,
+                          "Followers",
+                          () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        FollowersFollowingScreen(
+                                            uid: widget.uid)));
+                          },
+                        ),
+                      ),
+                    ),
                     Container(
                       height: 50,
                       color: Colors.black54,
                       width: 1,
                     ),
                     Container(
-                        width: 70,
-                        child: Center(
-                            child: buildStatColumn(following, "Following"))),
+                      width: 70,
+                      child: Center(
+                        child: buildStatColumn(following, "Following", () {}),
+                      ),
+                    ),
                   ],
                 ),
                 Padding(
@@ -1521,14 +1537,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Column buildStatColumn(int num, String label) {
+  Column buildStatColumn(int num, String label, Function()? onTap) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        Text(
-          num.toString(),
-          style: TextStyle(fontSize: 19, fontWeight: FontWeight.w700),
+        GestureDetector(
+          onTap: onTap,
+          child: Text(
+            num.toString(),
+            style: TextStyle(fontSize: 19, fontWeight: FontWeight.w700),
+          ),
         ),
         Container(
           margin: const EdgeInsets.only(top: 12),

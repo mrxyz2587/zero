@@ -356,6 +356,23 @@ class _ReelsScreenState extends State<ReelsScreen> {
     );
   }
 
+  // fetchCommentLen() async {
+  //   try {
+  //     QuerySnapshot snap = await FirebaseFirestore.instance
+  //         .collection('reel')
+  //         .doc(widget.snap['postId'])
+  //         .collection('comments')
+  //         .get();
+  //     commentLen = snap.docs.length;
+  //   } catch (err) {
+  //     showSnackBar(
+  //       context,
+  //       err.toString(),
+  //     );
+  //   }
+  //   setState(() {});
+  // }
+
   @override
   Widget build(BuildContext context) {
     final UserProvider userProvider = Provider.of<UserProvider>(context);
@@ -463,6 +480,7 @@ class _ReelsScreenState extends State<ReelsScreen> {
                                 )
                               : const Icon(
                                   FontAwesomeIcons.heart,
+                                  color: Colors.white,
                                 ),
                           onPressed: () => FireStoreMethods().likeReel(
                             snapshot.data!.docs[index]
@@ -475,7 +493,10 @@ class _ReelsScreenState extends State<ReelsScreen> {
                       ),
                       SizedBox(height: 12),
                       Text(
-                        "126.5K",
+                        snapshot.data!.docs[index]
+                            .data()['likes']
+                            .length
+                            .toString(),
                         style: TextStyle(color: Colors.white, fontSize: 10),
                       ),
                       SizedBox(height: 20),
@@ -494,10 +515,13 @@ class _ReelsScreenState extends State<ReelsScreen> {
                             color: Colors.white, size: 32),
                       ),
                       SizedBox(height: 10),
-                      Text(
-                        "126",
-                        style: TextStyle(color: Colors.white, fontSize: 10),
-                      ),
+                      // Text(
+                      //   snapshot.data!.docs[index]
+                      //       .data()['likes']
+                      //       .length
+                      //       .toString(),
+                      //   style: TextStyle(color: Colors.white, fontSize: 10),
+                      // ),
                       SizedBox(height: 20),
                       InkWell(
                         onTap: () {

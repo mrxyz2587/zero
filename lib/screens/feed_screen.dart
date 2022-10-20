@@ -325,11 +325,13 @@ class _FeedScreenState extends State<FeedScreen> {
               leading: GestureDetector(
                 onTap: () {
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => ProfileScreen(
-                                uid: userProvider.getUser.uid,
-                              )));
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProfileScreen(
+                        uid: userProvider.getUser.uid,
+                      ),
+                    ),
+                  );
                 },
                 child: Padding(
                   padding: const EdgeInsets.all(0),
@@ -379,7 +381,8 @@ class _FeedScreenState extends State<FeedScreen> {
                   onPressed: () {
                     Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => NoticeScreen()));
+                        MaterialPageRoute(
+                            builder: (context) => NoticeScreen()));
                   },
                 ),
                 IconButton(
