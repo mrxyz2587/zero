@@ -13,13 +13,18 @@ import '/utils/global_variable.dart';
 import '/utils/utils.dart';
 import '/widgets/like_animation.dart';
 import 'package:provider/provider.dart';
+import 'dart:convert';
+
+import 'package:http/http.dart' as http;
 
 class PostCard extends StatefulWidget {
   final snap;
   final Function()? onshareingbtnPressed;
-  const PostCard(
-      {Key? key, required this.snap, required this.onshareingbtnPressed})
-      : super(key: key);
+  const PostCard({
+    Key? key,
+    required this.snap,
+    required this.onshareingbtnPressed,
+  }) : super(key: key);
 
   @override
   State<PostCard> createState() => _PostCardState();
@@ -29,10 +34,26 @@ class _PostCardState extends State<PostCard> {
   int commentLen = 0;
   bool isLikeAnimating = false;
   bool issaved = false;
+  String tokenpst = '';
   @override
   void initState() {
     super.initState();
     fetchCommentLen();
+    getData();
+  }
+
+  void getData() async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .where("uid", isEqualTo: widget.snap['uid'])
+        .get()
+        .then((value) {
+      for (var docs in value.docs) {
+        if (docs.data()['uid'].toString() == widget.snap['uid']) {
+          tokenpst = docs.data()['token'].toString();
+        }
+      }
+    });
   }
 
   var searchController = TextEditingController();
@@ -45,7 +66,6 @@ class _PostCardState extends State<PostCard> {
       context: context,
       builder: (BuildContext c) {
         return Container(
-
           color: Colors.transparent,
           child: Container(
             decoration: BoxDecoration(
@@ -114,7 +134,6 @@ class _PostCardState extends State<PostCard> {
                     },
                   ),
                 ),
-
                 StreamBuilder(
                   stream: FirebaseFirestore.instance
                       .collection('users')
@@ -143,11 +162,14 @@ class _PostCardState extends State<PostCard> {
                                         minimumSize: Size(75, 12),
                                         shape: RoundedRectangleBorder(
                                             borderRadius:
-                                            BorderRadius.circular(8))),
-                                    onPressed: () {Navigator.pop(context);},
+                                                BorderRadius.circular(8))),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
                                     child: Text(
                                       "Send",
-                                      style: TextStyle(color: Colors.white,
+                                      style: TextStyle(
+                                          color: Colors.white,
                                           fontWeight: FontWeight.w700),
                                     )),
                                 title: Text(
@@ -186,6 +208,7 @@ class _PostCardState extends State<PostCard> {
       },
     );
   }
+
   bottomSheetforlike(context, String txt) {
     showModalBottomSheet(
       enableDrag: true,
@@ -195,7 +218,6 @@ class _PostCardState extends State<PostCard> {
       context: context,
       builder: (BuildContext c) {
         return Container(
-
           color: Colors.transparent,
           child: Container(
             decoration: BoxDecoration(
@@ -268,15 +290,21 @@ class _PostCardState extends State<PostCard> {
                   crossAxisAlignment: CrossAxisAlignment.baseline,
                   textBaseline: TextBaseline.alphabetic,
                   children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 14),
-                    child: Text('Liked by',style: TextStyle(fontWeight: FontWeight.w700,fontSize: 15),),
-                  ),
-                  Padding( //TODO Wanted to use positioned widgit to make this at corner.
-                    padding: const EdgeInsets.only(left: 240.0),
-                    child: Text('12 likes',style: TextStyle(fontSize: 15)),
-                  ),
-                ],),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 14),
+                      child: Text(
+                        'Liked by',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w700, fontSize: 15),
+                      ),
+                    ),
+                    Padding(
+                      //TODO Wanted to use positioned widgit to make this at corner.
+                      padding: const EdgeInsets.only(left: 240.0),
+                      child: Text('12 likes', style: TextStyle(fontSize: 15)),
+                    ),
+                  ],
+                ),
                 Divider(
                   height: 20,
                   thickness: 2,
@@ -301,92 +329,106 @@ class _PostCardState extends State<PostCard> {
                       itemCount: (snapshot.data! as dynamic).docs.length,
                       itemBuilder: (context, index) => Align(
                           child: Container(
-                            color: Colors.white,
-                            child: SizedBox(
-                              height: 60,
-                              child: Container(
-                                child: Expanded(
-                                  child: Row(
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.only(left: 20),
-                                        child: CircleAvatar(
-                                          backgroundImage: NetworkImage(
-                                            (snapshot.data! as dynamic)
-                                                .docs[index]['photoUrl']
-                                                .toString(),
-                                          ),
-                                          radius: 20,
-                                        ),
+                        color: Colors.white,
+                        child: SizedBox(
+                          height: 60,
+                          child: Container(
+                            child: Expanded(
+                              child: Row(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 20),
+                                    child: CircleAvatar(
+                                      backgroundImage: NetworkImage(
+                                        (snapshot.data! as dynamic)
+                                            .docs[index]['photoUrl']
+                                            .toString(),
                                       ),
-                                      SizedBox(
-                                        width: 3,
-                                      ),
-                                      Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(12.0),
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              Text(
-                                                  (snapshot.data! as dynamic)
-                                                      .docs[index]['username']
-                                                      .toString(),
-                                                  style: TextStyle(
-                                                      color: Color(0xFF000000),
-                                                      fontSize: 15,
-                                                      fontWeight: FontWeight.w700,
-                                                      fontFamily: 'Roboto')),
-                                              SizedBox(
-                                                height: 3,
-                                              ),
-                                              Text(
-                                                  (snapshot.data! as dynamic)
-                                                      .docs[index]['university']
-                                                      .toString(),
-                                                  style: TextStyle(
-                                                    color: Colors.black54,
-                                                      fontSize: 13, fontFamily: 'Roboto')
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(right: 13),
-                                        child: Row(
-                                          children: [
-                                          IconButton(
-                                            style: ElevatedButton.styleFrom(
-                                                backgroundColor: btnCOlorblue,
-                                                minimumSize: Size(50, 12),
-                                                shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                    BorderRadius.circular(7))),
-                                            onPressed: () {},  //TODO 2. button action
-                                            icon: Icon(FontAwesomeIcons.userPlus,size: 20,),),
-                                          SizedBox(
-                                            width: 10,
-                                          ),
-                                          IconButton(
-                                            style: ElevatedButton.styleFrom(
-                                                backgroundColor: btnCOlorblue,
-                                                minimumSize: Size(50, 12),
-                                                shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                    BorderRadius.circular(7))),
-                                            onPressed: () {},  //TODO 2. button action
-                                            icon: Icon(FontAwesomeIcons.solidPaperPlane,size: 20,),),
-                                        ],),
-                                      )
-                                    ],
+                                      radius: 20,
+                                    ),
                                   ),
-                                ),
-
+                                  SizedBox(
+                                    width: 3,
+                                  ),
+                                  Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(12.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                              (snapshot.data! as dynamic)
+                                                  .docs[index]['username']
+                                                  .toString(),
+                                              style: TextStyle(
+                                                  color: Color(0xFF000000),
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.w700,
+                                                  fontFamily: 'Roboto')),
+                                          SizedBox(
+                                            height: 3,
+                                          ),
+                                          Text(
+                                              (snapshot.data! as dynamic)
+                                                  .docs[index]['university']
+                                                  .toString(),
+                                              style: TextStyle(
+                                                  color: Colors.black54,
+                                                  fontSize: 13,
+                                                  fontFamily: 'Roboto')),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 13),
+                                    child: Row(
+                                      children: [
+                                        IconButton(
+                                          style: ElevatedButton.styleFrom(
+                                              backgroundColor: btnCOlorblue,
+                                              minimumSize: Size(50, 12),
+                                              shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          7))),
+                                          onPressed:
+                                              () {}, //TODO 2. button action
+                                          icon: Icon(
+                                            FontAwesomeIcons.userPlus,
+                                            size: 20,
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          width: 10,
+                                        ),
+                                        IconButton(
+                                          style: ElevatedButton.styleFrom(
+                                              backgroundColor: btnCOlorblue,
+                                              minimumSize: Size(50, 12),
+                                              shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          7))),
+                                          onPressed:
+                                              () {}, //TODO 2. button action
+                                          icon: Icon(
+                                            FontAwesomeIcons.solidPaperPlane,
+                                            size: 20,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                ],
                               ),
                             ),
-                          )),
+                          ),
+                        ),
+                      )),
                     );
                   },
                 )
@@ -397,6 +439,7 @@ class _PostCardState extends State<PostCard> {
       },
     );
   }
+
   bottomSheetforownthreedot(context, String txt) {
     showModalBottomSheet(
       backgroundColor: Colors.black.withOpacity(0),
@@ -438,7 +481,7 @@ class _PostCardState extends State<PostCard> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           InkWell(
-                            onTap: (){
+                            onTap: () {
                               bottomSheetforshare(context, 'txt');
                             },
                             child: Container(
@@ -543,23 +586,22 @@ class _PostCardState extends State<PostCard> {
                 ),
                 Divider(thickness: 0.5, color: Colors.black12),
                 ListTile(
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => EditPostScreen(
-                                postId: widget.snap["postId"],
-                                postUrl: widget.snap["postUrl"],
-                                postDescription: widget.snap["description"],
-                              )));
-                    },
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => EditPostScreen(
+                                  postId: widget.snap["postId"],
+                                  postUrl: widget.snap["postUrl"],
+                                  postDescription: widget.snap["description"],
+                                )));
+                  },
                   title: Text('Edit',
                       style: TextStyle(color: Color(0xFF000000), fontSize: 17)),
                 ),
                 ListTile(
                   onTap: () => deletePost(widget.snap["postId"]),
-
                   title: Text('Delete',
                       style: TextStyle(color: Color(0xFF000000), fontSize: 17)),
                 ),
@@ -615,7 +657,7 @@ class _PostCardState extends State<PostCard> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           InkWell(
-                            onTap: (){
+                            onTap: () {
                               bottomSheetforshare(context, 'txt');
                             },
                             child: Container(
@@ -764,6 +806,42 @@ class _PostCardState extends State<PostCard> {
         context,
         err.toString(),
       );
+    }
+  }
+
+  sendNotification(String title, String token) async {
+    final data = {
+      'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+      'id': '1',
+      'status': 'done',
+      'message': title,
+    };
+
+    try {
+      http.Response response =
+          await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
+              headers: <String, String>{
+                'Content-Type': 'application/json',
+                'Authorization':
+                    'key=AAAAdVXFb4U:APA91bHPFxenxhJYUOgnxYUqRsIWGhpjxkxG_1p8VLBsaHjDlOwN9deEwDjs4O1I-ytIOaOajx6k0dzQ3mTaT4VBUB6LDRA_kKscvqomy_ps59Q0y-nBcKqaaanNeBY17Dy2VlCs-qvR'
+              },
+              body: jsonEncode(<String, dynamic>{
+                'notification': <String, dynamic>{
+                  'title': widget.snap['username'].toString(),
+                  'body': 'kisine like kr diya'
+                },
+                'priority': 'high',
+                'data': data,
+                'to': token
+              }));
+
+      if (response.statusCode == 200) {
+        print("Yeh notificatin is sended");
+      } else {
+        print(response.reasonPhrase);
+      }
+    } catch (e) {
+      print(e.toString());
     }
   }
 
@@ -993,10 +1071,10 @@ class _PostCardState extends State<PostCard> {
             GestureDetector(
               onDoubleTap: () {
                 FireStoreMethods().likePost(
-                  widget.snap['postId'].toString(),
-                  user.uid,
-                  widget.snap['likes'],
-                );
+                    widget.snap['postId'].toString(),
+                    user.uid,
+                    widget.snap['likes'],
+                    sendNotification('Someone liked your pic', tokenpst));
                 setState(() {
                   isLikeAnimating = true;
                 });
@@ -1066,10 +1144,11 @@ class _PostCardState extends State<PostCard> {
                               FontAwesomeIcons.heart,
                             ),
                       onPressed: () => FireStoreMethods().likePost(
-                        widget.snap['postId'].toString(),
-                        user.uid,
-                        widget.snap['likes'],
-                      ),
+                          widget.snap['postId'].toString(),
+                          user.uid,
+                          widget.snap['likes'],
+                          sendNotification(
+                              'someone liked your post', tokenpst)),
                     ),
                   ),
                   SizedBox(width: 12),
@@ -1085,6 +1164,8 @@ class _PostCardState extends State<PostCard> {
                       MaterialPageRoute(
                         builder: (context) => CommentsScreen(
                           postId: widget.snap['postId'].toString(),
+                          name: widget.snap['username'],
+                          token: tokenpst,
                         ),
                       ),
                     ),
@@ -1119,6 +1200,8 @@ class _PostCardState extends State<PostCard> {
                       MaterialPageRoute(
                         builder: (context) => CommentsScreen(
                           postId: widget.snap['postId'].toString(),
+                          token: tokenpst,
+                          name: widget.snap['name'].toString(),
                         ),
                       ),
                     ),
@@ -1132,12 +1215,14 @@ class _PostCardState extends State<PostCard> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  InkWell(onTap:(){
-                    bottomSheetforlike(context, 'txt');
-                  },
+                  InkWell(
+                    onTap: () {
+                      bottomSheetforlike(context, 'txt');
+                    },
                     child: Text(
                       '${widget.snap['likes'].length} Likes',
-                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                      style:
+                          TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
                     ),
                   ),
 

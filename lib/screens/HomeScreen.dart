@@ -93,11 +93,12 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
             Navigator.pop(context);
           },
         ),
-        title: Text("Chats",
-            style: TextStyle(
-                fontWeight: FontWeight.w700,
-                color: Color(0xFF000000),
-                fontSize: 19),
+        title: Text(
+          "Chats",
+          style: TextStyle(
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF000000),
+              fontSize: 19),
         ),
         actions: [
           IconButton(
@@ -121,8 +122,8 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
               strokeWidth: 1.5,
             ))
           : SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-            child: Column(
+              scrollDirection: Axis.vertical,
+              child: Column(
                 children: [
                   Padding(
                     padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
@@ -146,7 +147,8 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                         fillColor: Color(0xFFEFEFEF),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: Color(0xFFFFFFFF), width: 1),
+                          borderSide:
+                              BorderSide(color: Color(0xFFFFFFFF), width: 1),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
@@ -170,9 +172,11 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Align(alignment: Alignment.topLeft,
+                            Align(
+                              alignment: Alignment.topLeft,
                               child: Padding(
-                                padding: const EdgeInsets.only(left: 20.0, bottom: 5),
+                                padding: const EdgeInsets.only(
+                                    left: 20.0, bottom: 5),
                                 child: Container(
                                   color: Colors.white,
                                   padding: EdgeInsets.all(4),
@@ -181,8 +185,8 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                                       Stack(
                                         children: [
                                           CircleAvatar(
-                                            backgroundImage:
-                                            NetworkImage('https://images.unsplash.com/photo-1597466765990-64ad1c35dafc'
+                                            backgroundImage: NetworkImage(
+                                              'https://images.unsplash.com/photo-1597466765990-64ad1c35dafc'
                                                   .toString(),
                                             ),
                                             radius: 32,
@@ -192,21 +196,14 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                                             right: 6,
                                             child: Container(
                                               decoration: BoxDecoration(
-                                                  color:
-                                                  btnCOlorblue,
+                                                  color: btnCOlorblue,
                                                   borderRadius:
-                                                  BorderRadius
-                                                      .circular(
-                                                      10),
+                                                      BorderRadius.circular(10),
                                                   border: Border.all(
-                                                      color: Colors
-                                                          .white,
+                                                      color: Colors.white,
                                                       width: 1)),
-                                              constraints:
-                                              BoxConstraints
-                                                  .tight(Size
-                                                  .fromRadius(
-                                                  5)),
+                                              constraints: BoxConstraints.tight(
+                                                  Size.fromRadius(5)),
                                             ),
                                           )
                                         ],
@@ -216,19 +213,15 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                                       ),
                                       Text('Abhi',
                                           style: TextStyle(
-                                              color:
-                                              Color(0xFF000000),
+                                              color: Color(0xFF000000),
                                               fontSize: 14,
-                                              fontWeight:
-                                              FontWeight.w700,
-                                              fontFamily:
-                                              'Roboto')),
+                                              fontWeight: FontWeight.w700,
+                                              fontFamily: 'Roboto')),
                                     ],
                                   ),
                                 ),
                               ),
                             ),
-
                           ],
                         ),
                       ),
@@ -296,12 +289,13 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                       thickness: 1,
                       indent: 0,
                       endIndent: 0,
-                      color: Colors.black12
-                  ),
+                      color: Colors.black12),
                   StreamBuilder(
                     stream: FirebaseFirestore.instance
                         .collection('users')
-                    .where("uid",isNotEqualTo: FirebaseAuth.instance.currentUser!.uid.toString())
+                        .where("uid",
+                            isNotEqualTo: FirebaseAuth.instance.currentUser!.uid
+                                .toString())
                         .snapshots(),
                     builder: (context,
                         AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
@@ -321,23 +315,26 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                             await Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (_) => ChatRoom(
-
-                                  otUsername: snapshot.data!.docs[index]
-                                      .data()["username"],
-                                  otUid: snapshot.data!.docs[index].data()["uid"],
-                          profilePic: snapshot.data!.docs[index].data()["photoUrl"],
-                                  status:snapshot.data!.docs[index].data()["status"] ,
-                                  
-                                ),
+                                    otUsername: snapshot.data!.docs[index]
+                                        .data()["username"],
+                                    otUid: snapshot.data!.docs[index]
+                                        .data()["uid"],
+                                    profilePic: snapshot.data!.docs[index]
+                                        .data()["photoUrl"],
+                                    status: snapshot.data!.docs[index]
+                                        .data()["status"],
+                                    token: snapshot.data!.docs[index]
+                                        .data()["token"]
+                                        .toString()),
                               ),
                             );
                           },
                           leading: Stack(
                             children: [
                               CircleAvatar(
-                                backgroundImage:
-                                NetworkImage('https://images.unsplash.com/photo-1597466765990-64ad1c35dafc'
-                                    .toString(),
+                                backgroundImage: NetworkImage(
+                                  'https://images.unsplash.com/photo-1597466765990-64ad1c35dafc'
+                                      .toString(),
                                 ),
                                 radius: 23,
                               ),
@@ -346,21 +343,12 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                                 right: 3,
                                 child: Container(
                                   decoration: BoxDecoration(
-                                      color:
-                                      btnCOlorblue,
-                                      borderRadius:
-                                      BorderRadius
-                                          .circular(
-                                          10),
+                                      color: btnCOlorblue,
+                                      borderRadius: BorderRadius.circular(10),
                                       border: Border.all(
-                                          color: Colors
-                                              .white,
-                                          width: 1)),
+                                          color: Colors.white, width: 1)),
                                   constraints:
-                                  BoxConstraints
-                                      .tight(Size
-                                      .fromRadius(
-                                      5)),
+                                      BoxConstraints.tight(Size.fromRadius(5)),
                                 ),
                               )
                             ],
@@ -376,14 +364,19 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                               ),
                             ),
                           ),
-                          subtitle:
-                              Padding(
-                                padding: const EdgeInsets.only(left: 12),
-                                child: Text('5 new messages',style: TextStyle(fontSize: 12,color: Colors.black54)),
-                              ),
+                          subtitle: Padding(
+                            padding: const EdgeInsets.only(left: 12),
+                            child: Text('5 new messages',
+                                style: TextStyle(
+                                    fontSize: 12, color: Colors.black54)),
+                          ),
                           trailing: Padding(
                             padding: const EdgeInsets.only(right: 7.0),
-                            child: Icon(Icons.arrow_forward_ios_rounded, color: Colors.black,size: 25,),
+                            child: Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              color: Colors.black,
+                              size: 25,
+                            ),
                           ),
                         ),
                       );
@@ -391,7 +384,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                   ),
                 ],
               ),
-          ),
+            ),
     );
   }
 }

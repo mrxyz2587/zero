@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -11,6 +12,7 @@ import 'package:zero_fin/screens/HomeScreen.dart';
 import 'package:zero_fin/screens/profile_screen.dart';
 import 'package:zero_fin/screens/search_screen.dart';
 import '../providers/user_provider.dart';
+import '../utils/local_notification_services.dart';
 import '/utils/colors.dart';
 import '/utils/global_variable.dart';
 import '/widgets/post_card.dart';
@@ -235,7 +237,11 @@ class _FeedScreenState extends State<FeedScreen> {
 
     // TODO: implement initState
     getLocation();
+    storeNotificationToken();
     super.initState();
+    FirebaseMessaging.onMessage.listen((event) {
+      LocalNotificationService.display(event);
+    });
   }
 
   void getLocation() async {
@@ -301,6 +307,14 @@ class _FeedScreenState extends State<FeedScreen> {
         isLoasdings = false;
       });
     });
+  }
+
+  storeNotificationToken() async {
+    String? token = await FirebaseMessaging.instance.getToken();
+    await FirebaseFirestore.instance
+        .collection("users")
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .set({'token': token}, SetOptions(merge: true));
   }
 
   @override
@@ -398,7 +412,6 @@ class _FeedScreenState extends State<FeedScreen> {
                 ),
               ],
             ),
-
             body: ListView(
               physics: BouncingScrollPhysics(),
               children: [
@@ -510,7 +523,6 @@ class _FeedScreenState extends State<FeedScreen> {
                       ));
                     }
                     return ListView.builder(
-
                       shrinkWrap: true,
                       controller: ScrollController(keepScrollOffset: true),
                       scrollDirection: Axis.vertical,

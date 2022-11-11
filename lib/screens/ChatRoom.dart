@@ -1,8 +1,13 @@
+import 'dart:convert';
+
+import 'package:http/http.dart' as http;
+
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:expandable_text/expandable_text.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -17,17 +22,20 @@ import 'package:zero_fin/screens/profile_screen.dart';
 import 'package:zero_fin/utils/colors.dart';
 import 'dart:math' as math;
 import 'package:intl/intl.dart';
+import 'package:zero_fin/utils/local_notification_services.dart';
 
 class ChatRoom extends StatefulWidget {
   final String otUsername;
   final otUid;
   final String profilePic;
   final status;
+  final String token;
   ChatRoom(
       {required this.otUsername,
       required this.otUid,
       required this.profilePic,
-      required this.status});
+      required this.status,
+      required this.token});
 
   @override
   State<ChatRoom> createState() => _ChatRoomState();
@@ -78,6 +86,46 @@ class _ChatRoomState extends State<ChatRoom> {
             }).then((value) => {chatDocId = value.toString()});
           }
         });
+
+    FirebaseMessaging.onMessage.listen((event) {
+      LocalNotificationService.display(event);
+    });
+  }
+
+  sendNotification(String title, String token) async {
+    final data = {
+      'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+      'id': '1',
+      'status': 'done',
+      'message': title,
+    };
+
+    try {
+      http.Response response =
+          await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
+              headers: <String, String>{
+                'Content-Type': 'application/json',
+                'Authorization':
+                    'key=AAAAdVXFb4U:APA91bHPFxenxhJYUOgnxYUqRsIWGhpjxkxG_1p8VLBsaHjDlOwN9deEwDjs4O1I-ytIOaOajx6k0dzQ3mTaT4VBUB6LDRA_kKscvqomy_ps59Q0y-nBcKqaaanNeBY17Dy2VlCs-qvR'
+              },
+              body: jsonEncode(<String, dynamic>{
+                'notification': <String, dynamic>{
+                  'title': widget.otUsername.toString(),
+                  'body': title
+                },
+                'priority': 'high',
+                'data': data,
+                'to': '${widget.token}'
+              }));
+
+      if (response.statusCode == 200) {
+        print("Yeh notificatin is sended");
+      } else {
+        print(response.reasonPhrase);
+      }
+    } catch (e) {
+      print(e.toString());
+    }
   }
 
   void getData() async {
@@ -149,7 +197,10 @@ class _ChatRoomState extends State<ChatRoom> {
           .collection('chatroom')
           .doc(chatDocId)
           .collection('chats')
-          .add(messages);
+          .add(messages)
+          .whenComplete(() {
+        sendNotification(" Sended you a message", widget.token);
+      });
     } else {
       print("Enter Some Text");
     }
@@ -354,55 +405,10 @@ class _ChatRoomState extends State<ChatRoom> {
               children: [
                 Image.asset("images/chat_bg.png",
                     fit: BoxFit.cover, height: size.height, width: size.width),
-                emojiShow
-                    ? Container(
-                        alignment: Alignment.center,
-                        height: MediaQuery.of(context).size.height,
-                        child: EmojiPicker(
-                          onBackspacePressed: () {
-                            // Do something when the user taps the backspace button (optional)
-                          },
-                          textEditingController:
-                              _message, // pass here the same [TextEditingController] that is connected to your input field, usually a [TextFormField]
-                          config: Config(
-                            columns: 7,
-                            emojiSizeMax: 32 *
-                                (Platform.isIOS
-                                    ? 1.30
-                                    : 1.0), // Issue: https://github.com/flutter/flutter/issues/28894
-                            verticalSpacing: 0,
-                            horizontalSpacing: 0,
-                            gridPadding: EdgeInsets.zero,
-                            initCategory: Category.RECENT,
-                            bgColor: Color(0xFFF2F2F2),
-                            indicatorColor: Colors.blue,
-                            iconColor: Colors.grey,
-                            iconColorSelected: Colors.blue,
-                            backspaceColor: Colors.blue,
-                            skinToneDialogBgColor: Colors.white,
-                            skinToneIndicatorColor: Colors.grey,
-                            enableSkinTones: true,
-                            showRecentsTab: true,
-                            recentsLimit: 28,
-                            noRecents: const Text(
-                              'No Recents',
-                              style: TextStyle(
-                                  fontSize: 20, color: Colors.black26),
-                              textAlign: TextAlign.center,
-                            ), // Needs to be const Widget
-                            loadingIndicator: const SizedBox
-                                .shrink(), // Needs to be const Widget
-                            tabIndicatorAnimDuration: kTabScrollDuration,
-                            categoryIcons: const CategoryIcons(),
-                            buttonMode: ButtonMode.MATERIAL,
-                          ),
-                        ),
-                      )
-                    : Container(),
                 StreamBuilder(
                   stream: _firestore
-                      .collection('users')
-                      .doc(currentUid)
+                      .collection('chatroom')
+                      .doc(chatDocId)
                       .collection('chats')
                       .orderBy("time", descending: true)
                       .snapshots(),
@@ -518,9 +524,6 @@ class _ChatRoomState extends State<ChatRoom> {
                                           ),
                                           onPressed: () {
                                             onSendMessage();
-                                            setState(() {
-                                              onSendMessage();
-                                            });
                                           }),
                                     ),
                                   ),
@@ -564,5 +567,3 @@ class ShowImage extends StatelessWidget {
     );
   }
 }
-
-//

@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../utils/local_notification_services.dart';
 import '/models/user.dart';
 import '/providers/user_provider.dart';
 import '/resources/firestore_methods.dart';
@@ -8,10 +10,17 @@ import '/utils/colors.dart';
 import '/utils/utils.dart';
 import '/widgets/comment_card.dart';
 import 'package:provider/provider.dart';
+import 'dart:convert';
+
+import 'package:http/http.dart' as http;
 
 class CommentsScreen extends StatefulWidget {
   final postId;
-  const CommentsScreen({Key? key, required this.postId}) : super(key: key);
+  final String name;
+  final String token;
+  const CommentsScreen(
+      {Key? key, required this.postId, required this.token, required this.name})
+      : super(key: key);
 
   @override
   _CommentsScreenState createState() => _CommentsScreenState();
@@ -24,12 +33,12 @@ class _CommentsScreenState extends State<CommentsScreen> {
   void postComment(String uid, String name, String profilePic) async {
     try {
       String res = await FireStoreMethods().postComment(
-        widget.postId,
-        commentEditingController.text,
-        uid,
-        name,
-        profilePic,
-      );
+          widget.postId,
+          commentEditingController.text,
+          uid,
+          name,
+          profilePic,
+          sendNotification('${name} commented on your post', widget.token));
 
       if (res != 'success') {
         showSnackBar(context, res);
@@ -42,6 +51,51 @@ class _CommentsScreenState extends State<CommentsScreen> {
         context,
         err.toString(),
       );
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    FirebaseMessaging.onMessage.listen((event) {
+      LocalNotificationService.display(event);
+    });
+  }
+
+  sendNotification(String title, String token) async {
+    final data = {
+      'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+      'id': '1',
+      'status': 'done',
+      'message': title,
+    };
+
+    try {
+      http.Response response =
+          await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
+              headers: <String, String>{
+                'Content-Type': 'application/json',
+                'Authorization':
+                    'key=AAAAdVXFb4U:APA91bHPFxenxhJYUOgnxYUqRsIWGhpjxkxG_1p8VLBsaHjDlOwN9deEwDjs4O1I-ytIOaOajx6k0dzQ3mTaT4VBUB6LDRA_kKscvqomy_ps59Q0y-nBcKqaaanNeBY17Dy2VlCs-qvR'
+              },
+              body: jsonEncode(<String, dynamic>{
+                'notification': <String, dynamic>{
+                  'title': widget.name.toString(),
+                  'body': 'This betichod commented on your post'
+                },
+                'priority': 'high',
+                'data': data,
+                'to': token
+              }));
+
+      if (response.statusCode == 200) {
+        print("Yeh notificatin is sended");
+      } else {
+        print(response.reasonPhrase);
+      }
+    } catch (e) {
+      print(e.toString());
     }
   }
 
@@ -133,8 +187,8 @@ class _CommentsScreenState extends State<CommentsScreen> {
                       const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                   child: const Text(
                     'POST',
-                    style: TextStyle(color: Colors.blue,
-                    fontWeight: FontWeight.w700),
+                    style: TextStyle(
+                        color: Colors.blue, fontWeight: FontWeight.w700),
                   ),
                 ),
               )

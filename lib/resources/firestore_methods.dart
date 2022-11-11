@@ -95,7 +95,8 @@ class FireStoreMethods {
     return res;
   }
 
-  Future<String> likePost(String postId, String uid, List likes) async {
+  Future<String> likePost(
+      String postId, String uid, List likes, Future functions) async {
     String res = "Some error occurred";
     try {
       if (likes.contains(uid)) {
@@ -104,10 +105,10 @@ class FireStoreMethods {
           'likes': FieldValue.arrayRemove([uid])
         });
       } else {
-        // else we need to add uid to the likes array
         _firestore.collection('posts').doc(postId).update({
           'likes': FieldValue.arrayUnion([uid])
         });
+        functions;
       }
       res = 'success';
     } catch (err) {
@@ -162,7 +163,7 @@ class FireStoreMethods {
 
   // Post comment
   Future<String> postComment(String postId, String text, String uid,
-      String name, String profilePic) async {
+      String name, String profilePic, Future functions) async {
     String res = "Some error occurred";
     try {
       if (text.isNotEmpty) {
@@ -182,6 +183,7 @@ class FireStoreMethods {
           'datePublished': DateTime.now(),
         });
         res = 'success';
+        functions;
       } else {
         res = "Please enter text";
       }
