@@ -97,7 +97,7 @@ class _SearchScreenState extends State<SearchScreen> {
         desiredAccuracy: LocationAccuracy.high);
     final LocationSettings locationSettings = LocationSettings(
       accuracy: LocationAccuracy.high,
-      distanceFilter: 100,
+      distanceFilter: 10,
     );
     StreamSubscription<Position> positionStream =
         Geolocator.getPositionStream(locationSettings: locationSettings)
@@ -105,21 +105,22 @@ class _SearchScreenState extends State<SearchScreen> {
       print(position == null
           ? 'Unknown'
           : ' this is locs ${position.latitude.toString()}, ${position.longitude.toString()}');
-      if (position != null) {
-        setState(() {
-          longitude = position.longitude;
-          latitude = position.latitude;
-        });
-        await FirebaseFirestore.instance
-            .collection("users")
-            .doc(FirebaseAuth.instance.currentUser!.uid)
-            .update(<String, String>{
-          "longCoordinates": longitude.toString(),
-          "latitudeCoordinates": latitude.toString(),
-        });
-        print(longitude.toString() + " locas " + latitude.toString());
-      }
+      if (position != null) {}
     });
+    setState(() {
+      longitude = position.longitude;
+      latitude = position.latitude;
+    });
+    print(longitude.toString() + " locas " + latitude.toString());
+
+    await FirebaseFirestore.instance
+        .collection("users")
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .update(<String, String>{
+      "longCoordinates": longitude.toString(),
+      "latitudeCoordinates": latitude.toString(),
+    });
+
     isLoading = false;
   }
 
@@ -130,10 +131,8 @@ class _SearchScreenState extends State<SearchScreen> {
     var a = 0.5 -
         c((lat2 - lat1) * p) / 2 +
         c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p)) / 2;
-    return (12742 * asin(sqrt(a))) / 1000;
+    return (12742 * asin(sqrt(a))) / 100;
   }
-
-  void getdistance() async {}
 
   @override
   Widget build(BuildContext context) {
@@ -679,7 +678,7 @@ class _SearchScreenState extends State<SearchScreen> {
                             width: MediaQuery.of(context).size.width,
                             child: ListView.builder(
                               physics: ClampingScrollPhysics(),
-                              scrollDirection: Axis.vertical,
+                              scrollDirection: Axis.horizontal,
                               controller:
                                   ScrollController(keepScrollOffset: true),
                               shrinkWrap: true,
@@ -704,8 +703,11 @@ class _SearchScreenState extends State<SearchScreen> {
                                   print(longitude.toString() +
                                       " my " +
                                       latitude.toString());
-                                  distanceInMeters = calculateDistance(latitude,
-                                      longitude, otherlatitude, otherlongitude);
+                                  distanceInMeters = Geolocator.distanceBetween(
+                                      latitude,
+                                      longitude,
+                                      otherlatitude,
+                                      otherlongitude);
                                   print(distanceInMeters.toString());
                                   print("distance$distanceInMeters  $i");
                                   i++;
@@ -777,10 +779,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                           ),
                                         ),
                                       )
-                                    : Container(
-                                        child: Text(
-                                            'Users near you will be shown here if there location is on Please ask them " ki kholo jara kholo "'),
-                                      );
+                                    : Container();
                               },
                             ),
                           );

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:zero_fin/screens/profile_screen.dart';
@@ -107,63 +108,75 @@ class _FollowersFollowingScreenState extends State<FollowersFollowingScreen> {
                                 ),
                               ),
                             ),
-                            Padding(
-                              padding: const EdgeInsets.only(right: 13),
-                              child: Row(
-                                children: [
-                                  IconButton(
-                                    style: ElevatedButton.styleFrom(
-                                        backgroundColor: btnCOlorblue,
-                                        minimumSize: Size(50, 12),
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(7))),
-                                    onPressed: () {}, //TODO 2. button action
-                                    icon: Icon(
-                                      FontAwesomeIcons.userPlus,
-                                      size: 20,
+                            (snapshot.data! as dynamic)
+                                        .docs[index]['followid']
+                                        .toString() !=
+                                    FirebaseAuth.instance.currentUser!.uid
+                                        .toString()
+                                ? Padding(
+                                    padding: const EdgeInsets.only(right: 13),
+                                    child: Row(
+                                      children: [
+                                        IconButton(
+                                          style: ElevatedButton.styleFrom(
+                                              backgroundColor: btnCOlorblue,
+                                              minimumSize: Size(50, 12),
+                                              shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          7))),
+                                          onPressed:
+                                              () {}, //TODO 2. button action
+                                          icon: Icon(
+                                            FontAwesomeIcons.userPlus,
+                                            size: 20,
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          width: 10,
+                                        ),
+                                        IconButton(
+                                          style: ElevatedButton.styleFrom(
+                                              backgroundColor: btnCOlorblue,
+                                              minimumSize: Size(50, 12),
+                                              shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          7))),
+                                          onPressed: () {
+                                            Navigator.of(context).push(MaterialPageRoute(
+                                                builder: (context) => ChatRoom(
+                                                    otUsername: (snapshot.data!
+                                                            as dynamic)
+                                                        .docs[index]['username']
+                                                        .toString(),
+                                                    otUid: (snapshot.data! as dynamic)
+                                                        .docs[index]['followid']
+                                                        .toString(),
+                                                    profilePic: (snapshot.data!
+                                                            as dynamic)
+                                                        .docs[index]
+                                                            ['profilepic']
+                                                        .toString(),
+                                                    status: (snapshot.data!
+                                                            as dynamic)
+                                                        .docs[index]['status']
+                                                        .toString(),
+                                                    token: (snapshot.data! as dynamic)
+                                                        .docs[index]['token']
+                                                        .toString())));
+                                          }, //TODO 2. button action
+                                          icon: Icon(
+                                            FontAwesomeIcons.solidPaperPlane,
+                                            size: 20,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-                                  IconButton(
-                                    style: ElevatedButton.styleFrom(
-                                        backgroundColor: btnCOlorblue,
-                                        minimumSize: Size(50, 12),
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(7))),
-                                    onPressed: () {
-                                      Navigator.of(context).push(MaterialPageRoute(
-                                          builder: (context) => ChatRoom(
-                                              otUsername:
-                                                  (snapshot.data! as dynamic)
-                                                      .docs[index]['username']
-                                                      .toString(),
-                                              otUid: (snapshot.data! as dynamic)
-                                                  .docs[index]['followid']
-                                                  .toString(),
-                                              profilePic:
-                                                  (snapshot.data! as dynamic)
-                                                      .docs[index]['profilepic']
-                                                      .toString(),
-                                              status:
-                                                  (snapshot.data! as dynamic)
-                                                      .docs[index]['status']
-                                                      .toString(),
-                                              token: (snapshot.data! as dynamic)
-                                                  .docs[index]['token']
-                                                  .toString())));
-                                    }, //TODO 2. button action
-                                    icon: Icon(
-                                      FontAwesomeIcons.solidPaperPlane,
-                                      size: 20,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            )
+                                  )
+                                : SizedBox(
+                                    width: 50,
+                                  )
                           ],
                         ),
                       ),

@@ -55,7 +55,8 @@ class _ChatRoomState extends State<ChatRoom> {
 
   bool isLoasdings = true;
 
-  bool emojiShow = false;
+  bool emojiShowing = false;
+  FocusNode? focusNode;
 
   Future getImage() async {
     ImagePicker _picker = ImagePicker();
@@ -90,6 +91,17 @@ class _ChatRoomState extends State<ChatRoom> {
     FirebaseMessaging.onMessage.listen((event) {
       LocalNotificationService.display(event);
     });
+
+    focusNode = FocusNode();
+    focusNode?.addListener(() {
+      print('Listener');
+    });
+  }
+
+  @override
+  void dispose() {
+    focusNode?.dispose();
+    super.dispose();
   }
 
   sendNotification(String title, String token) async {
@@ -453,150 +465,216 @@ class _ChatRoomState extends State<ChatRoom> {
                 ],
               ),
             ),
-            body: Stack(
-              children: [
-                Image.asset("images/chat_bg.png",
-                    fit: BoxFit.cover, height: size.height, width: size.width),
-                StreamBuilder(
-                  stream: _firestore
-                      .collection('chatroom')
-                      .doc(chatDocId)
-                      .collection('chats')
-                      .orderBy("time", descending: true)
-                      .snapshots(),
-                  builder: (BuildContext context,
-                      AsyncSnapshot<QuerySnapshot> snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(
-                          child: CircularProgressIndicator(
-                        color: Colors.blue,
-                        strokeWidth: 5.5,
-                      ));
-                    }
-                    if (!snapshot.hasData) {
-                      return Container();
-                    }
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 56.0),
-                      child: ListView.builder(
-                        itemCount: snapshot.data!.docs.length,
-                        shrinkWrap: true,
-                        reverse: true,
-                        physics: BouncingScrollPhysics(),
-                        itemBuilder: (context, index) {
-                          Map<String, dynamic> map = snapshot.data!.docs[index]
-                              .data() as Map<String, dynamic>;
-                          print(snapshot.data!.docs[index].data().toString());
+            body: SafeArea(
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                          image: DecorationImage(
+                        image: AssetImage(
+                          "images/chat_bg.png",
+                        ),
+                        fit: BoxFit.cover,
+                      )),
+                      child: StreamBuilder(
+                        stream: _firestore
+                            .collection('chatroom')
+                            .doc(chatDocId)
+                            .collection('chats')
+                            .orderBy("time", descending: true)
+                            .snapshots(),
+                        builder: (BuildContext context,
+                            AsyncSnapshot<QuerySnapshot> snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(
+                                child: CircularProgressIndicator(
+                              color: Colors.blue,
+                              strokeWidth: 5.5,
+                            ));
+                          }
+                          if (!snapshot.hasData) {
+                            return Container();
+                          }
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 20.0),
+                            child: ListView.builder(
+                              itemCount: snapshot.data!.docs.length,
+                              shrinkWrap: true,
+                              reverse: true,
+                              physics: BouncingScrollPhysics(),
+                              itemBuilder: (context, index) {
+                                Map<String, dynamic> map =
+                                    snapshot.data!.docs[index].data()
+                                        as Map<String, dynamic>;
+                                print(snapshot.data!.docs[index]
+                                    .data()
+                                    .toString());
 
-                          return messages(
-                            size,
-                            map,
-                            context,
-                            snapshot.data!.docs[index].id.toString(),
+                                return messages(
+                                  size,
+                                  map,
+                                  context,
+                                  snapshot.data!.docs[index].id.toString(),
+                                );
+                              },
+                            ),
                           );
                         },
                       ),
-                    );
-                  },
-                ),
-                Container(
-                  width: size.width,
-                  alignment: Alignment.bottomCenter,
-                  child: Container(
-                    height: size.height / 15.5,
+                    ),
+                  ),
+                  Container(
                     width: size.width,
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(20),
-                            topRight: Radius.circular(20))),
+                    alignment: Alignment.bottomCenter,
                     child: Container(
-                      padding: EdgeInsets.zero,
                       width: size.width,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          Padding(
-                            padding: const EdgeInsets.only(left: 18.0),
-                            child: GestureDetector(
-                                onTap: () {
-                                  print("ema");
-                                  setState(() {
-                                    emojiShow = !emojiShow;
-                                  });
-                                },
-                                child: Icon(CupertinoIcons.smiley_fill)),
-                          ),
-                          Expanded(
-                            child: TextField(
-                              controller: _message,
-                              onTap: () {
-                                print("tapped");
-                              },
-                              minLines: 1,
-                              maxLines: 50,
-                              keyboardType: TextInputType.multiline,
-                              decoration: InputDecoration(
-                                contentPadding: EdgeInsets.symmetric(
-                                    vertical: 10.0, horizontal: 20.0),
-                                hintMaxLines: 1,
-                                hintText: 'Message...',
-                                border: InputBorder.none,
-                              ),
-                            ),
-                          ),
-                          Row(children: [
-                            IconButton(
-                              onPressed: () {},
-                              icon: Icon(
-                                CupertinoIcons.mic_fill,
-                                size: 22,
-                              ),
-                            ),
-                            IconButton(
-                              icon: Icon(
-                                FontAwesomeIcons.solidImage,
-                                size: 20,
-                              ),
-                              onPressed: () => getImage(),
-                            ),
-                            SizedBox(
-                              width: 5,
-                            ),
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(20),
+                              topRight: Radius.circular(20))),
+                      child: Container(
+                        padding: EdgeInsets.zero,
+                        width: size.width,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
                             Padding(
-                              padding: const EdgeInsets.fromLTRB(0, 8, 14, 8),
-                              child: SizedBox(
-                                height: 40,
-                                width: 40,
-                                child: DecoratedBox(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(25),
-                                    color: btnCOlorblue,
-                                  ),
-                                  child: Container(
-                                    child: Transform.rotate(
-                                      angle: 45 * math.pi / 180,
-                                      child: IconButton(
-                                          icon: Icon(
-                                            FontAwesomeIcons.solidPaperPlane,
-                                            color: Colors.white,
-                                            size: 15,
-                                          ),
-                                          onPressed: () {
-                                            onSendMessage();
-                                          }),
+                              padding: const EdgeInsets.only(left: 18.0),
+                              child: GestureDetector(
+                                  onTap: () {
+                                    print("ema");
+                                    setState(() {
+                                      emojiShowing = !emojiShowing;
+                                      if (emojiShowing == true) {
+                                        focusNode?.unfocus();
+                                      } else {
+                                        focusNode?.requestFocus();
+                                      }
+                                    });
+                                  },
+                                  child: emojiShowing == true
+                                      ? Icon(CupertinoIcons.keyboard)
+                                      : Icon(CupertinoIcons.smiley_fill)),
+                            ),
+                            Expanded(
+                              child: TextField(
+                                focusNode: focusNode,
+                                controller: _message,
+                                onTap: () {
+                                  print("tapped");
+                                  focusNode?.requestFocus();
+                                  emojiShowing = false;
+                                },
+                                minLines: 1,
+                                maxLines: 50,
+                                keyboardType: TextInputType.multiline,
+                                decoration: InputDecoration(
+                                  contentPadding: EdgeInsets.symmetric(
+                                      vertical: 10.0, horizontal: 20.0),
+                                  hintMaxLines: 1,
+                                  hintText: 'Message...',
+                                  border: InputBorder.none,
+                                ),
+                              ),
+                            ),
+                            Row(children: [
+                              IconButton(
+                                onPressed: () {},
+                                icon: Icon(
+                                  CupertinoIcons.mic_fill,
+                                  size: 22,
+                                ),
+                              ),
+                              IconButton(
+                                icon: Icon(
+                                  FontAwesomeIcons.solidImage,
+                                  size: 20,
+                                ),
+                                onPressed: () => getImage(),
+                              ),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(0, 8, 14, 8),
+                                child: SizedBox(
+                                  height: 40,
+                                  width: 40,
+                                  child: DecoratedBox(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(25),
+                                      color: btnCOlorblue,
+                                    ),
+                                    child: Container(
+                                      child: Transform.rotate(
+                                        angle: 45 * math.pi / 180,
+                                        child: IconButton(
+                                            icon: Icon(
+                                              FontAwesomeIcons.solidPaperPlane,
+                                              color: Colors.white,
+                                              size: 15,
+                                            ),
+                                            onPressed: () {
+                                              onSendMessage();
+                                            }),
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ])
-                        ],
+                            ])
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                  Offstage(
+                    offstage: !emojiShowing,
+                    child: SizedBox(
+                        height: 250,
+                        child: EmojiPicker(
+                          textEditingController: _message,
+                          onBackspacePressed: () {
+                            Navigator.pop(context);
+                          },
+                          config: Config(
+                            columns: 7,
+                            // Issue: https://github.com/flutter/flutter/issues/28894
+                            verticalSpacing: 0,
+                            horizontalSpacing: 0,
+                            emojiSizeMax: 32,
+                            gridPadding: EdgeInsets.zero,
+                            initCategory: Category.RECENT,
+                            bgColor: const Color(0xFFF2F2F2),
+                            indicatorColor: Colors.blue,
+                            iconColor: Colors.grey,
+                            iconColorSelected: Colors.blue,
+                            backspaceColor: Colors.blue,
+                            skinToneDialogBgColor: Colors.white,
+                            skinToneIndicatorColor: Colors.grey,
+                            enableSkinTones: true,
+                            showRecentsTab: true,
+                            recentsLimit: 28,
+                            replaceEmojiOnLimitExceed: false,
+                            noRecents: const Text(
+                              'No Recents',
+                              style: TextStyle(
+                                  fontSize: 20, color: Colors.black26),
+                              textAlign: TextAlign.center,
+                            ),
+                            loadingIndicator: const SizedBox.shrink(),
+                            tabIndicatorAnimDuration: kTabScrollDuration,
+                            categoryIcons: const CategoryIcons(),
+                            buttonMode: ButtonMode.MATERIAL,
+                            checkPlatformCompatibility: true,
+                          ),
+                        )),
+                  ),
+                ],
+              ),
             ),
           );
   }
