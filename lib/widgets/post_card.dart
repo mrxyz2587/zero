@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:zero_fin/resources/firebase_dynamic_links.dart';
 import '../screens/edit_post_screen.dart';
 import '../screens/profile_screen.dart';
 import '/models/user.dart' as model;
@@ -690,38 +691,48 @@ class _PostCardState extends State<PostCard> {
                       ),
                     ),
                     SizedBox(width: 18),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                                color: Colors.white,
-                                border: Border.all(
-                                  color: Colors.black87,
+                    GestureDetector(
+                      onTap: () async {
+                        print('louda');
+
+                        String generatedDeepLink =
+                            await FirebaseDynamicLinksService.createDynamicLink(
+                                widget.snap.toString());
+                        print(generatedDeepLink.toString());
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  border: Border.all(
+                                    color: Colors.black87,
+                                  ),
+                                  borderRadius: BorderRadius.circular(25)),
+                              child: Padding(
+                                padding: const EdgeInsets.all(15.0),
+                                child: Icon(
+                                  FontAwesomeIcons.shareNodes,
+                                  size: 18,
+                                  color: Colors.black,
                                 ),
-                                borderRadius: BorderRadius.circular(25)),
-                            child: Padding(
-                              padding: const EdgeInsets.all(15.0),
-                              child: Icon(
-                                FontAwesomeIcons.shareNodes,
-                                size: 18,
-                                color: Colors.black,
                               ),
                             ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text('Share',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                  color: Color(0xFF000000),
-                                  fontSize: 13,
-                                )),
-                          ),
-                        ],
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text('Share',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    color: Color(0xFF000000),
+                                    fontSize: 13,
+                                  )),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     SizedBox(width: 18),

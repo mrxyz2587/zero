@@ -6,6 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:zero_fin/resources/firestore_methods.dart';
+import 'package:zero_fin/screens/ChatRoom.dart';
+import 'package:zero_fin/screens/HomeScreen.dart';
 import 'package:zero_fin/widgets/text_field_input.dart';
 import 'package:zero_fin/widgets/video_player_items.dart';
 import 'package:zero_fin/widgets/videoplayersearch.dart';
@@ -38,6 +41,7 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   void initState() {
     super.initState();
+    _determinePosition();
     timer = Timer.periodic(Duration(seconds: 5), (timer) {
       getLocation();
     });
@@ -141,10 +145,6 @@ class _SearchScreenState extends State<SearchScreen> {
           title: TextFormField(
             controller: searchController,
             decoration: InputDecoration(
-              // suffixIcon: Icon(
-              //   FontAwesomeIcons.magnifyingGlass,
-              //   color: Colors.black54,
-              // ),
               isDense: true,
               isCollapsed: true,
               filled: true,
@@ -174,9 +174,10 @@ class _SearchScreenState extends State<SearchScreen> {
                 isTrue = true;
               });
             },
-            onFieldSubmitted: (String _) {
+            onChanged: (String _) {
               setState(() {
                 isShowUsers = true;
+                isTrue = false;
               });
               print(_);
             },
@@ -190,19 +191,15 @@ class _SearchScreenState extends State<SearchScreen> {
                 FontAwesomeIcons.chevronLeft,
                 color: Colors.black,
               ),
-              onPressed: () {},
+              onPressed: () {
+                setState(() {
+                  isShowUsers = false;
+                  isTrue = false;
+                });
+              },
             ),
           ),
-          actions: [
-            // Padding(
-            //   padding: const EdgeInsets.all(16),
-            //   child: Icon(
-            //     FontAwesomeIcons.magnifyingGlass,
-            //     color: Colors.black87,
-            //     size: 20,
-            //   ),
-            // )
-          ],
+          actions: [],
         ),
         body: isTrue
             ? ListView(
@@ -399,6 +396,8 @@ class _SearchScreenState extends State<SearchScreen> {
                         shrinkWrap: true,
                         itemCount: (snapshot.data! as dynamic).docs.length,
                         itemBuilder: (context, index) {
+                          List followers = (snapshot.data! as dynamic)
+                              .docs[index]['followers'];
                           return InkWell(
                             onTap: () => Navigator.of(context).push(
                               MaterialPageRoute(
@@ -473,48 +472,108 @@ class _SearchScreenState extends State<SearchScreen> {
                                           ),
                                         ),
                                       ),
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(right: 13),
-                                        child: Row(
-                                          children: [
-                                            IconButton(
-                                              style: ElevatedButton.styleFrom(
-                                                  backgroundColor: btnCOlorblue,
-                                                  minimumSize: Size(50, 12),
-                                                  shape: RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              7))),
-                                              onPressed:
-                                                  () {}, //TODO 2. button action
-                                              icon: Icon(
-                                                FontAwesomeIcons.userPlus,
-                                                size: 20,
+                                      (snapshot.data! as dynamic)
+                                                  .docs[index]['uid']
+                                                  .toString() !=
+                                              FirebaseAuth
+                                                  .instance.currentUser!.uid
+                                                  .toString()
+                                          ? Padding(
+                                              padding: const EdgeInsets.only(
+                                                  right: 13),
+                                              child: Row(
+                                                children: [
+                                                  followers.contains(
+                                                          FirebaseAuth.instance
+                                                              .currentUser!.uid
+                                                              .toString())
+                                                      ? IconButton(
+                                                          style: ElevatedButton.styleFrom(
+                                                              backgroundColor:
+                                                                  btnCOlorblue,
+                                                              minimumSize:
+                                                                  const Size(
+                                                                      50, 12),
+                                                              shape: RoundedRectangleBorder(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              7))),
+                                                          onPressed:
+                                                              () {}, //TODO 2. button action
+                                                          icon: Icon(
+                                                            FontAwesomeIcons
+                                                                .userCheck,
+                                                            size: 20,
+                                                          ),
+                                                        )
+                                                      : IconButton(
+                                                          style: ElevatedButton.styleFrom(
+                                                              backgroundColor:
+                                                                  btnCOlorblue,
+                                                              minimumSize:
+                                                                  const Size(
+                                                                      50, 12),
+                                                              shape: RoundedRectangleBorder(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              7))),
+                                                          onPressed:
+                                                              () {}, //TODO 2. button action
+                                                          icon: Icon(
+                                                            FontAwesomeIcons
+                                                                .userPlus,
+                                                            size: 20,
+                                                          ),
+                                                        ),
+                                                  SizedBox(
+                                                    width: 10,
+                                                  ),
+                                                  IconButton(
+                                                    style: ElevatedButton.styleFrom(
+                                                        backgroundColor:
+                                                            btnCOlorblue,
+                                                        minimumSize:
+                                                            Size(50, 12),
+                                                        shape: RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        7))),
+                                                    onPressed: () {
+                                                      Navigator.of(context).push(MaterialPageRoute(
+                                                          builder: (context) => ChatRoom(
+                                                              otUsername: (snapshot.data!
+                                                                      as dynamic)
+                                                                  .docs[index][
+                                                                      'username']
+                                                                  .toString(),
+                                                              otUid: (snapshot.data!
+                                                                      as dynamic)
+                                                                  .docs[index]
+                                                                      ['uid']
+                                                                  .toString(),
+                                                              profilePic: (snapshot.data!
+                                                                      as dynamic)
+                                                                  .docs[index]
+                                                                      ['photoUrl']
+                                                                  .toString(),
+                                                              status: (snapshot.data! as dynamic).docs[index]['status'].toString(),
+                                                              token: (snapshot.data! as dynamic).docs[index]['token'].toString())));
+                                                    }, //TODO 2. button action
+                                                    icon: Icon(
+                                                      FontAwesomeIcons
+                                                          .solidPaperPlane,
+                                                      size: 20,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
-                                            ),
-                                            SizedBox(
-                                              width: 10,
-                                            ),
-                                            IconButton(
-                                              style: ElevatedButton.styleFrom(
-                                                  backgroundColor: btnCOlorblue,
-                                                  minimumSize: Size(50, 12),
-                                                  shape: RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              7))),
-                                              onPressed:
-                                                  () {}, //TODO 2. button action
-                                              icon: Icon(
-                                                FontAwesomeIcons
-                                                    .solidPaperPlane,
-                                                size: 20,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      )
+                                            )
+                                          : SizedBox(
+                                              width: 50,
+                                            )
                                     ],
                                   ),
                                 ),
@@ -531,23 +590,13 @@ class _SearchScreenState extends State<SearchScreen> {
                 ? ListView(
                     children: [
                       FutureBuilder(
-                        future: (selectedText == " ")
-                            ? FirebaseFirestore.instance
-                                .collection('users')
-                                .where(
-                                  'username',
-                                  isGreaterThanOrEqualTo: searchController.text,
-                                )
-                                .get()
-                            : FirebaseFirestore.instance
-                                .collection('users')
-                                .where(
-                                  'username',
-                                  isGreaterThanOrEqualTo: searchController.text,
-                                )
-                                .where("department",
-                                    isEqualTo: selectedText.toString())
-                                .get(),
+                        future: FirebaseFirestore.instance
+                            .collection('users')
+                            .where(
+                              'username',
+                              isGreaterThanOrEqualTo: searchController.text,
+                            )
+                            .get(),
                         builder: (context, snapshot) {
                           if (!snapshot.hasData) {
                             return const Center(
@@ -630,118 +679,108 @@ class _SearchScreenState extends State<SearchScreen> {
                             width: MediaQuery.of(context).size.width,
                             child: ListView.builder(
                               physics: ClampingScrollPhysics(),
-                              scrollDirection: Axis.horizontal,
+                              scrollDirection: Axis.vertical,
                               controller:
                                   ScrollController(keepScrollOffset: true),
                               shrinkWrap: true,
                               itemCount:
                                   (snapshot.data! as dynamic).docs.length,
                               itemBuilder: (context, index) {
-                                FirebaseFirestore.instance
-                                    .collection("users")
-                                    .where("uid",
-                                        isNotEqualTo: FirebaseAuth
-                                            .instance.currentUser!.uid)
-                                    .get()
-                                    .then((value) {
-                                  for (var docs in value.docs) {
-                                    if (docs.data()["uid"].toString() !=
-                                        FirebaseAuth.instance.currentUser!.uid
-                                            .toString()) {
-                                      otherlatitude = double.parse(
-                                          docs.data()['latitudeCoordinates']);
-                                      otherlongitude = double.parse(
-                                          docs.data()['longCoordinates']);
-                                      print(otherlongitude.toString() +
-                                          "  " +
-                                          otherlatitude.toString());
+                                if ((snapshot.data! as dynamic)
+                                        .docs[index]["uid"]
+                                        .toString() !=
+                                    FirebaseAuth.instance.currentUser!.uid
+                                        .toString()) {
+                                  otherlatitude = double.parse(
+                                      (snapshot.data! as dynamic).docs[index]
+                                          ['latitudeCoordinates']);
+                                  otherlongitude = double.parse(
+                                      (snapshot.data! as dynamic).docs[index]
+                                          ['longCoordinates']);
+                                  print(otherlongitude.toString() +
+                                      "  " +
+                                      otherlatitude.toString());
 
-                                      print(longitude.toString() +
-                                          " my " +
-                                          latitude.toString());
-                                      distanceInMeters = calculateDistance(
-                                          latitude,
-                                          longitude,
-                                          otherlatitude,
-                                          otherlongitude);
+                                  print(longitude.toString() +
+                                      " my " +
+                                      latitude.toString());
+                                  distanceInMeters = calculateDistance(latitude,
+                                      longitude, otherlatitude, otherlongitude);
+                                  print(distanceInMeters.toString());
+                                  print("distance$distanceInMeters  $i");
+                                  i++;
+                                }
 
-                                      if (distanceInMeters < 100) {
-                                        return Align(
-                                          alignment: Alignment.topLeft,
-                                          child: Padding(
-                                            padding: const EdgeInsets.only(
-                                                top: 10, left: 20.0, bottom: 5),
-                                            child: Container(
-                                              color: Colors.white,
-                                              padding: EdgeInsets.all(4),
-                                              child: Column(
-                                                children: [
-                                                  Stack(
-                                                    children: [
-                                                      CircleAvatar(
-                                                        backgroundImage:
-                                                            NetworkImage(
-                                                          (snapshot.data!
-                                                                  as dynamic)
-                                                              .docs[index]
-                                                                  ['photoUrl']
-                                                              .toString(),
-                                                        ),
-                                                        radius: 30,
+                                return distanceInMeters < 100
+                                    ? Align(
+                                        alignment: Alignment.topLeft,
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(
+                                              top: 10, left: 20.0, bottom: 5),
+                                          child: Container(
+                                            color: Colors.white,
+                                            padding: EdgeInsets.all(4),
+                                            child: Column(
+                                              children: [
+                                                Stack(
+                                                  children: [
+                                                    CircleAvatar(
+                                                      backgroundImage:
+                                                          NetworkImage(
+                                                        (snapshot.data!
+                                                                as dynamic)
+                                                            .docs[index]
+                                                                ['photoUrl']
+                                                            .toString(),
                                                       ),
-                                                      Positioned(
-                                                        bottom: 3,
-                                                        right: 6,
-                                                        child: Container(
-                                                          decoration: BoxDecoration(
-                                                              color:
-                                                                  btnCOlorblue,
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          10),
-                                                              border: Border.all(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  width: 1)),
-                                                          constraints:
-                                                              BoxConstraints
-                                                                  .tight(Size
-                                                                      .fromRadius(
-                                                                          5)),
-                                                        ),
-                                                      )
-                                                    ],
-                                                  ),
-                                                  SizedBox(
-                                                    height: 8,
-                                                  ),
-                                                  Text(
-                                                      (snapshot.data!
-                                                              as dynamic)
-                                                          .docs[index]
-                                                              ['username']
-                                                          .toString(),
-                                                      style: TextStyle(
-                                                          color:
-                                                              Color(0xFF000000),
-                                                          fontSize: 10,
-                                                          fontWeight:
-                                                              FontWeight.w700,
-                                                          fontFamily:
-                                                              'Roboto')),
-                                                ],
-                                              ),
+                                                      radius: 30,
+                                                    ),
+                                                    Positioned(
+                                                      bottom: 3,
+                                                      right: 6,
+                                                      child: Container(
+                                                        decoration: BoxDecoration(
+                                                            color: btnCOlorblue,
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10),
+                                                            border: Border.all(
+                                                                color: Colors
+                                                                    .white,
+                                                                width: 1)),
+                                                        constraints:
+                                                            BoxConstraints
+                                                                .tight(Size
+                                                                    .fromRadius(
+                                                                        5)),
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                                SizedBox(
+                                                  height: 8,
+                                                ),
+                                                Text(
+                                                    (snapshot.data! as dynamic)
+                                                        .docs[index]['username']
+                                                        .toString(),
+                                                    style: TextStyle(
+                                                        color:
+                                                            Color(0xFF000000),
+                                                        fontSize: 10,
+                                                        fontWeight:
+                                                            FontWeight.w700,
+                                                        fontFamily: 'Roboto')),
+                                              ],
                                             ),
                                           ),
-                                        );
-                                      }
-                                      print("distance$distanceInMeters  $i");
-                                      i++;
-                                    }
-                                  }
-                                });
-                                return Container();
+                                        ),
+                                      )
+                                    : Container(
+                                        child: Text(
+                                            'Users near you will be shown here if there location is on Please ask them " ki kholo jara kholo "'),
+                                      );
                               },
                             ),
                           );

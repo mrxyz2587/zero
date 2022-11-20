@@ -199,128 +199,166 @@ class _ChatRoomState extends State<ChatRoom> {
           .collection('chats')
           .add(messages)
           .whenComplete(() {
-        sendNotification(" Sended you a message", widget.token);
+        sendNotification("Sended you a message", widget.token);
       });
     } else {
       print("Enter Some Text");
     }
   }
 
-  Widget messages(Size size, Map<String, dynamic> map, BuildContext context) {
+  Widget messages(
+    Size size,
+    Map<String, dynamic> map,
+    BuildContext context,
+    String chatId,
+  ) {
     return map['type'] == "text"
-        ? Container(
-            width: size.width,
-            padding: EdgeInsets.symmetric(horizontal: 8),
-            child: ChatBubble(
-              elevation: 0,
-              clipper: map['sendby'] == _auth.currentUser!.uid
-                  ? ChatBubbleClipper1(
-                      type: BubbleType.sendBubble,
-                      radius: 10,
-                      nipHeight: 8,
-                      nipWidth: 8)
-                  : ChatBubbleClipper1(
-                      type: BubbleType.receiverBubble,
-                      radius: 10,
-                      nipHeight: 8,
-                      nipWidth: 8),
-              alignment: map['sendby'] == _auth.currentUser!.uid
-                  ? Alignment.centerRight
-                  : Alignment.centerLeft,
-              margin: EdgeInsets.only(top: 6),
-              backGroundColor: map['sendby'] == _auth.currentUser!.uid
-                  ? btnCOlorblue
-                  : Colors.white,
-              child: Container(
-                constraints: BoxConstraints(
-                  maxWidth: MediaQuery.of(context).size.width * 0.7,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ExpandableText(
-                      map['message'],
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: map['sendby'] == _auth.currentUser!.uid
-                            ? Colors.white
-                            : Colors.black87,
+        ? GestureDetector(
+            onLongPress: () async {
+              if (map['sendby'] == _auth.currentUser!.uid)
+              //TODO abh1: Add dialog ui and a warning message that says if you delete the message it will be permanently deleted
+              {
+                await _firestore
+                    .collection('chatroom')
+                    .doc(chatDocId)
+                    .collection('chats')
+                    .doc(chatId)
+                    .delete();
+              }
+            },
+            child: Container(
+              width: size.width,
+              padding: EdgeInsets.symmetric(horizontal: 8),
+              child: ChatBubble(
+                elevation: 0,
+                clipper: map['sendby'] == _auth.currentUser!.uid
+                    ? ChatBubbleClipper1(
+                        type: BubbleType.sendBubble,
+                        radius: 10,
+                        nipHeight: 8,
+                        nipWidth: 8)
+                    : ChatBubbleClipper1(
+                        type: BubbleType.receiverBubble,
+                        radius: 10,
+                        nipHeight: 8,
+                        nipWidth: 8),
+                alignment: map['sendby'] == _auth.currentUser!.uid
+                    ? Alignment.centerRight
+                    : Alignment.centerLeft,
+                margin: EdgeInsets.only(top: 6),
+                backGroundColor: map['sendby'] == _auth.currentUser!.uid
+                    ? btnCOlorblue
+                    : Colors.white,
+                child: Container(
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width * 0.7,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ExpandableText(
+                        map['message'],
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: map['sendby'] == _auth.currentUser!.uid
+                              ? Colors.white
+                              : Colors.black87,
+                        ),
+                        expandText: 'more',
+                        collapseText: 'hide',
+                        linkColor: Colors.grey,
+                        maxLines: 15,
                       ),
-                      expandText: 'more',
-                      collapseText: 'hide',
-                      linkColor: Colors.grey,
-                      maxLines: 15,
-                    ),
-                    SizedBox(
-                      height: 3,
-                    ),
-                    Text(
-                      "12:06 pm",
-                      style: TextStyle(
-                          fontSize: 9,
-                          fontStyle: FontStyle.italic,
-                          color: Colors.grey.shade700),
-                    )
-                  ],
-                ),
-              ),
-            ),
-            // child: Container(
-            //   padding: EdgeInsets.symmetric(vertical: 10, horizontal: 14),
-            //   margin: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
-            //   decoration: BoxDecoration(
-            //     borderRadius: BorderRadius.circular(15),
-            //     color: btnCOlorblue,
-            //   ),
-            //   child: Text(
-            //     map['message'],
-            //     style: TextStyle(
-            //       fontSize: 16,
-            //       fontWeight: FontWeight.w500,
-            //       color: Colors.white,
-            //     ),
-            //   ),
-            // ),
-          )
-        : Container(
-            height: size.height / 2.5,
-            width: size.width,
-            padding: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
-            alignment: map['sendby'] == _auth.currentUser!.uid
-                ? Alignment.centerRight
-                : Alignment.centerLeft,
-            child: InkWell(
-              onTap: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => ShowImage(
-                    imageUrl: map['message'],
+                      SizedBox(
+                        height: 3,
+                      ),
+                      Text(
+                        map['time'] == null
+                            ? "sending...."
+                            : DateFormat.jm()
+                                .format(map['time'].toDate())
+                                .toString(),
+                        style: TextStyle(
+                            fontSize: 9,
+                            fontStyle: FontStyle.italic,
+                            color: Colors.grey.shade700),
+                      )
+                    ],
                   ),
                 ),
               ),
-              child: Container(
-                padding: EdgeInsets.all(4),
-                height: size.height / 2.5,
-                width: size.width / 2,
-                constraints: BoxConstraints(
-                  minHeight: MediaQuery.of(context).size.width / 2,
-                  maxWidth: MediaQuery.of(context).size.width * 0.7,
+              // child: Container(
+              //   padding: EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+              //   margin: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
+              //   decoration: BoxDecoration(
+              //     borderRadius: BorderRadius.circular(15),
+              //     color: btnCOlorblue,
+              //   ),
+              //   child: Text(
+              //     map['message'],
+              //     style: TextStyle(
+              //       fontSize: 16,
+              //       fontWeight: FontWeight.w500,
+              //       color: Colors.white,
+              //     ),
+              //   ),
+              // ),
+            ),
+          )
+        : GestureDetector(
+            onLongPress: () async {
+              if (map['sendby'] == _auth.currentUser!.uid)
+              //TODO abh1.1: Add dialog ui and a warning message that says if you delete the message it will be permanently deleted
+
+              {
+                await _firestore
+                    .collection('chatroom')
+                    .doc(chatDocId)
+                    .collection('chats')
+                    .doc(chatId)
+                    .delete();
+              }
+            },
+            child: Container(
+              height: size.height / 2.5,
+              width: size.width,
+              padding: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
+              alignment: map['sendby'] == _auth.currentUser!.uid
+                  ? Alignment.centerRight
+                  : Alignment.centerLeft,
+              child: InkWell(
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => ShowImage(
+                      imageUrl: map['message'],
+                    ),
+                  ),
                 ),
-                decoration: BoxDecoration(
-                    color: map['sendby'] == _auth.currentUser!.uid
-                        ? btnCOlorblue
-                        : Colors.white,
-                    borderRadius: BorderRadius.circular(10)),
-                alignment: map['message'] != "" ? null : Alignment.center,
-                child: map['message'] != ""
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: Image.network(
-                          map['message'],
-                          fit: BoxFit.cover,
-                        ),
-                      )
-                    : CircularProgressIndicator(),
+                child: Container(
+                  padding: EdgeInsets.all(4),
+                  height: size.height / 2.5,
+                  width: size.width / 2,
+                  constraints: BoxConstraints(
+                    minHeight: MediaQuery.of(context).size.width / 2,
+                    maxWidth: MediaQuery.of(context).size.width * 0.7,
+                  ),
+                  decoration: BoxDecoration(
+                      color: map['sendby'] == _auth.currentUser!.uid
+                          ? btnCOlorblue
+                          : Colors.white,
+                      borderRadius: BorderRadius.circular(10)),
+                  alignment: map['message'] != "" ? null : Alignment.center,
+                  child: map['message'] != ""
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image.network(
+                            map['message'],
+                            fit: BoxFit.cover,
+                          ),
+                        )
+                      : CircularProgressIndicator(),
+                ),
               ),
             ),
           );
@@ -399,6 +437,20 @@ class _ChatRoomState extends State<ChatRoom> {
                     },
                   ),
                 ),
+                actions: [
+                  IconButton(
+                      onPressed: () {
+                        DropdownMenuItem(
+                          child: Text("Report"),
+                          enabled: true,
+                          onTap: () {},
+                        );
+                      },
+                      icon: Icon(
+                        Icons.more_vert,
+                        color: Colors.black45,
+                      ))
+                ],
               ),
             ),
             body: Stack(
@@ -421,7 +473,9 @@ class _ChatRoomState extends State<ChatRoom> {
                         strokeWidth: 5.5,
                       ));
                     }
-
+                    if (!snapshot.hasData) {
+                      return Container();
+                    }
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 56.0),
                       child: ListView.builder(
@@ -433,7 +487,13 @@ class _ChatRoomState extends State<ChatRoom> {
                           Map<String, dynamic> map = snapshot.data!.docs[index]
                               .data() as Map<String, dynamic>;
                           print(snapshot.data!.docs[index].data().toString());
-                          return messages(size, map, context);
+
+                          return messages(
+                            size,
+                            map,
+                            context,
+                            snapshot.data!.docs[index].id.toString(),
+                          );
                         },
                       ),
                     );

@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import 'package:zero_fin/models/reels.dart';
 import '/models/post.dart';
@@ -235,27 +236,75 @@ class FireStoreMethods {
     return res;
   }
 
-  Future<void> followUser(String uid, String followId) async {
+  Future<void> followUser(String uid, String followId, String followUsername,
+      String followphotoUrl, String followStatus, String followToken) async {
     try {
+      DocumentSnapshot uCsnap = await _firestore
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .get();
+      var profilepic = (uCsnap.data()! as dynamic)['photoUrl'];
+      var username = (uCsnap.data()! as dynamic)['username'];
+      var status = (uCsnap.data()! as dynamic)['status'];
+      var token = (uCsnap.data()! as dynamic)['token'];
+
       DocumentSnapshot snap =
           await _firestore.collection('users').doc(uid).get();
+
       List following = (snap.data()! as dynamic)['following'];
 
       if (following.contains(followId)) {
         await _firestore.collection('users').doc(followId).update({
           'followers': FieldValue.arrayRemove([uid])
         });
+        await _firestore
+            .collection('users')
+            .doc(followId)
+            .collection('followers')
+            .doc(uid)
+            .delete();
 
         await _firestore.collection('users').doc(uid).update({
           'following': FieldValue.arrayRemove([followId])
         });
+
+        await _firestore
+            .collection('users')
+            .doc(uid)
+            .collection('following')
+            .doc(followId)
+            .delete();
       } else {
         await _firestore.collection('users').doc(followId).update({
           'followers': FieldValue.arrayUnion([uid])
         });
-
+        await _firestore
+            .collection('users')
+            .doc(followId)
+            .collection('followers')
+            .doc(uid)
+            .set({
+          'followid': uid,
+          'profilepic': profilepic,
+          'username': username,
+          'status': status,
+          'token': token,
+        });
         await _firestore.collection('users').doc(uid).update({
           'following': FieldValue.arrayUnion([followId])
+        });
+
+        await _firestore
+            .collection('users')
+            .doc(uid)
+            .collection('following')
+            .doc(followId)
+            .set({
+          'followid': followId,
+          'profilepic': followphotoUrl,
+          'username': followUsername,
+          'status': followStatus,
+          'token': followToken,
         });
       }
     } catch (e) {

@@ -3,10 +3,11 @@ import 'package:zero_fin/screens/search_screen.dart';
 import 'package:zero_fin/utils/colors.dart';
 
 import '/Screens/ChatRoom.dart';
-import '/group_chats/group_chat_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
+import 'global_group_chat_screen.dart';
 
 class ChatScreen extends StatefulWidget {
   @override
@@ -109,7 +110,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
             ),
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (_) => GroupChatHomeScreen(),
+                builder: (_) => GlobalGroupChatScreen(),
               ),
             ),
           ),
@@ -338,19 +339,21 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                                 ),
                                 radius: 23,
                               ),
-                              Positioned(
-                                bottom: 0,
-                                right: 3,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                      color: btnCOlorblue,
-                                      borderRadius: BorderRadius.circular(10),
-                                      border: Border.all(
-                                          color: Colors.white, width: 1)),
-                                  constraints:
-                                      BoxConstraints.tight(Size.fromRadius(5)),
-                                ),
-                              )
+                              if (snapshot.data!.docs[index].data()["status"] ==
+                                  'online')
+                                Positioned(
+                                  bottom: 0,
+                                  right: 3,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        color: btnCOlorblue,
+                                        borderRadius: BorderRadius.circular(10),
+                                        border: Border.all(
+                                            color: Colors.white, width: 1)),
+                                    constraints: BoxConstraints.tight(
+                                        Size.fromRadius(5)),
+                                  ),
+                                )
                             ],
                           ),
                           title: Padding(
