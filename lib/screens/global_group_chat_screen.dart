@@ -13,6 +13,7 @@ import 'package:flutter_chat_bubble/clippers/chat_bubble_clipper_1.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:math' as math;
 
@@ -104,20 +105,42 @@ class _GlobalGroupChatScreenState extends State<GlobalGroupChatScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      ExpandableText(
-                        map['message'],
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: map['sendby'] == _auth.currentUser!.uid
-                              ? Colors.white
-                              : Colors.black87,
-                        ),
-                        expandText: 'more',
-                        collapseText: 'hide',
-                        linkColor: Colors.grey,
-                        maxLines: 15,
-                      ),
+                      ExpandableText(map['message'],
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: map['sendby'] == _auth.currentUser!.uid
+                                ? Colors.white
+                                : Colors.black87,
+                          ),
+                          expandText: 'more',
+                          collapseText: 'hide',
+                          linkColor: Colors.grey,
+                          maxLines: 15,
+                          urlStyle: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF0B57A4),
+                              fontSize: 14), onUrlTap: (url) async {
+                        if (url.contains("https://www.")) {
+                          if (await canLaunch(url)) {
+                            await launch(url);
+                          }
+                        } else if (!url.contains("https://www.")) {
+                          if (await canLaunch("https://www." + url)) {
+                            await launch("https://www." + url);
+                          }
+                        } else if (url.contains("https://") &&
+                            !url.contains("https://www.")) {
+                          if (await canLaunch("www." + url)) {
+                            await launch("www." + url);
+                          }
+                        } else if (!url.contains("https://") &&
+                            url.contains("www.")) {
+                          if (await canLaunch("https://" + url)) {
+                            await launch("https://" + url);
+                          }
+                        }
+                      }),
                       SizedBox(
                         height: 3,
                       ),
@@ -291,11 +314,7 @@ class _GlobalGroupChatScreenState extends State<GlobalGroupChatScreen> {
           ),
           backgroundColor: Colors.white,
           elevation: 1,
-          title: Text(
-            'Messages Global',
-            style: TextStyle(
-                color: Colors.black, fontWeight: FontWeight.w700, fontSize: 16),
-          ),
+          title: DialogExample(),
           leading: Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: IconButton(
@@ -311,15 +330,29 @@ class _GlobalGroupChatScreenState extends State<GlobalGroupChatScreen> {
           ),
           actions: [
             IconButton(
-                onPressed: () {
-                  DropdownMenuItem(
-                    child: Text("Report"),
-                    enabled: true,
-                    onTap: () {},
-                  );
-                },
+                onPressed: () => showDialog<String>(
+                      context: context,
+                      builder: (BuildContext context) => const AlertDialog(
+                        title: Text(
+                          'Rules of the Group',
+                          style: TextStyle(
+                              color: blueColor, fontWeight: FontWeight.bold),
+                        ),
+                        content: Text('AlertDialog description'),
+                        // actions: <Widget>[
+                        //   TextButton(
+                        //     onPressed: () => Navigator.pop(context, 'Cancel'),
+                        //     child: const Text('Cancel'),
+                        //   ),
+                        //   TextButton(
+                        //     onPressed: () => Navigator.pop(context, 'OK'),
+                        //     child: const Text('OK'),
+                        //   ),
+                        // ],
+                      ),
+                    ),
                 icon: Icon(
-                  Icons.more_vert,
+                  FontAwesomeIcons.circleInfo,
                   color: Colors.black45,
                 ))
           ],
@@ -436,13 +469,13 @@ class _GlobalGroupChatScreenState extends State<GlobalGroupChatScreen> {
                         ),
                       ),
                       Row(children: [
-                        IconButton(
-                          onPressed: () {},
-                          icon: Icon(
-                            CupertinoIcons.mic_fill,
-                            size: 22,
-                          ),
-                        ),
+                        // IconButton(
+                        //   onPressed: () {},
+                        //   icon: Icon(
+                        //     CupertinoIcons.mic_fill,
+                        //     size: 22,
+                        //   ),
+                        // ),
                         IconButton(
                           icon: Icon(
                             FontAwesomeIcons.solidImage,
@@ -555,6 +588,39 @@ class ShowImage extends StatelessWidget {
           ),
           child: Image.network(imageUrl),
         ),
+      ),
+    );
+  }
+}
+
+class DialogExample extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      onPressed: () => showDialog<String>(
+        context: context,
+        builder: (BuildContext context) => const AlertDialog(
+          title: Text(
+            'Rules of the Group',
+            style: TextStyle(color: blueColor, fontWeight: FontWeight.bold),
+          ),
+          content: Text('AlertDialog description'),
+          // actions: <Widget>[
+          //   TextButton(
+          //     onPressed: () => Navigator.pop(context, 'Cancel'),
+          //     child: const Text('Cancel'),
+          //   ),
+          //   TextButton(
+          //     onPressed: () => Navigator.pop(context, 'OK'),
+          //     child: const Text('OK'),
+          //   ),
+          // ],
+        ),
+      ),
+      child: const Text(
+        'Messages Global',
+        style: TextStyle(
+            color: Colors.black, fontWeight: FontWeight.w700, fontSize: 16),
       ),
     );
   }

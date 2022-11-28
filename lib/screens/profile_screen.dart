@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:expandable_text/expandable_text.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
@@ -12,6 +13,7 @@ import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 import 'package:zero_fin/resources/storage_methods.dart';
 import 'package:zero_fin/screens/followers_follower_screen.dart';
@@ -29,6 +31,8 @@ import 'package:file_picker/file_picker.dart';
 import '/utils/utils.dart';
 import '/widgets/follow_button.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
+import 'ChatRoom.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String uid;
@@ -427,17 +431,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     Stack(
                       children: [
-                        Container(
-                          height: 150,
-                          color: Colors.grey.shade200,
-                          width: double.infinity,
-                          child: userData['coverimage'] != null
-                              ? Image.network(
-                                  userData['coverimage'],
-                                  fit: BoxFit.cover,
-                                  filterQuality: FilterQuality.high,
-                                )
-                              : Image.asset('images/two.png'),
+                        GestureDetector(
+                          onTap: () {
+                            if (userData['coverimage'] != null) {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => ShowImage(
+                                            imageUrl: userData['coverimage'],
+                                          )));
+                            }
+                          },
+                          child: Container(
+                            height: 150,
+                            color: Colors.grey.shade200,
+                            width: double.infinity,
+                            child: userData['coverimage'] != null
+                                ? Image.network(
+                                    userData['coverimage'],
+                                    fit: BoxFit.cover,
+                                    filterQuality: FilterQuality.high,
+                                  )
+                                : Image.asset('images/two.png'),
+                          ),
                         ),
                         Positioned(
                           left: 20,
@@ -448,10 +464,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             radius: 53,
                             child: Stack(
                               children: [
-                                CircleAvatar(
-                                  maxRadius: 50,
-                                  backgroundImage: NetworkImage(
-                                    userData['photoUrl'],
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => ShowImage(
+                                                  imageUrl:
+                                                      userData['photoUrl'],
+                                                )));
+                                  },
+                                  child: CircleAvatar(
+                                    maxRadius: 50,
+                                    backgroundImage: NetworkImage(
+                                      userData['photoUrl'],
+                                    ),
                                   ),
                                 ),
                                 if (FirebaseAuth.instance.currentUser!.uid ==
@@ -909,18 +936,62 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         ),
                                       ),
                                     ),
-                          SizedBox(width: 9),
+                          SizedBox(
+                            width: 12,
+                          ),
+                          if (FirebaseAuth.instance.currentUser!.uid !=
+                              widget.uid)
+                            Container(
+                              padding: EdgeInsets.all(0),
+                              decoration: BoxDecoration(
+                                  color: Color(0xFAF0EFEF),
+                                  borderRadius: BorderRadius.circular(25)),
+                              child: IconButton(
+                                constraints:
+                                    BoxConstraints.tight(Size.fromRadius(18)),
+                                padding: EdgeInsets.zero,
+                                icon: Transform.rotate(
+                                  angle: 0.175,
+                                  child: Icon(
+                                    FontAwesomeIcons.solidPaperPlane,
+                                    size: 17,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                onPressed: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => ChatRoom(
+                                                token: userData['token'],
+                                                otUsername:
+                                                    userData['username'],
+                                                otUid: userData['uid'],
+                                                profilePic:
+                                                    userData['photoUrl'],
+                                                status: userData['status'],
+                                              )));
+                                },
+                              ),
+                            ),
+                          SizedBox(width: 3),
                           if (FirebaseAuth.instance.currentUser!.uid ==
                               widget.uid)
                             GestureDetector(
                               onTap: () {
                                 showModalBottomSheet(
                                     context: context,
+                                    enableDrag: true,
+                                    isScrollControlled: true,
+                                    isDismissible: true,
                                     builder: (BuildContext ctx) {
                                       return Container(
                                         color: Colors.black.withOpacity(0.1),
                                         child: Container(
-                                          height: 250,
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.35,
                                           decoration: BoxDecoration(
                                               color: Colors.white,
                                               borderRadius: BorderRadius.only(
@@ -935,6 +1006,61 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             child: Column(children: [
                                               ListTile(
                                                 onTap: () async {
+                                                  String url =
+                                                      "https://www.google.com";
+                                                  if (await canLaunch(url)) {
+                                                    await launch(url,
+                                                        enableDomStorage: true,
+                                                        enableJavaScript: true,
+                                                        forceWebView: true);
+                                                  }
+                                                },
+                                                title: Text(
+                                                  'Apply for Banner Post',
+                                                  style: TextStyle(
+                                                      color: btnCOlorblue,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              ),
+                                              ListTile(
+                                                onTap: () async {
+                                                  String url =
+                                                      "https://www.google.com";
+                                                  if (await canLaunch(url)) {
+                                                    await launch(url,
+                                                        enableDomStorage: true,
+                                                        enableJavaScript: true,
+                                                        forceWebView: true);
+                                                  }
+                                                },
+                                                title: Text('Feedback',
+                                                    style: TextStyle(
+                                                        color: btnCOlorblue,
+                                                        fontWeight:
+                                                            FontWeight.bold)),
+                                              ),
+                                              ListTile(
+                                                onTap: () async {
+                                                  String url =
+                                                      "https://www.google.com";
+                                                  if (await canLaunch(url)) {
+                                                    await launch(url,
+                                                        enableDomStorage: true,
+                                                        enableJavaScript: true,
+                                                        forceWebView: true);
+                                                  }
+                                                },
+                                                title: Text(
+                                                  'Join Team',
+                                                  style: TextStyle(
+                                                      color: btnCOlorblue,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              ),
+                                              ListTile(
+                                                onTap: () async {
                                                   await AuthMethods().signOut();
                                                   Navigator.of(context)
                                                       .pushReplacement(
@@ -945,7 +1071,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                   );
                                                 },
                                                 title: Text('Logout'),
-                                              )
+                                              ),
                                             ]),
                                           ),
                                         ),
@@ -970,12 +1096,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             child: Container(
                               child: Align(
                                 alignment: Alignment.topLeft,
-                                child: Text(
-                                  userData['bio'],
-                                  textAlign: TextAlign.left,
+                                child: ExpandableText(
+                                  '${userData['bio']}',
+                                  expandText: 'show more',
+                                  collapseText: 'show less',
+                                  maxLines: 3,
+                                  linkColor: btnCOlorblue,
+                                  urlStyle: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF0B57A4),
+                                      fontSize: 14),
+                                  onUrlTap: (url) async {
+                                    if (url.contains("https://www.")) {
+                                      if (await canLaunch(url)) {
+                                        await launch(url);
+                                      }
+                                    } else if (!url.contains("https://www.")) {
+                                      if (await canLaunch(
+                                          "https://www." + url)) {
+                                        await launch("https://www." + url);
+                                      }
+                                    } else if (url.contains("https://") &&
+                                        !url.contains("https://www.")) {
+                                      if (await canLaunch("www." + url)) {
+                                        await launch("www." + url);
+                                      }
+                                    } else if (!url.contains("https://") &&
+                                        url.contains("www.")) {
+                                      if (await canLaunch("https://" + url)) {
+                                        await launch("https://" + url);
+                                      }
+                                    }
+                                  },
+                                  textAlign: TextAlign.justify,
+                                  // text: TextSpan(
+                                  //   text: ' ${widget.snap['description']}',
                                   style: TextStyle(
                                       fontSize: 11, color: Colors.black54),
-                                  maxLines: 5,
+                                  // ),
                                 ),
                               ),
                             ),
@@ -1032,7 +1190,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     builder: (context) =>
                                         FollowersFollowingScreen(
                                           uid: widget.uid,
-                                          textfwl: 'followers',
+                                          textfwl:
+                                              userData['username'].toString(),
+                                          indexinitial: 0,
                                         )));
                           },
                           child: Container(
@@ -1058,7 +1218,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     builder: (context) =>
                                         FollowersFollowingScreen(
                                           uid: widget.uid,
-                                          textfwl: 'following',
+                                          textfwl:
+                                              userData['username'].toString(),
+                                          indexinitial: 1,
                                         )));
                           },
                           child: Container(
@@ -1865,6 +2027,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         Text(
           num,
           style: TextStyle(fontSize: 19, fontWeight: FontWeight.w700),
+          softWrap: false,
+          overflow: TextOverflow.fade,
         ),
         Container(
           margin: const EdgeInsets.only(top: 12),
@@ -1874,6 +2038,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
       ],
+    );
+  }
+}
+
+class ShowImage extends StatelessWidget {
+  final String imageUrl;
+
+  const ShowImage({required this.imageUrl, Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
+
+    return Scaffold(
+      body: Container(
+        height: size.height,
+        width: size.width,
+        decoration: BoxDecoration(
+          color: Colors.black,
+        ),
+        child:
+            InteractiveViewer(panEnabled: true, child: Image.network(imageUrl)),
+      ),
     );
   }
 }

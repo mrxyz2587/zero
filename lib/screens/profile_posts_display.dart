@@ -167,7 +167,6 @@ class _PostProfileLinearDisplayState extends State<PostProfileLinearDisplay> {
 
                             return PostCard(
                               snap: snap,
-                              onshareingbtnPressed: () {},
                             );
                           },
                         );

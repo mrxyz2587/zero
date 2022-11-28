@@ -8,9 +8,9 @@ class LocalNotificationService {
   static final FlutterLocalNotificationsPlugin
       _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   static void initialize() {
-    final InitializationSettings initializationSettings =
+    const InitializationSettings initializationSettings =
         InitializationSettings(
-            android: AndroidInitializationSettings("@mipmap/ic_launcher"));
+            android: AndroidInitializationSettings("app_icon"));
     _flutterLocalNotificationsPlugin.initialize(initializationSettings);
   }
 
@@ -29,10 +29,11 @@ class LocalNotificationService {
             enableLights: true,
             enableVibration: true,
             playSound: true,
+
             visibility: NotificationVisibility.public,
             color: Color(0xFF000000),
-            icon: 'images/.png',
             colorized: true,
+            icon: 'images/zero_logo.png',
             category: AndroidNotificationCategory.event),
       );
       print("my id is ${id.toString()}");

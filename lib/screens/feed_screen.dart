@@ -7,7 +7,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
+import 'package:scroll_to_top/scroll_to_top.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:zero_fin/resources/firebase_dynamic_links.dart';
 import 'package:zero_fin/screens/HomeScreen.dart';
 import 'package:zero_fin/screens/profile_screen.dart';
 import 'package:zero_fin/screens/search_screen.dart';
@@ -37,6 +39,8 @@ class _FeedScreenState extends State<FeedScreen> {
   bool isLoasdings = true;
 
   var searchController = TextEditingController();
+
+  bool isSended = false;
 
   bottomSheetforshare(context, String txt) {
     showModalBottomSheet(
@@ -137,20 +141,44 @@ class _FeedScreenState extends State<FeedScreen> {
                             child: SizedBox(
                               height: 60,
                               child: ListTile(
-                                trailing: TextButton(
-                                    style: ElevatedButton.styleFrom(
-                                        backgroundColor: btnCOlorblue,
-                                        minimumSize: Size(75, 12),
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(8))),
-                                    onPressed: () {},
-                                    child: Text(
-                                      "Send",
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w700),
-                                    )),
+                                trailing: isSended == false
+                                    ? TextButton(
+                                        style: ElevatedButton.styleFrom(
+                                            backgroundColor: btnCOlorblue,
+                                            minimumSize: Size(75, 12),
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(8))),
+                                        onPressed: () {
+                                          setState(() {
+                                            isSended = !isSended;
+                                          });
+                                        },
+                                        child: Text(
+                                          isSended == false ? "Send" : "sent",
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w700),
+                                        ))
+                                    : TextButton(
+                                        style: ElevatedButton.styleFrom(
+                                            backgroundColor:
+                                                Colors.grey.shade300,
+                                            minimumSize: Size(75, 12),
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(8))),
+                                        onPressed: () {
+                                          setState(() {
+                                            isSended = !isSended;
+                                          });
+                                        },
+                                        child: Text(
+                                          "sent",
+                                          style: TextStyle(
+                                              color: Colors.black54,
+                                              fontWeight: FontWeight.w700),
+                                        )),
                                 title: Text(
                                     (snapshot.data! as dynamic)
                                         .docs[index]['username']
@@ -234,8 +262,8 @@ class _FeedScreenState extends State<FeedScreen> {
   void initState() {
     _determinePosition();
     getData();
-
     // TODO: implement initState
+
     getLocation();
     storeNotificationToken();
     super.initState();
@@ -321,7 +349,8 @@ class _FeedScreenState extends State<FeedScreen> {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final UserProvider userProvider = Provider.of<UserProvider>(context);
-
+    final ScrollController _scrollController =
+        ScrollController(keepScrollOffset: true);
     return isLoasdings
         ? Scaffold(
             backgroundColor: Colors.white,
@@ -334,6 +363,7 @@ class _FeedScreenState extends State<FeedScreen> {
         : Scaffold(
             backgroundColor: Color(0xFFEFEFEF),
             appBar: AppBar(
+              elevation: 0.6,
               backgroundColor: mobileBackgroundColor,
               centerTitle: true,
               leading: GestureDetector(
@@ -364,27 +394,7 @@ class _FeedScreenState extends State<FeedScreen> {
                   ),
                 ),
               ),
-              title: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(0),
-                    child: Image.asset('images/logo.jpeg', height: 40),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 8, left: 0.5),
-                    child: Text(
-                      'ERO',
-                      style: TextStyle(
-                          color: Color(0xFF000000),
-                          fontSize: 20,
-                          fontWeight: FontWeight.w700,
-                          fontFamily: 'Comfortaa'),
-                    ),
-                  ),
-                ],
-              ),
+              title: Image.asset('images/logoofzeroappbar.png', height: 38),
               actions: [
                 IconButton(
                   icon: const Icon(
@@ -412,137 +422,141 @@ class _FeedScreenState extends State<FeedScreen> {
                 ),
               ],
             ),
-            body: ListView(
-              physics: BouncingScrollPhysics(),
-              children: [
-                StreamBuilder(
-                  stream: FirebaseFirestore.instance
-                      .collection('banners')
-                      .snapshots(),
-                  builder: (context,
-                      AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
-                          snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(
-                          child: CircularProgressIndicator(
-                        color: Colors.grey.shade300,
-                        strokeWidth: 1.5,
-                      ));
-                    }
-                    return ClipRRect(
-                      child: CarouselSlider.builder(
-                        itemCount: snapshot.data!.docs.length,
+            body: ScrollToTop(
+              scrollController: _scrollController,
+              btnColor: Colors.white70,
+              txtColor: Colors.black87,
+              scrollOffset: 1000,
+              child: ListView(
+                controller: _scrollController,
+                physics: BouncingScrollPhysics(),
+                children: [
+                  StreamBuilder(
+                    stream: FirebaseFirestore.instance
+                        .collection('banners')
+                        .snapshots(),
+                    builder: (context,
+                        AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
+                            snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(
+                            child: CircularProgressIndicator(
+                          color: Colors.grey.shade300,
+                          strokeWidth: 1.5,
+                        ));
+                      }
+                      return ClipRRect(
+                        child: CarouselSlider.builder(
+                          itemCount: snapshot.data!.docs.length,
 
-                        options: CarouselOptions(
-                          viewportFraction: 0.8,
-                          disableCenter: true,
-                          height: MediaQuery.of(context).size.height * 0.25,
-                          autoPlay: true,
-                          scrollDirection: Axis.horizontal,
+                          options: CarouselOptions(
+                            viewportFraction: 0.8,
+                            disableCenter: true,
+                            height: MediaQuery.of(context).size.height * 0.25,
+                            autoPlay: true,
+                            scrollDirection: Axis.horizontal,
+                          ),
+                          itemBuilder: (BuildContext context, int itemIndex,
+                                  int pageViewIndex) =>
+                              GestureDetector(
+                            onTap: () async {
+                              final url = snapshot.data!.docs[itemIndex]
+                                  .data()["url"]
+                                  .toString();
+                              if (await canLaunch(url)) {
+                                await launch(url);
+                              }
+                            },
+                            child: Container(
+                              margin: EdgeInsets.symmetric(
+                                  horizontal: 1, vertical: 10),
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: Colors.grey.shade200),
+                              child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: Image.network(
+                                          snapshot.data!.docs[itemIndex]
+                                              .data()["imageUrl"]
+                                              .toString(),
+                                          fit: BoxFit.fill) ??
+                                      Image.asset("images/logo.jpeg",
+                                          fit: BoxFit.fill)),
+                            ),
+                          ),
+                          // imageUrls.map((i) {
+                          //   return Container(
+                          //     margin: EdgeInsets.symmetric(horizontal: 1, vertical: 10),
+                          //     decoration: BoxDecoration(
+                          //         borderRadius: BorderRadius.circular(10),
+                          //         color: Colors.grey.shade200),
+                          //     child: ClipRRect(
+                          //         borderRadius: BorderRadius.circular(10),
+                          //         child: Image.network(  snapshot.data!.docs[index]
+                          //             .data()["imageUrl"]
+                          //             .toString(),
+                          //             , fit: BoxFit.fill)),
+                          //   );
+                          // }).toList(),
                         ),
-                        itemBuilder: (BuildContext context, int itemIndex,
-                                int pageViewIndex) =>
-                            GestureDetector(
-                          onTap: () async {
-                            final url = snapshot.data!.docs[itemIndex]
-                                .data()["url"]
-                                .toString();
-                            if (await canLaunch(url)) {
-                              await launch(url);
-                            }
-                          },
-                          child: Container(
-                            margin: EdgeInsets.symmetric(
-                                horizontal: 1, vertical: 10),
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: Colors.grey.shade200),
-                            child: ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: Image.network(
-                                        snapshot.data!.docs[itemIndex]
-                                            .data()["imageUrl"]
-                                            .toString(),
-                                        fit: BoxFit.fill) ??
-                                    Image.asset("images/logo.jpeg",
-                                        fit: BoxFit.fill)),
+                      );
+
+                      // ListView.builder(
+                      //   addAutomaticKeepAlives: true,
+                      //   shrinkWrap: true,
+                      //   controller: ScrollController(keepScrollOffset: true),
+                      //   scrollDirection: Axis.vertical,
+                      //   itemCount: snapshot.data!.docs.length,
+                      //   itemBuilder: (ctx, index) => Container(
+                      //     margin:
+                      //     EdgeInsets.symmetric(horizontal: 1, vertical: 10),
+                      //     decoration: BoxDecoration(
+                      //         borderRadius: BorderRadius.circular(10),
+                      //         color: Colors.grey.shade200),
+                      //     child: ClipRRect(
+                      //         borderRadius: BorderRadius.circular(10),
+                      //         child: Image.network(
+                      //             snapshot.data!.docs[index]
+                      //                 .data()["imageUrl"]
+                      //                 .toString(),
+                      //             fit: BoxFit.fill)),
+                      //   ),
+                      // );
+                    },
+                  ),
+                  StreamBuilder(
+                    stream: FirebaseFirestore.instance
+                        .collection('posts')
+                        .snapshots(),
+                    builder: (context,
+                        AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
+                            snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(
+                            child: CircularProgressIndicator(
+                          color: Colors.grey.shade300,
+                          strokeWidth: 1.5,
+                        ));
+                      }
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        controller: ScrollController(),
+                        scrollDirection: Axis.vertical,
+                        itemCount: snapshot.data!.docs.length,
+                        itemBuilder: (ctx, index) => Container(
+                          margin: EdgeInsets.symmetric(
+                            horizontal: width > webScreenSize ? width * 0.3 : 0,
+                            vertical: width > webScreenSize ? 15 : 0,
+                          ),
+                          child: PostCard(
+                            snap: snapshot.data!.docs[index].data(),
                           ),
                         ),
-                        // imageUrls.map((i) {
-                        //   return Container(
-                        //     margin: EdgeInsets.symmetric(horizontal: 1, vertical: 10),
-                        //     decoration: BoxDecoration(
-                        //         borderRadius: BorderRadius.circular(10),
-                        //         color: Colors.grey.shade200),
-                        //     child: ClipRRect(
-                        //         borderRadius: BorderRadius.circular(10),
-                        //         child: Image.network(  snapshot.data!.docs[index]
-                        //             .data()["imageUrl"]
-                        //             .toString(),
-                        //             , fit: BoxFit.fill)),
-                        //   );
-                        // }).toList(),
-                      ),
-                    );
-
-                    // ListView.builder(
-                    //   addAutomaticKeepAlives: true,
-                    //   shrinkWrap: true,
-                    //   controller: ScrollController(keepScrollOffset: true),
-                    //   scrollDirection: Axis.vertical,
-                    //   itemCount: snapshot.data!.docs.length,
-                    //   itemBuilder: (ctx, index) => Container(
-                    //     margin:
-                    //     EdgeInsets.symmetric(horizontal: 1, vertical: 10),
-                    //     decoration: BoxDecoration(
-                    //         borderRadius: BorderRadius.circular(10),
-                    //         color: Colors.grey.shade200),
-                    //     child: ClipRRect(
-                    //         borderRadius: BorderRadius.circular(10),
-                    //         child: Image.network(
-                    //             snapshot.data!.docs[index]
-                    //                 .data()["imageUrl"]
-                    //                 .toString(),
-                    //             fit: BoxFit.fill)),
-                    //   ),
-                    // );
-                  },
-                ),
-                StreamBuilder(
-                  stream: FirebaseFirestore.instance
-                      .collection('posts')
-                      .snapshots(),
-                  builder: (context,
-                      AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
-                          snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(
-                          child: CircularProgressIndicator(
-                        color: Colors.grey.shade300,
-                        strokeWidth: 1.5,
-                      ));
-                    }
-                    return ListView.builder(
-                      shrinkWrap: true,
-                      controller: ScrollController(keepScrollOffset: true),
-                      scrollDirection: Axis.vertical,
-                      itemCount: snapshot.data!.docs.length,
-                      itemBuilder: (ctx, index) => Container(
-                        margin: EdgeInsets.symmetric(
-                          horizontal: width > webScreenSize ? width * 0.3 : 0,
-                          vertical: width > webScreenSize ? 15 : 0,
-                        ),
-                        child: PostCard(
-                          snap: snapshot.data!.docs[index].data(),
-                          onshareingbtnPressed: () {
-                            bottomSheetforshare(context, "txt");
-                          },
-                        ),
-                      ),
-                    );
-                  },
-                )
-              ],
+                      );
+                    },
+                  )
+                ],
+              ),
             )
             // : Center(
             //     child: CircularProgressIndicator(

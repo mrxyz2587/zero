@@ -50,7 +50,7 @@ class AuthMethods {
             .uploadImageToStorage('profilePics', file, false);
 
         model.User _user = model.User(
-            username: username,
+            username: username.toLowerCase(),
             uid: cred.user!.uid,
             photoUrl: photoUrl,
             email: email,

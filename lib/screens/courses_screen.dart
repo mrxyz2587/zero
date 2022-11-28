@@ -15,6 +15,8 @@ import '../models/events_model.dart';
 import '../resources/firestore_methods.dart';
 import '../utils/colors.dart';
 import '../widgets/event_item.dart';
+import 'HomeScreen.dart';
+import 'notice_screen.dart';
 
 class Course_screen extends StatefulWidget {
   const Course_screen({Key? key}) : super(key: key);
@@ -33,15 +35,40 @@ class _Course_screenState extends State<Course_screen> {
     return Scaffold(
         backgroundColor: Color(0xFFEFEFEF),
         appBar: AppBar(
-            elevation: 1,
-            backgroundColor: Colors.white,
-            leading: Icon(FontAwesomeIcons.graduationCap, color: Colors.black),
-            title: Text(
-              'Courses',
-              style:
-                  TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-            )),
+          elevation: 1,
+          backgroundColor: Colors.white,
+          leading: Icon(FontAwesomeIcons.graduationCap, color: Colors.black),
+          title: Text(
+            'Courses',
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(
+                FontAwesomeIcons.solidBell,
+                color: Colors.black,
+                size: 18,
+              ),
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => NoticeScreen()));
+              },
+            ),
+            IconButton(
+              icon: const Icon(
+                FontAwesomeIcons.solidPaperPlane,
+                size: 18,
+                color: Colors.black,
+              ),
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => ChatScreen()));
+              },
+            ),
+          ],
+        ),
         body: ListView(
+          physics: BouncingScrollPhysics(),
           children: [
             Padding(
               padding: const EdgeInsets.only(
@@ -54,74 +81,34 @@ class _Course_screenState extends State<Course_screen> {
                       borderRadius: BorderRadius.circular(50)),
                 ),
                 onPressed: () async {
-                  FilePickerResult? result = await FilePicker.platform
-                      .pickFiles(
-                          allowMultiple: false,
-                          allowCompression: true,
-                          type: FileType.custom,
-                          allowedExtensions: ["pdf"]);
-
-                  if (result != null) {
-                    File c = File(result.files.single.path.toString());
-
-                    setState(() {
-                      file = c;
-                      name = result.names.toString();
-                    });
-                    String res = await FireStoreMethods().UploadResume(file!);
+                  String url = "https://app.resumebuilder.com/create-resume/";
+                  if (await canLaunch(url)) {
+                    await launch(url,
+                        enableDomStorage: true,
+                        enableJavaScript: true,
+                        forceWebView: true);
                   }
-                  // if (result != null) {
-                  //   Uint8List? fileBytes = result.files.first.bytes;
-                  //   String fileName = result.files.first.name;
-                  //   setState(() {
-                  //     _file = fileBytes;
-                  //
-                  //     isLoading = true;
-                  //   });
-                  //   // Upload file
-                  //   try {
-                  //     String res =
-                  //         await FireStoreMethods().UploadResume(_file!);
-                  //     if (res == "success") {
-                  //       setState(() {
-                  //         isLoading = false;
-                  //       });
-                  //       showSnackBar(
-                  //         context,
-                  //         'Posted!',
-                  //       );
-                  //     } else {
-                  //       showSnackBar(context, res);
-                  //     }
-                  //   } catch (err) {
-                  //     setState(() {
-                  //       isLoading = false;
-                  //     });
-                  //     showSnackBar(
-                  //       context,
-                  //       err.toString(),
-                  //     );
-                  //   }
-                  // }
 
-                  // FilePickerResult? result =
-                  //     await FilePicker.platform.pickFiles(
-                  //   type: FileType.custom,
-                  //   allowedExtensions: ["pdf"],
-                  //   allowCompression: true,
-                  // );
+                  // FilePickerResult? result = await FilePicker.platform
+                  //     .pickFiles(
+                  //         allowMultiple: false,
+                  //         allowCompression: true,
+                  //         type: FileType.custom,
+                  //         allowedExtensions: ["pdf"]);
                   //
                   // if (result != null) {
-                  //   PlatformFile? file = result.files.first;
-                  // } else {
-                  //   // User canceled the picker
+                  //   File c = File(result.files.single.path.toString());
+                  //
+                  //   setState(() {
+                  //     file = c;
+                  //     name = result.names.toString();
+                  //   });
+                  //   String res = await FireStoreMethods().UploadResume(file!);
                   // }
                 },
-                child: isSubmitted
-                    ? Text('Uploaded', style: TextStyle(color: Colors.white))
-                    : Text('Upload Resume',
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold)),
+                child: Text('Build Resume',
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold)),
                 // color: Color(0xFF262626),
                 // shape: RoundedRectangleBorder(
                 //     borderRadius: BorderRadius.circular(50)),
@@ -130,6 +117,7 @@ class _Course_screenState extends State<Course_screen> {
             Padding(
               padding: const EdgeInsets.all(6.0),
               child: GridView(
+                physics: ClampingScrollPhysics(),
                 controller: ScrollController(keepScrollOffset: true),
                 children: [
                   GestureDetector(

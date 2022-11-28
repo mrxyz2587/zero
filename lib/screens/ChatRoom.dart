@@ -17,12 +17,15 @@ import 'package:flutter_chat_bubble/clippers/chat_bubble_clipper_1.dart';
 import 'package:flutter_chat_bubble/clippers/chat_bubble_clipper_5.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 import 'package:zero_fin/screens/profile_screen.dart';
 import 'package:zero_fin/utils/colors.dart';
 import 'dart:math' as math;
 import 'package:intl/intl.dart';
 import 'package:zero_fin/utils/local_notification_services.dart';
+
+import 'SharedPostDisplay.dart';
 
 class ChatRoom extends StatefulWidget {
   final String otUsername;
@@ -55,7 +58,8 @@ class _ChatRoomState extends State<ChatRoom> {
 
   bool isLoasdings = true;
 
-  bool emojiShow = false;
+  bool emojiShowing = false;
+  FocusNode? focusNode;
 
   Future getImage() async {
     ImagePicker _picker = ImagePicker();
@@ -90,6 +94,17 @@ class _ChatRoomState extends State<ChatRoom> {
     FirebaseMessaging.onMessage.listen((event) {
       LocalNotificationService.display(event);
     });
+
+    focusNode = FocusNode();
+    focusNode?.addListener(() {
+      print('Listener');
+    });
+  }
+
+  @override
+  void dispose() {
+    focusNode?.dispose();
+    super.dispose();
   }
 
   sendNotification(String title, String token) async {
@@ -212,156 +227,600 @@ class _ChatRoomState extends State<ChatRoom> {
     BuildContext context,
     String chatId,
   ) {
-    return map['type'] == "text"
-        ? GestureDetector(
-            onLongPress: () async {
-              if (map['sendby'] == _auth.currentUser!.uid)
-              //TODO abh1: Add dialog ui and a warning message that says if you delete the message it will be permanently deleted
-              {
-                await _firestore
-                    .collection('chatroom')
-                    .doc(chatDocId)
-                    .collection('chats')
-                    .doc(chatId)
-                    .delete();
-              }
-            },
+    // switch() {
+    //   case "text":
+    //     break;
+    //   case "img":
+    //     GestureDetector(
+    //       onLongPress: () async {
+    //         if (map['sendby'] == _auth.currentUser!.uid)
+    //         //TODO abh1.1: Add dialog ui and a warning message that says if you delete the message it will be permanently deleted
+    //
+    //         {
+    //           await _firestore
+    //               .collection('chatroom')
+    //               .doc(chatDocId)
+    //               .collection('chats')
+    //               .doc(chatId)
+    //               .delete();
+    //         }
+    //       },
+    //       child: Container(
+    //         height: size.height / 2.5,
+    //         width: size.width,
+    //         padding: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
+    //         alignment: map['sendby'] == _auth.currentUser!.uid
+    //             ? Alignment.centerRight
+    //             : Alignment.centerLeft,
+    //         child: InkWell(
+    //           onTap: () => Navigator.of(context).push(
+    //             MaterialPageRoute(
+    //               builder: (_) => ShowImage(
+    //                 imageUrl: map['message'],
+    //               ),
+    //             ),
+    //           ),
+    //           child: Container(
+    //             padding: EdgeInsets.all(4),
+    //             height: size.height / 2.5,
+    //             width: size.width / 2,
+    //             constraints: BoxConstraints(
+    //               minHeight: MediaQuery.of(context).size.width / 2,
+    //               maxWidth: MediaQuery.of(context).size.width * 0.7,
+    //             ),
+    //             decoration: BoxDecoration(
+    //                 color: map['sendby'] == _auth.currentUser!.uid
+    //                     ? btnCOlorblue
+    //                     : Colors.white,
+    //                 borderRadius: BorderRadius.circular(10)),
+    //             alignment: map['message'] != "" ? null : Alignment.center,
+    //             child: map['message'] != ""
+    //                 ? ClipRRect(
+    //                     borderRadius: BorderRadius.circular(10),
+    //                     child: Image.network(
+    //                       map['message'],
+    //                       fit: BoxFit.cover,
+    //                     ),
+    //                   )
+    //                 : CircularProgressIndicator(),
+    //           ),
+    //         ),
+    //       ),
+    //     );
+    //     break;
+    //   case "sharedpost":
+    //     Container(
+    //       color: Colors.red,
+    //       width: 100,
+    //       height: 100,
+    //     );
+    // };
+    if (map['type'] == "text") {
+      return GestureDetector(
+        onLongPress: () async {
+          if (map['sendby'] == _auth.currentUser!.uid)
+          //TODO abh1: Add dialog ui and a warning message that says if you delete the message it will be permanently deleted
+          {
+            await _firestore
+                .collection('chatroom')
+                .doc(chatDocId)
+                .collection('chats')
+                .doc(chatId)
+                .delete();
+          }
+        },
+        child: Container(
+          width: size.width,
+          padding: EdgeInsets.symmetric(horizontal: 8),
+          child: ChatBubble(
+            elevation: 0,
+            clipper: map['sendby'] == _auth.currentUser!.uid
+                ? ChatBubbleClipper1(
+                    type: BubbleType.sendBubble,
+                    radius: 10,
+                    nipHeight: 8,
+                    nipWidth: 8)
+                : ChatBubbleClipper1(
+                    type: BubbleType.receiverBubble,
+                    radius: 10,
+                    nipHeight: 8,
+                    nipWidth: 8),
+            alignment: map['sendby'] == _auth.currentUser!.uid
+                ? Alignment.centerRight
+                : Alignment.centerLeft,
+            margin: EdgeInsets.only(top: 6),
+            backGroundColor: map['sendby'] == _auth.currentUser!.uid
+                ? btnCOlorblue
+                : Colors.white,
             child: Container(
-              width: size.width,
-              padding: EdgeInsets.symmetric(horizontal: 8),
-              child: ChatBubble(
-                elevation: 0,
-                clipper: map['sendby'] == _auth.currentUser!.uid
-                    ? ChatBubbleClipper1(
-                        type: BubbleType.sendBubble,
-                        radius: 10,
-                        nipHeight: 8,
-                        nipWidth: 8)
-                    : ChatBubbleClipper1(
-                        type: BubbleType.receiverBubble,
-                        radius: 10,
-                        nipHeight: 8,
-                        nipWidth: 8),
-                alignment: map['sendby'] == _auth.currentUser!.uid
-                    ? Alignment.centerRight
-                    : Alignment.centerLeft,
-                margin: EdgeInsets.only(top: 6),
-                backGroundColor: map['sendby'] == _auth.currentUser!.uid
+              constraints: BoxConstraints(
+                maxWidth: MediaQuery.of(context).size.width * 0.7,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ExpandableText(
+                    map['message'],
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: map['sendby'] == _auth.currentUser!.uid
+                          ? Colors.white
+                          : Colors.black87,
+                    ),
+                    expandText: 'more',
+                    collapseText: 'hide',
+                    linkColor: Colors.grey,
+                    urlStyle: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF0B57A4),
+                        fontSize: 14),
+                    onUrlTap: (url) async {
+                      if (url.contains("https://www.")) {
+                        if (await canLaunch(url)) {
+                          await launch(url);
+                        }
+                      } else if (!url.contains("https://www.")) {
+                        if (await canLaunch("https://www." + url)) {
+                          await launch("https://www." + url);
+                        }
+                      } else if (url.contains("https://") &&
+                          !url.contains("https://www.")) {
+                        if (await canLaunch("www." + url)) {
+                          await launch("www." + url);
+                        }
+                      } else if (!url.contains("https://") &&
+                          url.contains("www.")) {
+                        if (await canLaunch("https://" + url)) {
+                          await launch("https://" + url);
+                        }
+                      }
+                    },
+                    linkEllipsis: true,
+                    maxLines: 15,
+                  ),
+                  SizedBox(
+                    height: 3,
+                  ),
+                  Text(
+                    map['time'] == null
+                        ? "sending...."
+                        : DateFormat.jm()
+                            .format(map['time'].toDate())
+                            .toString(),
+                    style: TextStyle(
+                        fontSize: 9,
+                        fontStyle: FontStyle.italic,
+                        color: Colors.grey.shade700),
+                  )
+                ],
+              ),
+            ),
+          ),
+          // child: Container(
+          //   padding: EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+          //   margin: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
+          //   decoration: BoxDecoration(
+          //     borderRadius: BorderRadius.circular(15),
+          //     color: btnCOlorblue,
+          //   ),
+          //   child: Text(
+          //     map['message'],
+          //     style: TextStyle(
+          //       fontSize: 16,
+          //       fontWeight: FontWeight.w500,
+          //       color: Colors.white,
+          //     ),
+          //   ),
+          // ),
+        ),
+      );
+    } else if (map['type'] == "img") {
+      return GestureDetector(
+        onLongPress: () async {
+          if (map['sendby'] == _auth.currentUser!.uid)
+          //TODO abh1.1: Add dialog ui and a warning message that says if you delete the message it will be permanently deleted
+
+          {
+            await _firestore
+                .collection('chatroom')
+                .doc(chatDocId)
+                .collection('chats')
+                .doc(chatId)
+                .delete();
+          }
+        },
+        child: Container(
+          height: size.height / 2.5,
+          width: size.width,
+          padding: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
+          alignment: map['sendby'] == _auth.currentUser!.uid
+              ? Alignment.centerRight
+              : Alignment.centerLeft,
+          child: InkWell(
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => ShowImage(
+                  imageUrl: map['message'],
+                ),
+              ),
+            ),
+            child: Container(
+              padding: EdgeInsets.all(4),
+              height: size.height / 2.5,
+              width: size.width / 2,
+              constraints: BoxConstraints(
+                minHeight: MediaQuery.of(context).size.width / 2,
+                maxWidth: MediaQuery.of(context).size.width * 0.7,
+              ),
+              decoration: BoxDecoration(
+                  color: map['sendby'] == _auth.currentUser!.uid
+                      ? btnCOlorblue
+                      : Colors.white,
+                  borderRadius: BorderRadius.circular(10)),
+              alignment: map['message'] != "" ? null : Alignment.center,
+              child: map['message'] != ""
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Image.network(
+                        map['message'],
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                  : CircularProgressIndicator(),
+            ),
+          ),
+        ),
+      );
+    } else if (map['type'] == "sharedPost") {
+      return GestureDetector(
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => SharedPostsDiplay(
+              postId: map['postId'],
+            ),
+          ),
+        ),
+        onLongPress: () async {
+          if (map['sendby'] == _auth.currentUser!.uid) {
+            await _firestore
+                .collection('chatroom')
+                .doc(chatDocId)
+                .collection('chats')
+                .doc(chatId)
+                .delete();
+          }
+        },
+        child: Container(
+          width: size.width,
+          padding: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
+          alignment: map['sendby'] == _auth.currentUser!.uid
+              ? Alignment.centerRight
+              : Alignment.centerLeft,
+          child: Container(
+            padding: EdgeInsets.symmetric(vertical: 4),
+            width: size.width * 0.75,
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width * 0.7,
+            ),
+            decoration: BoxDecoration(
+                color: map['sendby'] == _auth.currentUser!.uid
                     ? btnCOlorblue
                     : Colors.white,
-                child: Container(
-                  constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width * 0.7,
-                  ),
-                  child: Column(
+                borderRadius: BorderRadius.circular(10)),
+            alignment: map['message'] != "" ? null : Alignment.center,
+            child: map['message'] != ""
+                ? Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      ExpandableText(
-                        map['message'],
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: map['sendby'] == _auth.currentUser!.uid
-                              ? Colors.white
-                              : Colors.black87,
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 8.0, horizontal: 12),
+                        child: Row(
+                          children: [
+                            CircleAvatar(
+                              backgroundImage: NetworkImage(
+                                map['profImage'],
+                              ),
+                              radius: 14,
+                            ),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Text(
+                              map['usenamepost'],
+                              style: TextStyle(
+                                  color: map['sendby'] == _auth.currentUser!.uid
+                                      ? Colors.white
+                                      : Colors.black87,
+                                  fontWeight: FontWeight.w700,
+                                  fontFamily: "Roboto",
+                                  fontSize: 16),
+                              softWrap: false,
+                              overflow: TextOverflow.fade,
+                            )
+                          ],
                         ),
-                        expandText: 'more',
-                        collapseText: 'hide',
-                        linkColor: Colors.grey,
-                        maxLines: 15,
                       ),
-                      SizedBox(
-                        height: 3,
+                      Image.network(
+                        map['message'],
+                        fit: BoxFit.cover,
                       ),
-                      Text(
-                        map['time'] == null
-                            ? "sending...."
-                            : DateFormat.jm()
-                                .format(map['time'].toDate())
-                                .toString(),
-                        style: TextStyle(
-                            fontSize: 9,
-                            fontStyle: FontStyle.italic,
-                            color: Colors.grey.shade700),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 4, horizontal: 15),
+                        child: Container(
+                          height: 34,
+                          child: Center(
+                            child: Text(
+                              map['postDescription'],
+                              style: TextStyle(
+                                  color: map['sendby'] == _auth.currentUser!.uid
+                                      ? Colors.white
+                                      : Colors.black87,
+                                  fontFamily: "Roboto"),
+                              maxLines: 2,
+                              softWrap: false,
+                              overflow: TextOverflow.fade,
+                            ),
+                          ),
+                        ),
                       )
                     ],
-                  ),
-                ),
-              ),
-              // child: Container(
-              //   padding: EdgeInsets.symmetric(vertical: 10, horizontal: 14),
-              //   margin: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
-              //   decoration: BoxDecoration(
-              //     borderRadius: BorderRadius.circular(15),
-              //     color: btnCOlorblue,
-              //   ),
-              //   child: Text(
-              //     map['message'],
-              //     style: TextStyle(
-              //       fontSize: 16,
-              //       fontWeight: FontWeight.w500,
-              //       color: Colors.white,
-              //     ),
-              //   ),
-              // ),
-            ),
-          )
-        : GestureDetector(
-            onLongPress: () async {
-              if (map['sendby'] == _auth.currentUser!.uid)
-              //TODO abh1.1: Add dialog ui and a warning message that says if you delete the message it will be permanently deleted
+                  )
+                : CircularProgressIndicator(),
+          ),
+        ),
+      );
+    } else {
+      return Container();
+    }
 
-              {
-                await _firestore
-                    .collection('chatroom')
-                    .doc(chatDocId)
-                    .collection('chats')
-                    .doc(chatId)
-                    .delete();
-              }
-            },
-            child: Container(
-              height: size.height / 2.5,
-              width: size.width,
-              padding: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
-              alignment: map['sendby'] == _auth.currentUser!.uid
-                  ? Alignment.centerRight
-                  : Alignment.centerLeft,
-              child: InkWell(
-                onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => ShowImage(
-                      imageUrl: map['message'],
-                    ),
-                  ),
-                ),
-                child: Container(
-                  padding: EdgeInsets.all(4),
-                  height: size.height / 2.5,
-                  width: size.width / 2,
-                  constraints: BoxConstraints(
-                    minHeight: MediaQuery.of(context).size.width / 2,
-                    maxWidth: MediaQuery.of(context).size.width * 0.7,
-                  ),
-                  decoration: BoxDecoration(
-                      color: map['sendby'] == _auth.currentUser!.uid
-                          ? btnCOlorblue
-                          : Colors.white,
-                      borderRadius: BorderRadius.circular(10)),
-                  alignment: map['message'] != "" ? null : Alignment.center,
-                  child: map['message'] != ""
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: Image.network(
-                            map['message'],
-                            fit: BoxFit.cover,
-                          ),
-                        )
-                      : CircularProgressIndicator(),
-                ),
-              ),
-            ),
-          );
+    // if(map['type'] == "text"){
+    //  return GestureDetector(
+    //    onLongPress: () async {
+    //      if (map['sendby'] == _auth.currentUser!.uid)
+    //        //TODO abh1: Add dialog ui and a warning message that says if you delete the message it will be permanently deleted
+    //          {
+    //        await _firestore
+    //            .collection('chatroom')
+    //            .doc(chatDocId)
+    //            .collection('chats')
+    //            .doc(chatId)
+    //            .delete();
+    //      }
+    //    },
+    //    child: Container(
+    //      width: size.width,
+    //      padding: EdgeInsets.symmetric(horizontal: 8),
+    //      child: ChatBubble(
+    //        elevation: 0,
+    //        clipper: map['sendby'] == _auth.currentUser!.uid
+    //            ? ChatBubbleClipper1(
+    //            type: BubbleType.sendBubble,
+    //            radius: 10,
+    //            nipHeight: 8,
+    //            nipWidth: 8)
+    //            : ChatBubbleClipper1(
+    //            type: BubbleType.receiverBubble,
+    //            radius: 10,
+    //            nipHeight: 8,
+    //            nipWidth: 8),
+    //        alignment: map['sendby'] == _auth.currentUser!.uid
+    //            ? Alignment.centerRight
+    //            : Alignment.centerLeft,
+    //        margin: EdgeInsets.only(top: 6),
+    //        backGroundColor: map['sendby'] == _auth.currentUser!.uid
+    //            ? btnCOlorblue
+    //            : Colors.white,
+    //        child: Container(
+    //          constraints: BoxConstraints(
+    //            maxWidth: MediaQuery.of(context).size.width * 0.7,
+    //          ),
+    //          child: Column(
+    //            crossAxisAlignment: CrossAxisAlignment.start,
+    //            children: [
+    //              ExpandableText(
+    //                map['message'],
+    //                style: TextStyle(
+    //                  fontSize: 16,
+    //                  fontWeight: FontWeight.w500,
+    //                  color: map['sendby'] == _auth.currentUser!.uid
+    //                      ? Colors.white
+    //                      : Colors.black87,
+    //                ),
+    //                expandText: 'more',
+    //                collapseText: 'hide',
+    //                linkColor: Colors.grey,
+    //                maxLines: 15,
+    //              ),
+    //              SizedBox(
+    //                height: 3,
+    //              ),
+    //              Text(
+    //                map['time'] == null
+    //                    ? "sending...."
+    //                    : DateFormat.jm()
+    //                    .format(map['time'].toDate())
+    //                    .toString(),
+    //                style: TextStyle(
+    //                    fontSize: 9,
+    //                    fontStyle: FontStyle.italic,
+    //                    color: Colors.grey.shade700),
+    //              )
+    //            ],
+    //          ),
+    //        ),
+    //      ),
+    //      // child: Container(
+    //      //   padding: EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+    //      //   margin: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
+    //      //   decoration: BoxDecoration(
+    //      //     borderRadius: BorderRadius.circular(15),
+    //      //     color: btnCOlorblue,
+    //      //   ),
+    //      //   child: Text(
+    //      //     map['message'],
+    //      //     style: TextStyle(
+    //      //       fontSize: 16,
+    //      //       fontWeight: FontWeight.w500,
+    //      //       color: Colors.white,
+    //      //     ),
+    //      //   ),
+    //      // ),
+    //    ),
+    //  );
+    // }
+    // return map['type'] == "text"
+    //     ? GestureDetector(
+    //         onLongPress: () async {
+    //           if (map['sendby'] == _auth.currentUser!.uid)
+    //           //TODO abh1: Add dialog ui and a warning message that says if you delete the message it will be permanently deleted
+    //           {
+    //             await _firestore
+    //                 .collection('chatroom')
+    //                 .doc(chatDocId)
+    //                 .collection('chats')
+    //                 .doc(chatId)
+    //                 .delete();
+    //           }
+    //         },
+    //         child: Container(
+    //           width: size.width,
+    //           padding: EdgeInsets.symmetric(horizontal: 8),
+    //           child: ChatBubble(
+    //             elevation: 0,
+    //             clipper: map['sendby'] == _auth.currentUser!.uid
+    //                 ? ChatBubbleClipper1(
+    //                     type: BubbleType.sendBubble,
+    //                     radius: 10,
+    //                     nipHeight: 8,
+    //                     nipWidth: 8)
+    //                 : ChatBubbleClipper1(
+    //                     type: BubbleType.receiverBubble,
+    //                     radius: 10,
+    //                     nipHeight: 8,
+    //                     nipWidth: 8),
+    //             alignment: map['sendby'] == _auth.currentUser!.uid
+    //                 ? Alignment.centerRight
+    //                 : Alignment.centerLeft,
+    //             margin: EdgeInsets.only(top: 6),
+    //             backGroundColor: map['sendby'] == _auth.currentUser!.uid
+    //                 ? btnCOlorblue
+    //                 : Colors.white,
+    //             child: Container(
+    //               constraints: BoxConstraints(
+    //                 maxWidth: MediaQuery.of(context).size.width * 0.7,
+    //               ),
+    //               child: Column(
+    //                 crossAxisAlignment: CrossAxisAlignment.start,
+    //                 children: [
+    //                   ExpandableText(
+    //                     map['message'],
+    //                     style: TextStyle(
+    //                       fontSize: 16,
+    //                       fontWeight: FontWeight.w500,
+    //                       color: map['sendby'] == _auth.currentUser!.uid
+    //                           ? Colors.white
+    //                           : Colors.black87,
+    //                     ),
+    //                     expandText: 'more',
+    //                     collapseText: 'hide',
+    //                     linkColor: Colors.grey,
+    //                     maxLines: 15,
+    //                   ),
+    //                   SizedBox(
+    //                     height: 3,
+    //                   ),
+    //                   Text(
+    //                     map['time'] == null
+    //                         ? "sending...."
+    //                         : DateFormat.jm()
+    //                             .format(map['time'].toDate())
+    //                             .toString(),
+    //                     style: TextStyle(
+    //                         fontSize: 9,
+    //                         fontStyle: FontStyle.italic,
+    //                         color: Colors.grey.shade700),
+    //                   )
+    //                 ],
+    //               ),
+    //             ),
+    //           ),
+    //           // child: Container(
+    //           //   padding: EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+    //           //   margin: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
+    //           //   decoration: BoxDecoration(
+    //           //     borderRadius: BorderRadius.circular(15),
+    //           //     color: btnCOlorblue,
+    //           //   ),
+    //           //   child: Text(
+    //           //     map['message'],
+    //           //     style: TextStyle(
+    //           //       fontSize: 16,
+    //           //       fontWeight: FontWeight.w500,
+    //           //       color: Colors.white,
+    //           //     ),
+    //           //   ),
+    //           // ),
+    //         ),
+    //       )
+    //     : GestureDetector(
+    //         onLongPress: () async {
+    //           if (map['sendby'] == _auth.currentUser!.uid)
+    //           //TODO abh1.1: Add dialog ui and a warning message that says if you delete the message it will be permanently deleted
+    //
+    //           {
+    //             await _firestore
+    //                 .collection('chatroom')
+    //                 .doc(chatDocId)
+    //                 .collection('chats')
+    //                 .doc(chatId)
+    //                 .delete();
+    //           }
+    //         },
+    //         child: Container(
+    //           height: size.height / 2.5,
+    //           width: size.width,
+    //           padding: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
+    //           alignment: map['sendby'] == _auth.currentUser!.uid
+    //               ? Alignment.centerRight
+    //               : Alignment.centerLeft,
+    //           child: InkWell(
+    //             onTap: () => Navigator.of(context).push(
+    //               MaterialPageRoute(
+    //                 builder: (_) => ShowImage(
+    //                   imageUrl: map['message'],
+    //                 ),
+    //               ),
+    //             ),
+    //             child: Container(
+    //               padding: EdgeInsets.all(4),
+    //               height: size.height / 2.5,
+    //               width: size.width / 2,
+    //               constraints: BoxConstraints(
+    //                 minHeight: MediaQuery.of(context).size.width / 2,
+    //                 maxWidth: MediaQuery.of(context).size.width * 0.7,
+    //               ),
+    //               decoration: BoxDecoration(
+    //                   color: map['sendby'] == _auth.currentUser!.uid
+    //                       ? btnCOlorblue
+    //                       : Colors.white,
+    //                   borderRadius: BorderRadius.circular(10)),
+    //               alignment: map['message'] != "" ? null : Alignment.center,
+    //               child: map['message'] != ""
+    //                   ? ClipRRect(
+    //                       borderRadius: BorderRadius.circular(10),
+    //                       child: Image.network(
+    //                         map['message'],
+    //                         fit: BoxFit.cover,
+    //                       ),
+    //                     )
+    //                   : CircularProgressIndicator(),
+    //             ),
+    //           ),
+    //         ),
+    //       );
   }
 
   @override
@@ -453,150 +912,217 @@ class _ChatRoomState extends State<ChatRoom> {
                 ],
               ),
             ),
-            body: Stack(
-              children: [
-                Image.asset("images/chat_bg.png",
-                    fit: BoxFit.cover, height: size.height, width: size.width),
-                StreamBuilder(
-                  stream: _firestore
-                      .collection('chatroom')
-                      .doc(chatDocId)
-                      .collection('chats')
-                      .orderBy("time", descending: true)
-                      .snapshots(),
-                  builder: (BuildContext context,
-                      AsyncSnapshot<QuerySnapshot> snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(
-                          child: CircularProgressIndicator(
-                        color: Colors.blue,
-                        strokeWidth: 5.5,
-                      ));
-                    }
-                    if (!snapshot.hasData) {
-                      return Container();
-                    }
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 56.0),
-                      child: ListView.builder(
-                        itemCount: snapshot.data!.docs.length,
-                        shrinkWrap: true,
-                        reverse: true,
-                        physics: BouncingScrollPhysics(),
-                        itemBuilder: (context, index) {
-                          Map<String, dynamic> map = snapshot.data!.docs[index]
-                              .data() as Map<String, dynamic>;
-                          print(snapshot.data!.docs[index].data().toString());
+            body: SafeArea(
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                          image: DecorationImage(
+                        image: AssetImage(
+                          "images/chat_bg.png",
+                        ),
+                        fit: BoxFit.cover,
+                      )),
+                      child: StreamBuilder(
+                        stream: _firestore
+                            .collection('chatroom')
+                            .doc(chatDocId)
+                            .collection('chats')
+                            .orderBy("time", descending: true)
+                            .snapshots(),
+                        builder: (BuildContext context,
+                            AsyncSnapshot<QuerySnapshot> snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(
+                                child: CircularProgressIndicator(
+                              color: Colors.blue,
+                              strokeWidth: 5.5,
+                            ));
+                          }
+                          if (!snapshot.hasData) {
+                            return Container();
+                          }
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 3),
+                            child: ListView.builder(
+                              itemCount: snapshot.data!.docs.length,
+                              shrinkWrap: true,
+                              reverse: true,
+                              physics: BouncingScrollPhysics(),
+                              itemBuilder: (context, index) {
+                                Map<String, dynamic> map =
+                                    snapshot.data!.docs[index].data()
+                                        as Map<String, dynamic>;
+                                print(snapshot.data!.docs[index]
+                                    .data()
+                                    .toString());
 
-                          return messages(
-                            size,
-                            map,
-                            context,
-                            snapshot.data!.docs[index].id.toString(),
+                                return messages(
+                                  size,
+                                  map,
+                                  context,
+                                  snapshot.data!.docs[index].id.toString(),
+                                );
+                              },
+                            ),
                           );
                         },
                       ),
-                    );
-                  },
-                ),
-                Container(
-                  width: size.width,
-                  alignment: Alignment.bottomCenter,
-                  child: Container(
-                    height: size.height / 15.5,
+                    ),
+                  ),
+                  Container(
                     width: size.width,
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(20),
-                            topRight: Radius.circular(20))),
+                    alignment: Alignment.bottomCenter,
                     child: Container(
-                      padding: EdgeInsets.zero,
                       width: size.width,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          Padding(
-                            padding: const EdgeInsets.only(left: 18.0),
-                            child: GestureDetector(
-                                onTap: () {
-                                  print("ema");
-                                  setState(() {
-                                    emojiShow = !emojiShow;
-                                  });
-                                },
-                                child: Icon(CupertinoIcons.smiley_fill)),
-                          ),
-                          Expanded(
-                            child: TextField(
-                              controller: _message,
-                              onTap: () {
-                                print("tapped");
-                              },
-                              minLines: 1,
-                              maxLines: 50,
-                              keyboardType: TextInputType.multiline,
-                              decoration: InputDecoration(
-                                contentPadding: EdgeInsets.symmetric(
-                                    vertical: 10.0, horizontal: 20.0),
-                                hintMaxLines: 1,
-                                hintText: 'Message...',
-                                border: InputBorder.none,
-                              ),
-                            ),
-                          ),
-                          Row(children: [
-                            IconButton(
-                              onPressed: () {},
-                              icon: Icon(
-                                CupertinoIcons.mic_fill,
-                                size: 22,
-                              ),
-                            ),
-                            IconButton(
-                              icon: Icon(
-                                FontAwesomeIcons.solidImage,
-                                size: 20,
-                              ),
-                              onPressed: () => getImage(),
-                            ),
-                            SizedBox(
-                              width: 5,
-                            ),
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(20),
+                              topRight: Radius.circular(20))),
+                      child: Container(
+                        padding: EdgeInsets.zero,
+                        width: size.width,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
                             Padding(
-                              padding: const EdgeInsets.fromLTRB(0, 8, 14, 8),
-                              child: SizedBox(
-                                height: 40,
-                                width: 40,
-                                child: DecoratedBox(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(25),
-                                    color: btnCOlorblue,
-                                  ),
-                                  child: Container(
-                                    child: Transform.rotate(
-                                      angle: 45 * math.pi / 180,
-                                      child: IconButton(
-                                          icon: Icon(
-                                            FontAwesomeIcons.solidPaperPlane,
-                                            color: Colors.white,
-                                            size: 15,
-                                          ),
-                                          onPressed: () {
-                                            onSendMessage();
-                                          }),
+                              padding: const EdgeInsets.only(left: 18.0),
+                              child: GestureDetector(
+                                  onTap: () {
+                                    print("ema");
+                                    setState(() {
+                                      emojiShowing = !emojiShowing;
+                                      if (emojiShowing == true) {
+                                        focusNode?.unfocus();
+                                      } else {
+                                        focusNode?.requestFocus();
+                                      }
+                                    });
+                                  },
+                                  child: emojiShowing == true
+                                      ? Icon(CupertinoIcons.keyboard)
+                                      : Icon(CupertinoIcons.smiley_fill)),
+                            ),
+                            Expanded(
+                              child: TextField(
+                                focusNode: focusNode,
+                                controller: _message,
+                                onTap: () {
+                                  print("tapped");
+                                  focusNode?.requestFocus();
+                                  emojiShowing = false;
+                                },
+                                minLines: 1,
+                                maxLines: 50,
+                                keyboardType: TextInputType.multiline,
+                                decoration: InputDecoration(
+                                  contentPadding: EdgeInsets.symmetric(
+                                      vertical: 10.0, horizontal: 20.0),
+                                  hintMaxLines: 1,
+                                  hintText: 'Message...',
+                                  border: InputBorder.none,
+                                ),
+                              ),
+                            ),
+                            Row(children: [
+                              //TODO: Adding the mic functionality and send audio file
+                              // IconButton(
+                              //   onPressed: () {},
+                              //   icon: Icon(
+                              //     CupertinoIcons.mic_fill,
+                              //     size: 22,
+                              //   ),
+                              // ),
+                              IconButton(
+                                icon: Icon(
+                                  FontAwesomeIcons.solidImage,
+                                  size: 20,
+                                ),
+                                onPressed: () => getImage(),
+                              ),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(0, 8, 14, 8),
+                                child: SizedBox(
+                                  height: 40,
+                                  width: 40,
+                                  child: DecoratedBox(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(25),
+                                      color: btnCOlorblue,
+                                    ),
+                                    child: Container(
+                                      child: Transform.rotate(
+                                        angle: 45 * math.pi / 180,
+                                        child: IconButton(
+                                            icon: Icon(
+                                              FontAwesomeIcons.solidPaperPlane,
+                                              color: Colors.white,
+                                              size: 15,
+                                            ),
+                                            onPressed: () {
+                                              onSendMessage();
+                                            }),
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ])
-                        ],
+                            ])
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                  Offstage(
+                    offstage: !emojiShowing,
+                    child: SizedBox(
+                        height: 250,
+                        child: EmojiPicker(
+                          textEditingController: _message,
+                          onBackspacePressed: () {
+                            Navigator.pop(context);
+                          },
+                          config: Config(
+                            columns: 7,
+                            // Issue: https://github.com/flutter/flutter/issues/28894
+                            verticalSpacing: 0,
+                            horizontalSpacing: 0,
+                            emojiSizeMax: 32,
+                            gridPadding: EdgeInsets.zero,
+                            initCategory: Category.RECENT,
+                            bgColor: const Color(0xFFF2F2F2),
+                            indicatorColor: Colors.blue,
+                            iconColor: Colors.grey,
+                            iconColorSelected: Colors.blue,
+                            backspaceColor: Colors.blue,
+                            skinToneDialogBgColor: Colors.white,
+                            skinToneIndicatorColor: Colors.grey,
+                            enableSkinTones: true,
+                            showRecentsTab: true,
+                            recentsLimit: 28,
+                            replaceEmojiOnLimitExceed: false,
+                            noRecents: const Text(
+                              'No Recents',
+                              style: TextStyle(
+                                  fontSize: 20, color: Colors.black26),
+                              textAlign: TextAlign.center,
+                            ),
+                            loadingIndicator: const SizedBox.shrink(),
+                            tabIndicatorAnimDuration: kTabScrollDuration,
+                            categoryIcons: const CategoryIcons(),
+                            buttonMode: ButtonMode.MATERIAL,
+                            checkPlatformCompatibility: true,
+                          ),
+                        )),
+                  ),
+                ],
+              ),
             ),
           );
   }
