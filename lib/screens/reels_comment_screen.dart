@@ -93,6 +93,7 @@ class _ReelsCommentsScreenState extends State<ReelsCommentsScreen> {
             itemCount: snapshot.data!.docs.length,
             itemBuilder: (ctx, index) => CommentCard(
               snap: snapshot.data!.docs[index],
+              postId: widget.postId.toString(),
             ),
           );
         },

@@ -15,7 +15,17 @@ class InternshipCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2.5),
       child: GestureDetector(
-        onTap: onpressed,
+        onTap: () async {
+          final url = snap["applylink"].toString();
+          if (await canLaunch(url)) {
+            await launch(
+              url,
+              forceWebView: true,
+              enableJavaScript: true,
+              enableDomStorage: true,
+            );
+          }
+        },
         child: Card(
           clipBehavior: Clip.antiAlias,
           elevation: 0,

@@ -69,24 +69,29 @@ class CourseItem extends StatelessWidget {
                         height: 10.h,
                       ),
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
                             snap["certificationlevel"].toString() +
                                 ' | ' +
-                                snap["coursetiming"].toString(),
+                                snap["coursetiming"].toString() +
+                                ' | ',
                             // 'Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled.',
                             maxLines: 4,
                             style: TextStyle(
                                 fontSize: 11.sp, color: Colors.black54),
                           ),
-                          if (isReg == true)
-                            Text(
-                              "Registered",
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Text(
+                              " \u{20B9} " + snap["price"].toString(),
                               style: TextStyle(
-                                  fontSize: 15.sp,
-                                  color: Colors.green,
-                                  fontStyle: FontStyle.italic),
+                                  fontSize: 14.sp,
+                                  color: Colors.deepOrange,
+                                  fontWeight: FontWeight.w700),
                             ),
+                          ),
                         ],
                       ),
                     ],

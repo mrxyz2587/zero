@@ -137,7 +137,9 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Color(0xFFEFEFEF),
+        backgroundColor: Color(0xFFFCFCFC),
+
+        // backgroundColor: Color(0xFFEFEFEF),
         appBar: AppBar(
           elevation: 0.5,
           backgroundColor: mobileBackgroundColor,
@@ -194,6 +196,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 setState(() {
                   isShowUsers = false;
                   isTrue = false;
+                  selectedText = " ";
                 });
               },
             ),
@@ -204,6 +207,7 @@ class _SearchScreenState extends State<SearchScreen> {
             ? ListView(
                 children: [
                   Container(
+                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 30),
                     child: GestureDetector(
                       onTap: () {
                         showDialog(
@@ -226,8 +230,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                           "Computer Sciences & Engineering"),
                                       onPressed: () {
                                         setState(() {
-                                          selectedText =
-                                              "Computer Sciences & Engineering";
+                                          selectedText = "B.Tech CSE-AIML";
                                         });
                                         Navigator.pop(context);
                                       }),
@@ -245,8 +248,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                       child: Text("Mechanical  Engineering"),
                                       onPressed: () {
                                         setState(() {
-                                          selectedText =
-                                              "Mechanical  Engineering";
+                                          selectedText = "B.tech ME-ROBO";
                                         });
                                         Navigator.pop(context);
                                       }),
@@ -368,12 +370,11 @@ class _SearchScreenState extends State<SearchScreen> {
                           },
                         );
                       },
-                      child: Padding(
-                        padding: const EdgeInsets.all(25),
-                        child: Text(
-                          "Filter",
-                          textAlign: TextAlign.end,
-                        ),
+                      child: Text(
+                        "Filter",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, color: btnCOlorblue),
+                        textAlign: TextAlign.end,
                       ),
                     ),
                   ),
@@ -503,6 +504,8 @@ class _SearchScreenState extends State<SearchScreen> {
                                                           icon: Icon(
                                                             FontAwesomeIcons
                                                                 .userCheck,
+                                                            color: Color(
+                                                                0xFF78CD00),
                                                             size: 20,
                                                           ),
                                                         )
@@ -625,13 +628,20 @@ class _SearchScreenState extends State<SearchScreen> {
                                     radius: 16,
                                   ),
                                   subtitle: Text(
-                                    (snapshot.data! as dynamic).docs[index]
-                                        ['university'],
-                                  ),
+                                      (snapshot.data! as dynamic).docs[index]
+                                          ['university'],
+                                      style: TextStyle(
+                                          color: Colors.black54,
+                                          fontSize: 13,
+                                          fontFamily: 'Roboto')),
                                   title: Text(
-                                    (snapshot.data! as dynamic).docs[index]
-                                        ['username'],
-                                  ),
+                                      (snapshot.data! as dynamic).docs[index]
+                                          ['username'],
+                                      style: TextStyle(
+                                          color: Color(0xFF000000),
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w700,
+                                          fontFamily: 'Roboto')),
                                 ),
                               );
                             },
@@ -713,57 +723,81 @@ class _SearchScreenState extends State<SearchScreen> {
                                   i++;
                                 }
 
-                                return distanceInMeters < 100
+                                return Geolocator.distanceBetween(
+                                            latitude,
+                                            longitude,
+                                            otherlatitude,
+                                            otherlongitude) <
+                                        100
                                     ? Align(
                                         alignment: Alignment.topLeft,
                                         child: Padding(
                                           padding: const EdgeInsets.only(
-                                              top: 10, left: 20.0, bottom: 5),
-                                          child: Container(
-                                            color: Colors.white,
-                                            padding: EdgeInsets.all(4),
-                                            child: Column(
-                                              children: [
-                                                Stack(
-                                                  children: [
-                                                    CircleAvatar(
-                                                      backgroundImage:
-                                                          NetworkImage(
-                                                        (snapshot.data!
-                                                                as dynamic)
-                                                            .docs[index]
-                                                                ['photoUrl']
-                                                            .toString(),
+                                              top: 10, bottom: 5),
+                                          child: InkWell(
+                                            onTap: () {
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          ProfileScreen(
+                                                            uid: (snapshot.data!
+                                                                    as dynamic)
+                                                                .docs[index]
+                                                                    ['uid']
+                                                                .toString(),
+                                                          )));
+                                            },
+                                            child: Container(
+                                              padding: EdgeInsets.all(4),
+                                              width: 100,
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                children: [
+                                                  Stack(
+                                                    children: [
+                                                      CircleAvatar(
+                                                        backgroundImage:
+                                                            NetworkImage(
+                                                          (snapshot.data!
+                                                                  as dynamic)
+                                                              .docs[index]
+                                                                  ['photoUrl']
+                                                              .toString(),
+                                                        ),
+                                                        radius: 30,
                                                       ),
-                                                      radius: 30,
-                                                    ),
-                                                    Positioned(
-                                                      bottom: 3,
-                                                      right: 6,
-                                                      child: Container(
-                                                        decoration: BoxDecoration(
-                                                            color: btnCOlorblue,
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        10),
-                                                            border: Border.all(
-                                                                color: Colors
-                                                                    .white,
-                                                                width: 1)),
-                                                        constraints:
-                                                            BoxConstraints
-                                                                .tight(Size
-                                                                    .fromRadius(
-                                                                        5)),
-                                                      ),
-                                                    )
-                                                  ],
-                                                ),
-                                                SizedBox(
-                                                  height: 8,
-                                                ),
-                                                Text(
+                                                      Positioned(
+                                                        bottom: 3,
+                                                        right: 6,
+                                                        child: Container(
+                                                          decoration: BoxDecoration(
+                                                              color:
+                                                                  btnCOlorblue,
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          10),
+                                                              border: Border.all(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  width: 1)),
+                                                          constraints:
+                                                              BoxConstraints
+                                                                  .tight(Size
+                                                                      .fromRadius(
+                                                                          5)),
+                                                        ),
+                                                      )
+                                                    ],
+                                                  ),
+                                                  SizedBox(
+                                                    height: 8,
+                                                  ),
+                                                  Text(
                                                     (snapshot.data! as dynamic)
                                                         .docs[index]['username']
                                                         .toString(),
@@ -773,8 +807,12 @@ class _SearchScreenState extends State<SearchScreen> {
                                                         fontSize: 10,
                                                         fontWeight:
                                                             FontWeight.w700,
-                                                        fontFamily: 'Roboto')),
-                                              ],
+                                                        fontFamily: 'Roboto'),
+                                                    maxLines: 1,
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ),

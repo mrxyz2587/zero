@@ -2,6 +2,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../resources/firebase_dynamic_links.dart';
 import '/utils/colors.dart';
 import '/utils/global_variable.dart';
 
@@ -20,6 +21,8 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
   void initState() {
     super.initState();
     pageController = PageController();
+    FirebaseDynamicLinksService.initDynamicLink(context);
+    print('homeScreenCalled');
     FirebaseMessaging.onMessage.listen((event) {
       print("Fcm Recieved");
     });

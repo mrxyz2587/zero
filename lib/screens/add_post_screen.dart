@@ -30,6 +30,8 @@ class _AddPostScreenState extends State<AddPostScreen> {
   final TextEditingController _descriptionController = TextEditingController();
   var name;
 
+  String selectedText = "Edit Privacy";
+
   @override
   void initState() {
     super.initState();
@@ -227,7 +229,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
                                       borderRadius: BorderRadius.circular(5))),
                               onPressed: () {},
                               child: Text(
-                                'Edit Privacy',
+                                selectedText.toString(),
                                 style: TextStyle(
                                     color: Colors.lightBlue,
                                     fontWeight: FontWeight.bold,
@@ -450,9 +452,48 @@ class _AddPostScreenState extends State<AddPostScreen> {
                                     width: 1.2, color: Color(0xFF000000)),
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(5))),
-                            onPressed: () {},
+                            onPressed: () => showDialog(
+                              useSafeArea: true,
+                              useRootNavigator: false,
+                              context: context,
+                              builder: (context) {
+                                return Dialog(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      SimpleDialogOption(
+                                        child: Text("All"),
+                                        onPressed: () {
+                                          setState(() {
+                                            selectedText = "All";
+                                          });
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                      SimpleDialogOption(
+                                          child: Text(" Only Students"),
+                                          onPressed: () {
+                                            setState(() {
+                                              selectedText = "Only Students";
+                                            });
+                                            Navigator.pop(context);
+                                          }),
+                                      SimpleDialogOption(
+                                          child: Text("Only Faculty"),
+                                          onPressed: () {
+                                            setState(() {
+                                              selectedText = "Only Faculty";
+                                            });
+                                            Navigator.pop(context);
+                                          }),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
                             child: Text(
-                              'Edit Privacy',
+                              selectedText.toString(),
                               style: TextStyle(
                                   color: Color(0xFF232323),
                                   fontWeight: FontWeight.bold,

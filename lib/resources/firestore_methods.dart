@@ -11,7 +11,7 @@ import 'package:uuid/uuid.dart';
 
 class FireStoreMethods {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
+  final _currentUserUid = FirebaseAuth.instance.currentUser!.uid.toString();
   Future<String> uploadReels(
     String description,
     File file,
@@ -84,6 +84,25 @@ class FireStoreMethods {
     return res;
   }
 
+  Future<String> uploadReportsOnPost(String postId, String reportingUseruserId,
+      String usermailIdposting) async {
+    try {
+      _firestore
+          .collection('reports')
+          .doc(reportingUseruserId)
+          .collection('posts')
+          .doc(postId)
+          .set({
+        'postId': postId,
+        'reportingUserId': reportingUseruserId,
+        'postinguseruid': usermailIdposting
+      });
+      return ' ';
+    } catch (e) {
+      return 'error aa gaya';
+    }
+  }
+
   Future<String> UploadResume(File file) async {
     String res = "Some error occurred";
     try {
@@ -92,6 +111,64 @@ class FireStoreMethods {
       res = "success";
     } catch (e) {
       res = e.toString();
+    }
+    return res;
+  }
+
+  Future<String> updateNotifications(
+      String postUid,
+      String currentUsername,
+      String type,
+      String postId,
+      List likes,
+      String uid,
+      String photoUrl) async {
+    if (likes.contains(uid) && type == 'liked') {
+    } else {
+      await _firestore
+          .collection('notifications')
+          .doc(postUid)
+          .collection('allNotifications')
+          .add({
+        'username': currentUsername,
+        'type': type,
+        'postId': postId,
+        'uidcurrent': uid,
+        'photoUrl': photoUrl,
+        'time': DateTime.now()
+      });
+    }
+
+    return '';
+  }
+
+  Future<String> likeComment(
+      String commentId, String uid, List likes, String postId) async {
+    String res = "Some error occurred";
+    try {
+      if (likes.contains(uid)) {
+        // if the likes list contains the user uid, we need to remove it
+        _firestore
+            .collection('posts')
+            .doc(postId)
+            .collection('comments')
+            .doc(commentId)
+            .update({
+          'likes': FieldValue.arrayRemove([uid])
+        });
+      } else {
+        _firestore
+            .collection('posts')
+            .doc(postId)
+            .collection('comments')
+            .doc(commentId)
+            .update({
+          'likes': FieldValue.arrayUnion([uid])
+        });
+      }
+      res = 'success';
+    } catch (err) {
+      res = err.toString();
     }
     return res;
   }
@@ -139,6 +216,20 @@ class FireStoreMethods {
     return res;
   }
 
+  Future<String> pinnedEvents(String eventId, List savedItem) async {
+    if (savedItem.contains(_currentUserUid)) {
+      await _firestore.collection('events').doc(eventId).update({
+        'saves': FieldValue.arrayRemove([_currentUserUid])
+      });
+    } else {
+      await _firestore.collection('events').doc(eventId).update({
+        'saves': FieldValue.arrayUnion([_currentUserUid])
+      });
+    }
+
+    return '';
+  }
+
   Future<String> SavedPosts(String postId, String uid, List saved) async {
     String res = "Some error occurred";
     try {
@@ -163,8 +254,14 @@ class FireStoreMethods {
   }
 
   // Post comment
-  Future<String> postComment(String postId, String text, String uid,
-      String name, String profilePic, Future functions) async {
+  Future<String> postComment(
+      String postId,
+      String text,
+      String uid,
+      String name,
+      String profilePic,
+      Future functions,
+      String universityname) async {
     String res = "Some error occurred";
     try {
       if (text.isNotEmpty) {
@@ -182,6 +279,8 @@ class FireStoreMethods {
           'text': text,
           'commentId': commentId,
           'datePublished': DateTime.now(),
+          'universityname': universityname,
+          'likes': []
         });
         res = 'success';
         functions;

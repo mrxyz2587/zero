@@ -1,9 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:zero_fin/resources/firebase_dynamic_links.dart';
 import 'package:zero_fin/screens/testing-screen.dart';
 import 'package:zero_fin/utils/local_notification_services.dart';
 import '/providers/user_provider.dart';
@@ -31,6 +33,7 @@ void main() async {
   } else {
     await Firebase.initializeApp();
   }
+
   FirebaseMessaging.onBackgroundMessage(_handleBackgroundMessage);
   LocalNotificationService.initialize();
   runApp(const MyApp());

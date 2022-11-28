@@ -1,7 +1,12 @@
+import 'package:clipboard/clipboard.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expandable_text/expandable_text.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:zero_fin/resources/firebase_dynamic_links.dart';
 import '../screens/edit_post_screen.dart';
 import '../screens/profile_screen.dart';
@@ -20,11 +25,10 @@ import 'package:http/http.dart' as http;
 
 class PostCard extends StatefulWidget {
   final snap;
-  final Function()? onshareingbtnPressed;
+
   const PostCard({
     Key? key,
     required this.snap,
-    required this.onshareingbtnPressed,
   }) : super(key: key);
 
   @override
@@ -35,7 +39,14 @@ class _PostCardState extends State<PostCard> {
   int commentLen = 0;
   bool isLikeAnimating = false;
   bool issaved = false;
+  bool isSended = false;
+  CollectionReference chats = FirebaseFirestore.instance.collection("chatroom");
+
   String tokenpst = '';
+
+  final currentUid = FirebaseAuth.instance.currentUser!.uid;
+
+  var chatDocId;
   @override
   void initState() {
     super.initState();
@@ -129,16 +140,24 @@ class _PostCardState extends State<PostCard> {
                     onTap: () {
                       setState(() {});
                     },
-                    onFieldSubmitted: (String _) {
+                    onChanged: (String _) {
                       setState(() {});
                       print(_);
                     },
                   ),
                 ),
                 StreamBuilder(
-                  stream: FirebaseFirestore.instance
-                      .collection('users')
-                      .snapshots(),
+                  stream: searchController.text.toString() == ""
+                      ? FirebaseFirestore.instance
+                          .collection('users')
+                          .where('uid', isNotEqualTo: currentUid)
+                          .snapshots()
+                      : FirebaseFirestore.instance
+                          .collection('users')
+                          .where('username',
+                              isGreaterThanOrEqualTo:
+                                  searchController.text.toString())
+                          .snapshots(),
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
                       return const Center(
@@ -157,22 +176,66 @@ class _PostCardState extends State<PostCard> {
                             child: SizedBox(
                               height: 60,
                               child: ListTile(
-                                trailing: TextButton(
-                                    style: ElevatedButton.styleFrom(
-                                        backgroundColor: btnCOlorblue,
-                                        minimumSize: Size(75, 12),
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(8))),
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
-                                    child: Text(
-                                      "Send",
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w700),
-                                    )),
+                                trailing:
+                                    // isSended == false
+                                    //     ?
+                                    (snapshot.data! as dynamic)
+                                                .docs[index]['uid']
+                                                .toString() !=
+                                            currentUid
+                                        ? TextButton(
+                                            style: ElevatedButton.styleFrom(
+                                                backgroundColor: btnCOlorblue,
+                                                minimumSize: Size(75, 12),
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8))),
+                                            onPressed: () {
+                                              getDataOfChats(
+                                                  (snapshot.data! as dynamic)
+                                                      .docs[index]['uid']
+                                                      .toString());
+                                              Fluttertoast.showToast(
+                                                  msg: "Post sent ",
+                                                  toastLength:
+                                                      Toast.LENGTH_SHORT,
+                                                  gravity: ToastGravity.BOTTOM,
+                                                  timeInSecForIosWeb: 1,
+                                                  backgroundColor:
+                                                      Colors.black87,
+                                                  textColor: Colors.white,
+                                                  fontSize: 16);
+                                            },
+                                            child: Text(
+                                              isSended == false
+                                                  ? "Send"
+                                                  : "sent",
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.w700),
+                                            ))
+                                        : SizedBox()
+                                // : TextButton(
+                                //     style: ElevatedButton.styleFrom(
+                                //         backgroundColor:
+                                //             Colors.grey.shade300,
+                                //         minimumSize: Size(75, 12),
+                                //         shape: RoundedRectangleBorder(
+                                //             borderRadius:
+                                //                 BorderRadius.circular(8))),
+                                //     onPressed: () {
+                                //       setState(() {
+                                //         isSended = !isSended;
+                                //       });
+                                //     },
+                                //     child: Text(
+                                //       "sent",
+                                //       style: TextStyle(
+                                //           color: Colors.black54,
+                                //           fontWeight: FontWeight.w700),
+                                //     ))
+                                ,
                                 title: Text(
                                     (snapshot.data! as dynamic)
                                         .docs[index]['username']
@@ -201,7 +264,7 @@ class _PostCardState extends State<PostCard> {
                           )),
                     );
                   },
-                )
+                ),
               ],
             ),
           ),
@@ -210,7 +273,7 @@ class _PostCardState extends State<PostCard> {
     );
   }
 
-  bottomSheetforlike(context, String txt) {
+  bottomSheetforlike(context, String txt, List likedUid) {
     showModalBottomSheet(
       enableDrag: true,
       isScrollControlled: true,
@@ -282,7 +345,6 @@ class _PostCardState extends State<PostCard> {
                       setState(() {});
                     },
                     onFieldSubmitted: (String _) {
-                      setState(() {});
                       print(_);
                     },
                   ),
@@ -294,7 +356,7 @@ class _PostCardState extends State<PostCard> {
                     Padding(
                       padding: const EdgeInsets.only(left: 14),
                       child: Text(
-                        'Liked by',
+                        'LIKED BY',
                         style: TextStyle(
                             fontWeight: FontWeight.w700, fontSize: 15),
                       ),
@@ -302,7 +364,8 @@ class _PostCardState extends State<PostCard> {
                     Padding(
                       //TODO Wanted to use positioned widgit to make this at corner.
                       padding: const EdgeInsets.only(left: 240.0),
-                      child: Text('12 likes', style: TextStyle(fontSize: 15)),
+                      child: Text(likedUid.length.toString() + " likes",
+                          style: TextStyle(fontSize: 15)),
                     ),
                   ],
                 ),
@@ -314,9 +377,15 @@ class _PostCardState extends State<PostCard> {
                   color: Color(0xFFD9D8D8),
                 ),
                 StreamBuilder(
-                  stream: FirebaseFirestore.instance
-                      .collection('users')
-                      .snapshots(),
+                  stream: searchController.text == ""
+                      ? FirebaseFirestore.instance
+                          .collection('users')
+                          .snapshots()
+                      : FirebaseFirestore.instance
+                          .collection('users')
+                          .where('username',
+                              isGreaterThanOrEqualTo: searchController.text)
+                          .snapshots(),
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
                       return const Center(
@@ -328,108 +397,146 @@ class _PostCardState extends State<PostCard> {
                       shrinkWrap: true,
                       physics: ClampingScrollPhysics(),
                       itemCount: (snapshot.data! as dynamic).docs.length,
-                      itemBuilder: (context, index) => Align(
-                          child: Container(
-                        color: Colors.white,
-                        child: SizedBox(
-                          height: 60,
-                          child: Container(
-                            child: Expanded(
-                              child: Row(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 20),
-                                    child: CircleAvatar(
-                                      backgroundImage: NetworkImage(
-                                        (snapshot.data! as dynamic)
-                                            .docs[index]['photoUrl']
-                                            .toString(),
-                                      ),
-                                      radius: 20,
-                                    ),
+                      itemBuilder: (context, index) => likedUid.contains(
+                              (snapshot.data! as dynamic)
+                                  .docs[index]['uid']
+                                  .toString())
+                          ? Align(
+                              child: GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ProfileScreen(
+                                        uid: (snapshot.data! as dynamic)
+                                            .docs[index]['uid']
+                                            .toString()),
                                   ),
-                                  SizedBox(
-                                    width: 3,
-                                  ),
-                                  Expanded(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(12.0),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
+                                );
+                              },
+                              child: Container(
+                                color: Colors.white,
+                                child: SizedBox(
+                                  child: Container(
+                                    child: Expanded(
+                                      child: Row(
                                         children: [
-                                          Text(
-                                              (snapshot.data! as dynamic)
-                                                  .docs[index]['username']
-                                                  .toString(),
-                                              style: TextStyle(
-                                                  color: Color(0xFF000000),
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.w700,
-                                                  fontFamily: 'Roboto')),
-                                          SizedBox(
-                                            height: 3,
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 20),
+                                            child: CircleAvatar(
+                                              backgroundImage: NetworkImage(
+                                                (snapshot.data! as dynamic)
+                                                    .docs[index]['photoUrl']
+                                                    .toString(),
+                                              ),
+                                              radius: 22,
+                                            ),
                                           ),
-                                          Text(
-                                              (snapshot.data! as dynamic)
-                                                  .docs[index]['university']
-                                                  .toString(),
-                                              style: TextStyle(
-                                                  color: Colors.black54,
-                                                  fontSize: 13,
-                                                  fontFamily: 'Roboto')),
+                                          SizedBox(
+                                            width: 3,
+                                          ),
+                                          Expanded(
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(12.0),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Text(
+                                                      (snapshot.data!
+                                                              as dynamic)
+                                                          .docs[index]
+                                                              ['username']
+                                                          .toString(),
+                                                      style: TextStyle(
+                                                          color:
+                                                              Color(0xFF000000),
+                                                          fontSize: 15,
+                                                          fontWeight:
+                                                              FontWeight.w700,
+                                                          fontFamily:
+                                                              'Roboto')),
+                                                  SizedBox(
+                                                    height: 3,
+                                                  ),
+                                                  Text(
+                                                      (snapshot.data!
+                                                              as dynamic)
+                                                          .docs[index]
+                                                              ['university']
+                                                          .toString(),
+                                                      style: TextStyle(
+                                                          color: Colors.black54,
+                                                          fontSize: 13,
+                                                          fontFamily:
+                                                              'Roboto')),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                right: 10),
+                                            child: Row(
+                                              children: [
+                                                SizedBox(
+                                                  width: 10,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          TextButton(
+                                              style: TextButton.styleFrom(
+                                                padding: EdgeInsets.zero,
+                                                minimumSize: Size(80, 30),
+                                                backgroundColor: btnCOlorblue,
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                            Radius.circular(
+                                                                7))),
+                                              ),
+                                              onPressed: () async {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        ProfileScreen(
+                                                      uid: (snapshot.data!
+                                                              as dynamic)
+                                                          .docs[index]['uid']
+                                                          .toString(),
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              // color: btnCOlorblue,
+                                              child: Text(
+                                                'View',
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.w700,
+                                                    fontSize: 14,
+                                                    color: Colors.white),
+                                              )),
+                                          Row(
+                                            children: [
+                                              SizedBox(
+                                                width: 15,
+                                              ),
+                                            ],
+                                          )
                                         ],
                                       ),
                                     ),
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(right: 13),
-                                    child: Row(
-                                      children: [
-                                        IconButton(
-                                          style: ElevatedButton.styleFrom(
-                                              backgroundColor: btnCOlorblue,
-                                              minimumSize: Size(50, 12),
-                                              shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          7))),
-                                          onPressed:
-                                              () {}, //TODO 2. button action
-                                          icon: Icon(
-                                            FontAwesomeIcons.userPlus,
-                                            size: 20,
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          width: 10,
-                                        ),
-                                        IconButton(
-                                          style: ElevatedButton.styleFrom(
-                                              backgroundColor: btnCOlorblue,
-                                              minimumSize: Size(50, 12),
-                                              shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          7))),
-                                          onPressed:
-                                              () {}, //TODO 2. button action
-                                          icon: Icon(
-                                            FontAwesomeIcons.solidPaperPlane,
-                                            size: 20,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                ],
+                                ),
                               ),
-                            ),
-                          ),
-                        ),
-                      )),
+                            ))
+                          : Container(),
                     );
                   },
                 )
@@ -515,72 +622,91 @@ class _PostCardState extends State<PostCard> {
                       ),
                     ),
                     SizedBox(width: 18),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                                color: Colors.white,
-                                border: Border.all(
-                                  color: Colors.black87,
+                    GestureDetector(
+                      onTap: () async {
+                        String generatedDeepLink =
+                            await FirebaseDynamicLinksService.createDynamicLink(
+                                widget.snap['postId'].toString());
+                        Share.share(
+                          generatedDeepLink,
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  border: Border.all(
+                                    color: Colors.black87,
+                                  ),
+                                  borderRadius: BorderRadius.circular(25)),
+                              child: Padding(
+                                padding: const EdgeInsets.all(15.0),
+                                child: Icon(
+                                  FontAwesomeIcons.shareNodes,
+                                  size: 18,
+                                  color: Colors.black,
                                 ),
-                                borderRadius: BorderRadius.circular(25)),
-                            child: Padding(
-                              padding: const EdgeInsets.all(15.0),
-                              child: Icon(
-                                FontAwesomeIcons.shareNodes,
-                                size: 18,
-                                color: Colors.black,
                               ),
                             ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text('Share',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                  color: Color(0xFF000000),
-                                  fontSize: 13,
-                                )),
-                          ),
-                        ],
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text('Share',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    color: Color(0xFF000000),
+                                    fontSize: 13,
+                                  )),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     SizedBox(width: 18),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                                color: Colors.white,
-                                border: Border.all(
-                                  color: Colors.black87,
+                    GestureDetector(
+                      onTap: () async {
+                        String generatedDeepLink =
+                            await FirebaseDynamicLinksService.createDynamicLink(
+                                widget.snap['postId'].toString());
+                        FlutterClipboard.copy(generatedDeepLink)
+                            .then((value) => print('copied'));
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  border: Border.all(
+                                    color: Colors.black87,
+                                  ),
+                                  borderRadius: BorderRadius.circular(25)),
+                              child: Padding(
+                                padding: const EdgeInsets.all(15.0),
+                                child: Icon(
+                                  FontAwesomeIcons.link,
+                                  size: 18,
+                                  color: Colors.black,
                                 ),
-                                borderRadius: BorderRadius.circular(25)),
-                            child: Padding(
-                              padding: const EdgeInsets.all(15.0),
-                              child: Icon(
-                                FontAwesomeIcons.link,
-                                size: 18,
-                                color: Colors.black,
                               ),
                             ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text('Link',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                    color: Color(0xFF000000),
-                                    fontSize: 13)),
-                          ),
-                        ],
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text('Link',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xFF000000),
+                                      fontSize: 13)),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],
@@ -659,6 +785,7 @@ class _PostCardState extends State<PostCard> {
                         children: [
                           InkWell(
                             onTap: () {
+                              print('pressed');
                               bottomSheetforshare(context, 'txt');
                             },
                             child: Container(
@@ -693,11 +820,13 @@ class _PostCardState extends State<PostCard> {
                     SizedBox(width: 18),
                     GestureDetector(
                       onTap: () async {
-                        print('louda');
-
+                        print('tapped to generate link\n\n\n\n');
                         String generatedDeepLink =
                             await FirebaseDynamicLinksService.createDynamicLink(
-                                widget.snap.toString());
+                                widget.snap['postId'].toString());
+                        Share.share(
+                          generatedDeepLink,
+                        );
                         print(generatedDeepLink.toString());
                       },
                       child: Padding(
@@ -736,47 +865,66 @@ class _PostCardState extends State<PostCard> {
                       ),
                     ),
                     SizedBox(width: 18),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                                color: Colors.white,
-                                border: Border.all(
-                                  color: Colors.black87,
+                    GestureDetector(
+                      onTap: () async {
+                        String generatedDeepLink =
+                            await FirebaseDynamicLinksService.createDynamicLink(
+                                widget.snap['postId'].toString());
+                        FlutterClipboard.copy(generatedDeepLink)
+                            .then((value) => print('copied'));
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  border: Border.all(
+                                    color: Colors.black87,
+                                  ),
+                                  borderRadius: BorderRadius.circular(25)),
+                              child: Padding(
+                                padding: const EdgeInsets.all(15.0),
+                                child: Icon(
+                                  FontAwesomeIcons.link,
+                                  size: 18,
+                                  color: Colors.black,
                                 ),
-                                borderRadius: BorderRadius.circular(25)),
-                            child: Padding(
-                              padding: const EdgeInsets.all(15.0),
-                              child: Icon(
-                                FontAwesomeIcons.link,
-                                size: 18,
-                                color: Colors.black,
                               ),
                             ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text('Link',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                    color: Color(0xFF000000),
-                                    fontSize: 13)),
-                          ),
-                        ],
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text('Link',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xFF000000),
+                                      fontSize: 13)),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],
                 ),
                 Divider(thickness: 0.5, color: Colors.black12),
                 ListTile(
-                  title: Text('Hide',
-                      style: TextStyle(color: Color(0xFF000000), fontSize: 17)),
-                ),
-                ListTile(
+                  onTap: () {
+                    FireStoreMethods().uploadReportsOnPost(
+                        widget.snap['postId'],
+                        FirebaseAuth.instance.currentUser!.uid.toString(),
+                        widget.snap['uid']);
+                    Fluttertoast.showToast(
+                        msg: "Post Reported ",
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.CENTER,
+                        timeInSecForIosWeb: 1,
+                        backgroundColor: Colors.black12,
+                        textColor: Colors.white,
+                        fontSize: 16);
+                  },
                   title: Text('Report',
                       style: TextStyle(color: Colors.red, fontSize: 17)),
                 ),
@@ -876,7 +1024,6 @@ class _PostCardState extends State<PostCard> {
         ),
         child: Column(
           children: [
-            // HEADER SECTION OF THE POST
             Container(
               padding: const EdgeInsets.symmetric(
                 vertical: 4,
@@ -1072,6 +1219,32 @@ class _PostCardState extends State<PostCard> {
                   collapseText: 'show less',
                   maxLines: 3,
                   linkColor: btnCOlorblue,
+                  urlStyle: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF0B57A4),
+                      fontSize: 14),
+                  onUrlTap: (url) async {
+                    if (url.contains("https://www.")) {
+                      if (await canLaunch(url)) {
+                        await launch(url);
+                      }
+                    } else if (!url.contains("https://www.")) {
+                      if (await canLaunch("https://www." + url)) {
+                        await launch("https://www." + url);
+                      }
+                    } else if (url.contains("https://") &&
+                        !url.contains("https://www.")) {
+                      if (await canLaunch("www." + url)) {
+                        await launch("www." + url);
+                      }
+                    } else if (!url.contains("https://") &&
+                        url.contains("www.")) {
+                      if (await canLaunch("https://" + url)) {
+                        await launch("https://" + url);
+                      }
+                    }
+                  },
+
                   textAlign: TextAlign.justify,
                   // text: TextSpan(
                   //   text: ' ${widget.snap['description']}',
@@ -1089,6 +1262,14 @@ class _PostCardState extends State<PostCard> {
                 setState(() {
                   isLikeAnimating = true;
                 });
+                FireStoreMethods().updateNotifications(
+                    widget.snap['uid'],
+                    user.username.toString(),
+                    'liked',
+                    widget.snap['postId'].toString(),
+                    widget.snap['likes'],
+                    user.uid,
+                    user.photoUrl.toString());
               },
               onTap: () {
                 Navigator.push(
@@ -1154,17 +1335,30 @@ class _PostCardState extends State<PostCard> {
                           : const Icon(
                               FontAwesomeIcons.heart,
                             ),
-                      onPressed: () => FireStoreMethods().likePost(
-                          widget.snap['postId'].toString(),
-                          user.uid,
-                          widget.snap['likes'],
-                          sendNotification(
-                              'someone liked your post', tokenpst)),
+                      onPressed: () {
+                        FireStoreMethods().likePost(
+                            widget.snap['postId'].toString(),
+                            user.uid,
+                            widget.snap['likes'],
+                            sendNotification(
+                                'someone liked your post', tokenpst));
+
+                        FireStoreMethods().updateNotifications(
+                            widget.snap['uid'],
+                            user.username.toString(),
+                            'liked',
+                            widget.snap['postId'].toString(),
+                            widget.snap['likes'],
+                            user.uid,
+                            user.photoUrl);
+                      },
                     ),
                   ),
                   SizedBox(width: 12),
                   GestureDetector(
-                      onTap: widget.onshareingbtnPressed,
+                      onTap: () {
+                        bottomSheetforshare(context, "txt");
+                      },
                       child: Image.asset(
                         'images/share_icons.png',
                         height: 20,
@@ -1174,7 +1368,7 @@ class _PostCardState extends State<PostCard> {
                     onTap: () => Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) => CommentsScreen(
-                          postId: widget.snap['postId'].toString(),
+                          snap: widget.snap,
                           name: widget.snap['username'],
                           token: tokenpst,
                         ),
@@ -1210,9 +1404,9 @@ class _PostCardState extends State<PostCard> {
                     onTap: () => Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) => CommentsScreen(
-                          postId: widget.snap['postId'].toString(),
+                          snap: widget.snap,
                           token: tokenpst,
-                          name: widget.snap['name'].toString(),
+                          name: widget.snap['username'].toString(),
                         ),
                       ),
                     ),
@@ -1228,7 +1422,8 @@ class _PostCardState extends State<PostCard> {
                 children: <Widget>[
                   InkWell(
                     onTap: () {
-                      bottomSheetforlike(context, 'txt');
+                      bottomSheetforlike(
+                          context, 'txt', (widget.snap['likes'] as List));
                     },
                     child: Text(
                       '${widget.snap['likes'].length} Likes',
@@ -1246,7 +1441,7 @@ class _PostCardState extends State<PostCard> {
                     ),
                   ),
                   Text(
-                    '2 Shares',
+                    'Shares',
                     style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
                   ),
 
@@ -1285,6 +1480,46 @@ class _PostCardState extends State<PostCard> {
         ),
       ),
     );
+  }
+
+  void getDataOfChats(String userId) {
+    chats
+        .where("users", isEqualTo: {currentUid: null, userId: null})
+        .limit(1)
+        .get()
+        .then((value) {
+          if (value.docs.isNotEmpty) {
+            chatDocId = value.docs.single.id.toString();
+            onSendMessage(chatDocId);
+          } else {
+            chats.add({
+              "users": {currentUid: null, userId: null}
+            }).then((value) {
+              chatDocId = value.toString();
+              onSendMessage(chatDocId);
+            });
+          }
+        });
+  }
+
+  void onSendMessage(String chatId) async {
+    Map<String, dynamic> messages = {
+      "sendby": currentUid,
+      "message": widget.snap['postUrl'],
+      "profImage": widget.snap['profImage'],
+      "usenamepost": widget.snap['username'],
+      "postId": widget.snap['postId'],
+      "type": "sharedPost",
+      "time": FieldValue.serverTimestamp(),
+      "postDescription": widget.snap['description'],
+    };
+
+    await FirebaseFirestore.instance
+        .collection('chatroom')
+        .doc(chatId)
+        .collection('chats')
+        .add(messages)
+        .whenComplete(() {});
   }
 }
 
