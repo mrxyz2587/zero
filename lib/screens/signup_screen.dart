@@ -1,9 +1,12 @@
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:expandable_text/expandable_text.dart';
+import 'package:feature_discovery/feature_discovery.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:zero_fin/screens/email_verification.dart';
 import '../widgets/selection_container.dart' as sc;
 import '/resources/auth_methods.dart';
@@ -376,11 +379,20 @@ class _SignupScreenState extends State<SignupScreen> {
                 textEditingController: _usernameController,
                 isPass: false,
               ),
-              TextFieldInput(
-                textEditingController: _emailController,
-                hintText: 'email',
-                textInputType: TextInputType.emailAddress,
-                isPass: false,
+              DescribedFeatureOverlay(
+                tapTarget: Text(''),
+                featureId: 'home_tappine',
+                backgroundColor: Colors.green,
+                contentLocation: ContentLocation.trivial,
+                enablePulsingAnimation: true,
+                overflowMode: OverflowMode.extendBackground,
+                backgroundOpacity: 0.1,
+                child: TextFieldInput(
+                  textEditingController: _emailController,
+                  hintText: 'email',
+                  textInputType: TextInputType.emailAddress,
+                  isPass: false,
+                ),
               ),
 
               TextFieldInput(
@@ -584,6 +596,74 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                 ),
               ),
+              Text('By Signing up you Agreeing all the'),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: () async {
+                      String url = 'https://zeromonk.com/Privacy-Policy';
+                      if (url.contains("https://www.")) {
+                        if (await canLaunch(url)) {
+                          await launch(url);
+                        }
+                      } else if (!url.contains("https://www.")) {
+                        if (await canLaunch("https://www." + url)) {
+                          await launch("https://www." + url);
+                        }
+                      } else if (url.contains("https://") &&
+                          !url.contains("https://www.")) {
+                        if (await canLaunch("www." + url)) {
+                          await launch("www." + url);
+                        }
+                      } else if (!url.contains("https://") &&
+                          url.contains("www.")) {
+                        if (await canLaunch("https://" + url)) {
+                          await launch("https://" + url);
+                        }
+                      }
+                    },
+                    child: Text(
+                      'Terms and Conditions',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF0B57A4),
+                          fontSize: 14),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () async {
+                      String url = 'https://zeromonk.com/Terms&Condition';
+                      if (url.contains("https://www.")) {
+                        if (await canLaunch(url)) {
+                          await launch(url);
+                        }
+                      } else if (!url.contains("https://www.")) {
+                        if (await canLaunch("https://www." + url)) {
+                          await launch("https://www." + url);
+                        }
+                      } else if (url.contains("https://") &&
+                          !url.contains("https://www.")) {
+                        if (await canLaunch("www." + url)) {
+                          await launch("www." + url);
+                        }
+                      } else if (!url.contains("https://") &&
+                          url.contains("www.")) {
+                        if (await canLaunch("https://" + url)) {
+                          await launch("https://" + url);
+                        }
+                      }
+                    },
+                    child: Text(
+                      'and Privacy Policy',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF0B57A4),
+                          fontSize: 14),
+                    ),
+                  ),
+                ],
+              )
             ],
           ),
         ),

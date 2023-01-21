@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:expandable/expandable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -23,20 +22,39 @@ class NoticeScreen extends StatefulWidget {
 
 class _NoticeScreenState extends State<NoticeScreen> {
   bool isLoasdings = true;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getData();
+  }
 
+  String docsId = '';
   void getData() async {
     await FirebaseFirestore.instance
-        .collection("collection")
+        .collection('notifications')
+        .doc(FirebaseAuth.instance.currentUser!.uid.toString())
+        .collection('allNotifications')
+        .orderBy('time', descending: true)
+        .limit(1)
         .get()
-        .then((value) => {
-              setState(() {
-                isLoasdings = false;
-              })
-            });
+        .then((value) {
+      docsId = value.docs.single.data()['docId'];
+
+      print(value.docs.toString() + " document value");
+    });
+
+    await FirebaseFirestore.instance
+        .collection('notifications')
+        .doc(FirebaseAuth.instance.currentUser!.uid.toString())
+        .collection('allNotifications')
+        .doc(docsId)
+        .update({'isSeen': true});
   }
 
   @override
   Widget build(BuildContext context) {
+    getData();
     return ScreenUtilInit(
         designSize: const Size(360, 690),
         minTextAdapt: true,
@@ -212,6 +230,9 @@ class _NoticeScreenState extends State<NoticeScreen> {
                   //     ),
                   //   ),
                   // ),
+                  /*
+                  * break
+                  * */
                   StreamBuilder(
                     stream: FirebaseFirestore.instance
                         .collection('notices')
@@ -243,18 +264,20 @@ class _NoticeScreenState extends State<NoticeScreen> {
                                   builder: (context) =>
                                       PdfViewerPage(url: url)));
                             },
-                            child: Card(
-                              margin: const EdgeInsets.only(
-                                  bottom: 10.0, right: 18.0, left: 18),
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                side: BorderSide(
-                                  color: Theme.of(context).colorScheme.outline,
+                            child: Container(
+                              height: 90,
+                              child: Card(
+                                margin: const EdgeInsets.only(
+                                    bottom: 10.0, right: 18.0, left: 18),
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  side: BorderSide(
+                                    color:
+                                        Theme.of(context).colorScheme.outline,
+                                  ),
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(12)),
                                 ),
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(12)),
-                              ),
-                              child: Expanded(
                                 child: Row(
                                   children: [
                                     Padding(
@@ -374,6 +397,7 @@ class _NoticeScreenState extends State<NoticeScreen> {
                                 .doc(FirebaseAuth.instance.currentUser!.uid
                                     .toString())
                                 .collection('allNotifications')
+                                .orderBy('time', descending: false)
                                 .snapshots(),
                             builder: (context,
                                 AsyncSnapshot<
@@ -387,13 +411,15 @@ class _NoticeScreenState extends State<NoticeScreen> {
                                   strokeWidth: 1.5,
                                 ));
                               }
+
                               return ListView.builder(
+                                reverse: true,
                                 shrinkWrap: true,
                                 controller:
                                     ScrollController(keepScrollOffset: true),
                                 scrollDirection: Axis.vertical,
                                 itemCount: snapshot.data!.docs.length,
-                                itemBuilder: (ctx, index) => GestureDetector(
+                                itemBuilder: (ctx, index) => InkWell(
                                   onTap: () {
                                     Navigator.of(context).push(
                                         MaterialPageRoute(

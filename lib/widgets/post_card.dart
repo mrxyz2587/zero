@@ -74,29 +74,34 @@ class _PostCardState extends State<PostCard> {
       enableDrag: true,
       isScrollControlled: true,
       isDismissible: true,
-      backgroundColor: Colors.black.withOpacity(0),
+      backgroundColor: Colors.transparent,
       context: context,
       builder: (BuildContext c) {
-        return Container(
-          color: Colors.transparent,
-          child: Container(
+        return DraggableScrollableSheet(
+          initialChildSize: 0.6,
+          maxChildSize: 1,
+          minChildSize: 0.3,
+          builder: (context, controller) => Container(
             decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
                     topRight: Radius.circular(8), topLeft: Radius.circular(8))),
             width: MediaQuery.of(context).size.width,
-            height: 700,
             padding: EdgeInsets.symmetric(
               horizontal: 5,
               vertical: 8,
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
+            child: ListView(
+              controller: controller,
               children: <Widget>[
-                SizedBox(height: 6),
+                SizedBox(
+                  height: 6,
+                ),
                 Container(
+                  margin: EdgeInsets.symmetric(horizontal: 160),
                   height: 4,
-                  width: 50,
+                  width: 10,
+                  constraints: BoxConstraints(maxWidth: 50),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(5),
                     color: Colors.black,
@@ -167,7 +172,8 @@ class _PostCardState extends State<PostCard> {
 
                     return ListView.builder(
                       shrinkWrap: true,
-                      physics: ClampingScrollPhysics(),
+                      physics: BouncingScrollPhysics(),
+                      controller: controller,
                       itemCount: (snapshot.data! as dynamic).docs.length,
                       itemBuilder: (context, index) => Align(
                           alignment: Alignment.topLeft,
@@ -278,272 +284,344 @@ class _PostCardState extends State<PostCard> {
       enableDrag: true,
       isScrollControlled: true,
       isDismissible: true,
-      backgroundColor: Colors.black.withOpacity(0),
+      backgroundColor: Colors.transparent,
       context: context,
       builder: (BuildContext c) {
-        return Container(
-          color: Colors.transparent,
-          child: Container(
-            decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(8), topLeft: Radius.circular(8))),
-            width: MediaQuery.of(context).size.width,
-            height: 700,
-            padding: EdgeInsets.symmetric(
-              horizontal: 5,
-              vertical: 8,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                SizedBox(height: 6),
-                Container(
-                  height: 4,
-                  width: 50,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    color: Colors.black,
+        return DraggableScrollableSheet(
+          initialChildSize: 0.6,
+          minChildSize: 0.30,
+          maxChildSize: 0.95,
+          builder: (context, scrollController) {
+            return Container(
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(8),
+                      topLeft: Radius.circular(8))),
+              width: MediaQuery.of(context).size.width,
+              padding: EdgeInsets.symmetric(
+                horizontal: 5,
+                vertical: 8,
+              ),
+              child: ListView(
+                controller: scrollController,
+                children: <Widget>[
+                  SizedBox(height: 6),
+                  Container(
+                    height: 4,
+                    width: 50,
+                    margin: EdgeInsets.symmetric(horizontal: 170),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      color: Colors.black,
+                    ),
                   ),
-                ),
-                SizedBox(height: 20),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextFormField(
-                    controller: searchController,
-                    decoration: InputDecoration(
-                      // suffixIcon: Icon(
-                      //   FontAwesomeIcons.magnifyingGlass,
-                      //   color: Colors.black54,
-                      // ),
-                      isDense: true,
-                      isCollapsed: true,
-                      filled: true,
-                      contentPadding: EdgeInsets.fromLTRB(
-                        10,
-                        10,
-                        0,
-                        10,
-                      ),
-                      hintStyle: TextStyle(fontWeight: FontWeight.w700),
-                      hintText: 'Search...',
-                      fillColor: Color(0xFFEFEFEF),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(
-                            color: const Color(0xFFD9D8D8), width: 1.5),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(
-                          color: Color(0xFFFFFFFF),
-                          width: 1,
+                  SizedBox(height: 20),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextFormField(
+                      controller: searchController,
+                      decoration: InputDecoration(
+                        // suffixIcon: Icon(
+                        //   FontAwesomeIcons.magnifyingGlass,
+                        //   color: Colors.black54,
+                        // ),
+                        isDense: true,
+                        isCollapsed: true,
+                        filled: true,
+                        contentPadding: EdgeInsets.fromLTRB(
+                          10,
+                          10,
+                          0,
+                          10,
+                        ),
+                        hintStyle: TextStyle(fontWeight: FontWeight.w700),
+                        hintText: 'Search...',
+                        fillColor: Color(0xFFEFEFEF),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(
+                              color: const Color(0xFFD9D8D8), width: 1.5),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Color(0xFFFFFFFF),
+                            width: 1,
+                          ),
                         ),
                       ),
+                      onTap: () {
+                        setState(() {});
+                      },
+                      onFieldSubmitted: (String _) {
+                        print(_);
+                      },
                     ),
-                    onTap: () {
-                      setState(() {});
-                    },
-                    onFieldSubmitted: (String _) {
-                      print(_);
-                    },
                   ),
-                ),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.baseline,
-                  textBaseline: TextBaseline.alphabetic,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 14),
-                      child: Text(
-                        'LIKED BY',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w700, fontSize: 15),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 14),
+                        child: Text(
+                          'LIKED BY',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w700, fontSize: 15),
+                        ),
                       ),
-                    ),
-                    Padding(
-                      //TODO Wanted to use positioned widgit to make this at corner.
-                      padding: const EdgeInsets.only(left: 240.0),
-                      child: Text(likedUid.length.toString() + " likes",
-                          style: TextStyle(fontSize: 15)),
-                    ),
-                  ],
-                ),
-                Divider(
-                  height: 20,
-                  thickness: 2,
-                  indent: 15,
-                  endIndent: 15,
-                  color: Color(0xFFD9D8D8),
-                ),
-                StreamBuilder(
-                  stream: searchController.text == ""
-                      ? FirebaseFirestore.instance
-                          .collection('users')
-                          .snapshots()
-                      : FirebaseFirestore.instance
-                          .collection('users')
-                          .where('username',
-                              isGreaterThanOrEqualTo: searchController.text)
-                          .snapshots(),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    }
+                      Padding(
+                        //TODO Wanted to use positioned widgit to make this at corner.
+                        padding: const EdgeInsets.only(left: 240.0),
+                        child: Text(likedUid.length.toString() + " likes",
+                            style: TextStyle(fontSize: 15)),
+                      ),
+                    ],
+                  ),
+                  Divider(
+                    height: 20,
+                    thickness: 2,
+                    indent: 15,
+                    endIndent: 15,
+                    color: Color(0xFFD9D8D8),
+                  ),
+                  StreamBuilder(
+                    stream: searchController.text.toString() == " "
+                        ? FirebaseFirestore.instance
+                            .collection('users')
+                            .snapshots()
+                        : FirebaseFirestore.instance
+                            .collection('users')
+                            .where('username',
+                                isGreaterThanOrEqualTo: searchController.text)
+                            .snapshots(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
 
-                    return ListView.builder(
-                      shrinkWrap: true,
-                      physics: ClampingScrollPhysics(),
-                      itemCount: (snapshot.data! as dynamic).docs.length,
-                      itemBuilder: (context, index) => likedUid.contains(
-                              (snapshot.data! as dynamic)
-                                  .docs[index]['uid']
-                                  .toString())
-                          ? Align(
-                              child: GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ProfileScreen(
-                                        uid: (snapshot.data! as dynamic)
-                                            .docs[index]['uid']
-                                            .toString()),
-                                  ),
-                                );
-                              },
-                              child: Container(
-                                color: Colors.white,
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        controller: scrollController,
+                        physics: ClampingScrollPhysics(),
+                        itemCount: (snapshot.data! as dynamic).docs.length,
+                        itemBuilder: (context, index) => likedUid.contains(
+                                (snapshot.data! as dynamic)
+                                    .docs[index]['uid']
+                                    .toString())
+                            ? Align(
+                                child: GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ProfileScreen(
+                                          uid: (snapshot.data! as dynamic)
+                                              .docs[index]['uid']
+                                              .toString()),
+                                    ),
+                                  );
+                                },
                                 child: SizedBox(
-                                  child: Container(
-                                    child: Expanded(
-                                      child: Row(
-                                        children: [
-                                          Padding(
-                                            padding:
-                                                const EdgeInsets.only(left: 20),
-                                            child: CircleAvatar(
-                                              backgroundImage: NetworkImage(
-                                                (snapshot.data! as dynamic)
-                                                    .docs[index]['photoUrl']
-                                                    .toString(),
-                                              ),
-                                              radius: 22,
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            width: 3,
-                                          ),
-                                          Expanded(
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(12.0),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  Text(
-                                                      (snapshot.data!
-                                                              as dynamic)
-                                                          .docs[index]
-                                                              ['username']
-                                                          .toString(),
-                                                      style: TextStyle(
-                                                          color:
-                                                              Color(0xFF000000),
-                                                          fontSize: 15,
-                                                          fontWeight:
-                                                              FontWeight.w700,
-                                                          fontFamily:
-                                                              'Roboto')),
-                                                  SizedBox(
-                                                    height: 3,
-                                                  ),
-                                                  Text(
-                                                      (snapshot.data!
-                                                              as dynamic)
-                                                          .docs[index]
-                                                              ['university']
-                                                          .toString(),
-                                                      style: TextStyle(
-                                                          color: Colors.black54,
-                                                          fontSize: 13,
-                                                          fontFamily:
-                                                              'Roboto')),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                right: 10),
-                                            child: Row(
-                                              children: [
-                                                SizedBox(
-                                                  width: 10,
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          TextButton(
-                                              style: TextButton.styleFrom(
-                                                padding: EdgeInsets.zero,
-                                                minimumSize: Size(80, 30),
+                                  height: 60,
+                                  child: ListTile(
+                                    trailing:
+                                        // isSended == false
+                                        //     ?
+                                        TextButton(
+                                            style: ElevatedButton.styleFrom(
                                                 backgroundColor: btnCOlorblue,
+                                                minimumSize: Size(75, 12),
                                                 shape: RoundedRectangleBorder(
                                                     borderRadius:
-                                                        BorderRadius.all(
-                                                            Radius.circular(
-                                                                7))),
-                                              ),
-                                              onPressed: () async {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        ProfileScreen(
-                                                      uid: (snapshot.data!
-                                                              as dynamic)
-                                                          .docs[index]['uid']
-                                                          .toString(),
-                                                    ),
+                                                        BorderRadius.circular(
+                                                            8))),
+                                            onPressed: () async {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      ProfileScreen(
+                                                    uid: (snapshot.data!
+                                                            as dynamic)
+                                                        .docs[index]['uid']
+                                                        .toString(),
                                                   ),
-                                                );
-                                              },
-                                              // color: btnCOlorblue,
-                                              child: Text(
-                                                'View',
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.w700,
-                                                    fontSize: 14,
-                                                    color: Colors.white),
-                                              )),
-                                          Row(
-                                            children: [
-                                              SizedBox(
-                                                width: 15,
-                                              ),
-                                            ],
-                                          )
-                                        ],
+                                                ),
+                                              );
+                                            },
+                                            child: Text(
+                                              "View",
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.w700),
+                                            ))
+                                    // : TextButton(
+                                    //     style: ElevatedButton.styleFrom(
+                                    //         backgroundColor:
+                                    //             Colors.grey.shade300,
+                                    //         minimumSize: Size(75, 12),
+                                    //         shape: RoundedRectangleBorder(
+                                    //             borderRadius:
+                                    //                 BorderRadius.circular(8))),
+                                    //     onPressed: () {
+                                    //       setState(() {
+                                    //         isSended = !isSended;
+                                    //       });
+                                    //     },
+                                    //     child: Text(
+                                    //       "sent",
+                                    //       style: TextStyle(
+                                    //           color: Colors.black54,
+                                    //           fontWeight: FontWeight.w700),
+                                    //     ))
+                                    ,
+                                    title: Text(
+                                        (snapshot.data! as dynamic)
+                                            .docs[index]['username']
+                                            .toString(),
+                                        style: TextStyle(
+                                            color: Color(0xFF000000),
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w700,
+                                            fontFamily: 'Roboto')),
+                                    leading: CircleAvatar(
+                                      backgroundImage: NetworkImage(
+                                        (snapshot.data! as dynamic)
+                                            .docs[index]['photoUrl']
+                                            .toString(),
                                       ),
+                                      radius: 20,
                                     ),
+                                    subtitle: Text(
+                                        (snapshot.data! as dynamic)
+                                            .docs[index]['university']
+                                            .toString(),
+                                        style: TextStyle(
+                                            fontSize: 13,
+                                            fontFamily: 'Roboto')),
                                   ),
                                 ),
-                              ),
-                            ))
-                          : Container(),
-                    );
-                  },
-                )
-              ],
-            ),
-          ),
+                                // Container(
+                                //   color: Colors.white,
+                                //   height: 60,
+                                //   child: Row(
+                                //     children: [
+                                //       Padding(
+                                //         padding:
+                                //             const EdgeInsets.only(left: 20),
+                                //         child: CircleAvatar(
+                                //           backgroundImage: NetworkImage(
+                                //             (snapshot.data! as dynamic)
+                                //                 .docs[index]['photoUrl']
+                                //                 .toString(),
+                                //           ),
+                                //           radius: 22,
+                                //         ),
+                                //       ),
+                                //       SizedBox(
+                                //         width: 3,
+                                //       ),
+                                //       Expanded(
+                                //         child: Padding(
+                                //           padding: const EdgeInsets.all(12.0),
+                                //           child: Column(
+                                //             crossAxisAlignment:
+                                //                 CrossAxisAlignment.start,
+                                //             mainAxisAlignment:
+                                //                 MainAxisAlignment.center,
+                                //             children: [
+                                //               Text(
+                                //                   (snapshot.data! as dynamic)
+                                //                       .docs[index]['username']
+                                //                       .toString(),
+                                //                   style: TextStyle(
+                                //                       color: Color(0xFF000000),
+                                //                       fontSize: 15,
+                                //                       fontWeight:
+                                //                           FontWeight.w700,
+                                //                       fontFamily: 'Roboto')),
+                                //               SizedBox(
+                                //                 height: 3,
+                                //               ),
+                                //               Text(
+                                //                   (snapshot.data! as dynamic)
+                                //                       .docs[index]['university']
+                                //                       .toString(),
+                                //                   style: TextStyle(
+                                //                       color: Colors.black54,
+                                //                       fontSize: 13,
+                                //                       fontFamily: 'Roboto')),
+                                //             ],
+                                //           ),
+                                //         ),
+                                //       ),
+                                //       Padding(
+                                //         padding:
+                                //             const EdgeInsets.only(right: 10),
+                                //         child: Row(
+                                //           children: [
+                                //             SizedBox(
+                                //               width: 10,
+                                //             ),
+                                //           ],
+                                //         ),
+                                //       ),
+                                //       TextButton(
+                                //           style: TextButton.styleFrom(
+                                //             padding: EdgeInsets.zero,
+                                //             minimumSize: Size(80, 30),
+                                //             backgroundColor: btnCOlorblue,
+                                //             shape: RoundedRectangleBorder(
+                                //                 borderRadius: BorderRadius.all(
+                                //                     Radius.circular(7))),
+                                //           ),
+                                //           onPressed: () async {
+                                //             Navigator.push(
+                                //               context,
+                                //               MaterialPageRoute(
+                                //                 builder: (context) =>
+                                //                     ProfileScreen(
+                                //                   uid: (snapshot.data!
+                                //                           as dynamic)
+                                //                       .docs[index]['uid']
+                                //                       .toString(),
+                                //                 ),
+                                //               ),
+                                //             );
+                                //           },
+                                //           // color: btnCOlorblue,
+                                //           child: Text(
+                                //             'View',
+                                //             style: TextStyle(
+                                //                 fontWeight: FontWeight.w700,
+                                //                 fontSize: 14,
+                                //                 color: Colors.white),
+                                //           )),
+                                //       Row(
+                                //         children: [
+                                //           SizedBox(
+                                //             width: 15,
+                                //           ),
+                                //         ],
+                                //       )
+                                //     ],
+                                //   ),
+                                // ),
+                              ))
+                            : Container(),
+                      );
+                    },
+                  )
+                ],
+              ),
+            );
+          },
         );
+        ;
       },
     );
   }
@@ -669,6 +747,15 @@ class _PostCardState extends State<PostCard> {
                     SizedBox(width: 18),
                     GestureDetector(
                       onTap: () async {
+                        Fluttertoast.showToast(
+                            msg: "Link Copied",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black87,
+                            textColor: Colors.white,
+                            fontSize: 16.0);
+
                         String generatedDeepLink =
                             await FirebaseDynamicLinksService.createDynamicLink(
                                 widget.snap['postId'].toString());
@@ -867,6 +954,15 @@ class _PostCardState extends State<PostCard> {
                     SizedBox(width: 18),
                     GestureDetector(
                       onTap: () async {
+                        Fluttertoast.showToast(
+                            msg: "Link Copied",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black87,
+                            textColor: Colors.white,
+                            fontSize: 16.0);
+
                         String generatedDeepLink =
                             await FirebaseDynamicLinksService.createDynamicLink(
                                 widget.snap['postId'].toString());
@@ -987,7 +1083,7 @@ class _PostCardState extends State<PostCard> {
               body: jsonEncode(<String, dynamic>{
                 'notification': <String, dynamic>{
                   'title': widget.snap['username'].toString(),
-                  'body': 'kisine like kr diya'
+                  'body': 'Liked your Post',
                 },
                 'priority': 'high',
                 'data': data,
@@ -1258,7 +1354,7 @@ class _PostCardState extends State<PostCard> {
                     widget.snap['postId'].toString(),
                     user.uid,
                     widget.snap['likes'],
-                    sendNotification('Someone liked your pic', tokenpst));
+                    sendNotification(' liked your pic', tokenpst));
                 setState(() {
                   isLikeAnimating = true;
                 });

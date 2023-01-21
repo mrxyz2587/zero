@@ -110,16 +110,19 @@ class _FollowersFollowingScreenState extends State<FollowersFollowingScreen>
                           ),
                           child: Padding(
                             padding: const EdgeInsets.only(right: 20, left: 20),
-                            child: Card(
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                side: BorderSide(
-                                  color: Theme.of(context).colorScheme.outline,
+                            child: Container(
+                              height: 80,
+                              width: double.infinity,
+                              child: Card(
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  side: BorderSide(
+                                    color:
+                                        Theme.of(context).colorScheme.outline,
+                                  ),
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(12)),
                                 ),
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(12)),
-                              ),
-                              child: Expanded(
                                 child: Row(
                                   children: [
                                     Padding(
@@ -282,16 +285,18 @@ class _FollowersFollowingScreenState extends State<FollowersFollowingScreen>
                           ),
                           child: Padding(
                             padding: const EdgeInsets.only(right: 20, left: 20),
-                            child: Card(
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                side: BorderSide(
-                                  color: Theme.of(context).colorScheme.outline,
+                            child: Container(
+                              height: 80,
+                              child: Card(
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  side: BorderSide(
+                                    color:
+                                        Theme.of(context).colorScheme.outline,
+                                  ),
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(12)),
                                 ),
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(12)),
-                              ),
-                              child: Expanded(
                                 child: Row(
                                   children: [
                                     Padding(

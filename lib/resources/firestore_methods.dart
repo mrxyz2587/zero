@@ -48,13 +48,8 @@ class FireStoreMethods {
     return res;
   }
 
-  Future<String> uploadPost(
-    String description,
-    Uint8List file,
-    String uid,
-    String username,
-    String profImage,
-  ) async {
+  Future<String> uploadPost(String description, Uint8List file, String uid,
+      String username, String profImage, String privacy) async {
     // asking uid here because we dont want to make extra calls to firebase auth when we can just get from our state management
     String res = "Some error occurred";
     try {
@@ -65,17 +60,18 @@ class FireStoreMethods {
       //     await StorageMethods().uploadVedioToStorage('reels', vedioFile, true);
       String postId = const Uuid().v1(); // creates unique id based on time
       Post post = Post(
-        description: description,
-        uid: uid,
-        username: username,
-        likes: [],
-        postId: postId,
-        datePublished:
-            DateFormat.yMMMMd('en_US').format(DateTime.now()).toString(),
-        postUrl: photoUrl,
-        profImage: profImage,
-        saves: [],
-      );
+          description: description,
+          uid: uid,
+          username: username,
+          likes: [],
+          postId: postId,
+          datePublished:
+              DateFormat.yMMMMd('en_US').format(DateTime.now()).toString(),
+          postUrl: photoUrl,
+          profImage: profImage,
+          saves: [],
+          privacy: privacy,
+          timestamp: DateTime.now());
       _firestore.collection('posts').doc(postId).set(post.toJson());
       res = "success";
     } catch (err) {
@@ -125,17 +121,22 @@ class FireStoreMethods {
       String photoUrl) async {
     if (likes.contains(uid) && type == 'liked') {
     } else {
+      String notifId = const Uuid().v1(); // creates unique id based on time
+
       await _firestore
           .collection('notifications')
           .doc(postUid)
           .collection('allNotifications')
-          .add({
+          .doc(notifId)
+          .set({
         'username': currentUsername,
         'type': type,
         'postId': postId,
         'uidcurrent': uid,
         'photoUrl': photoUrl,
-        'time': DateTime.now()
+        'time': DateTime.now(),
+        'isSeen': false,
+        'docId': notifId
       });
     }
 

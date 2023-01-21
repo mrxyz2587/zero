@@ -10,6 +10,8 @@ class Post {
   final String datePublished;
   final String postUrl;
   final String profImage;
+  final String privacy;
+  final DateTime timestamp;
 
   const Post(
       {required this.description,
@@ -20,7 +22,9 @@ class Post {
       required this.datePublished,
       required this.postUrl,
       required this.profImage,
-      required this.saves});
+      required this.saves,
+      required this.privacy,
+      required this.timestamp});
 
   static Post fromSnap(DocumentSnapshot snap) {
     var snapshot = snap.data() as Map<String, dynamic>;
@@ -34,7 +38,9 @@ class Post {
         username: snapshot["username"],
         postUrl: snapshot['postUrl'],
         saves: snapshot['saves'],
-        profImage: snapshot['profImage']);
+        profImage: snapshot['profImage'],
+        privacy: snapshot['privacy'],
+        timestamp: snapshot['timestamp']);
   }
 
   Map<String, dynamic> toJson() => {
@@ -46,6 +52,8 @@ class Post {
         "datePublished": datePublished,
         'postUrl': postUrl,
         'profImage': profImage,
-        'saves': saves
+        'saves': saves,
+        'privacy': privacy,
+        'timestamp': timestamp
       };
 }

@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'package:badges/badges.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -29,6 +31,9 @@ class FeedScreen extends StatefulWidget {
 }
 
 class _FeedScreenState extends State<FeedScreen> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   double longitude = 0;
   double latitude = 0;
   double otherlongitude = 0;
@@ -265,11 +270,30 @@ class _FeedScreenState extends State<FeedScreen> {
     // TODO: implement initState
 
     getLocation();
+    setStatus("Online");
+
     storeNotificationToken();
     super.initState();
     FirebaseMessaging.onMessage.listen((event) {
       LocalNotificationService.display(event);
     });
+  }
+
+  void setStatus(String status) async {
+    await _firestore.collection('users').doc(_auth.currentUser!.uid).update({
+      "status": status,
+    });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // online
+      setStatus("Online");
+    } else {
+      // offline
+      setStatus("Offline");
+    }
   }
 
   void getLocation() async {
@@ -326,6 +350,7 @@ class _FeedScreenState extends State<FeedScreen> {
     });
   }
 
+  bool badgeShown = false;
   void getData() async {
     var userSnap = await FirebaseFirestore.instance
         .collection('users')
@@ -334,6 +359,24 @@ class _FeedScreenState extends State<FeedScreen> {
       setState(() {
         isLoasdings = false;
       });
+    });
+    _firestore
+        .collection('notifications')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection('allNotifications')
+        .orderBy('time', descending: true)
+        .limit(1)
+        .get()
+        .then((value) {
+      if (value.docs.single.data()['isSeen'] == false) {
+        setState(() {
+          badgeShown = true;
+        });
+      } else {
+        setState(() {
+          badgeShown = false;
+        });
+      }
     });
   }
 
@@ -397,10 +440,21 @@ class _FeedScreenState extends State<FeedScreen> {
               title: Image.asset('images/logoofzeroappbar.png', height: 38),
               actions: [
                 IconButton(
-                  icon: const Icon(
-                    FontAwesomeIcons.solidBell,
-                    color: Colors.black,
-                    size: 18,
+                  icon: Badge(
+                    ignorePointer: true,
+                    badgeContent: Text('1',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 9,
+                            fontWeight: FontWeight.bold)),
+                    position: BadgePosition.topEnd(),
+                    shape: BadgeShape.circle,
+                    showBadge: badgeShown,
+                    child: const Icon(
+                      FontAwesomeIcons.solidBell,
+                      color: Colors.black,
+                      size: 18,
+                    ),
                   ),
                   onPressed: () {
                     Navigator.push(
@@ -527,6 +581,7 @@ class _FeedScreenState extends State<FeedScreen> {
                   StreamBuilder(
                     stream: FirebaseFirestore.instance
                         .collection('posts')
+                        .orderBy('timestamp', descending: true)
                         .snapshots(),
                     builder: (context,
                         AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>

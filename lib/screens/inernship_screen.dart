@@ -41,13 +41,13 @@ class _InternshipScreenState extends State<InternshipScreen> {
   void getdata() async {
     try {
       await FirebaseFirestore.instance
-          .collection('quiz')
-          .doc('dailyquiz')
+          .collection('applyIntershipCardd')
+          .doc('applyCard')
           .get()
           .then((value) {
         imageUrl = value.data()!["imageUrl"].toString();
         print(imageUrl.toString());
-        // quizUrl = value.data()!["quizUrl"].toString();
+         quizUrl = value.data()!["quizUrl"].toString();
       });
       setState(() {
         isSubmitted = true;

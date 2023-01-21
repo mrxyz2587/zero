@@ -452,9 +452,53 @@ class _ExamCrackersState extends State<ExamCrackers>
                                                             .toString(),
                                                         textAlign:
                                                             TextAlign.left,
-                                                        maxLines: 4,
+                                                        maxLines: 3,
                                                         style: TextStyle(
                                                           fontSize: 15.sp,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    GestureDetector(
+                                                      onTap: () async {
+                                                        String url = snapshot
+                                                            .data!.docs[index]
+                                                            .data()["url"]
+                                                            .toString();
+                                                        if (await canLaunch(
+                                                            url)) {
+                                                          await launch(url,
+                                                              forceWebView:
+                                                                  true,
+                                                              enableDomStorage:
+                                                                  true,
+                                                              enableJavaScript:
+                                                                  true);
+                                                        }
+                                                      },
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .symmetric(
+                                                                horizontal:
+                                                                    15.0),
+                                                        child: Text(
+                                                          snapshot
+                                                              .data!.docs[index]
+                                                              .data()["url"]
+                                                              .toString(),
+                                                          textAlign:
+                                                              TextAlign.left,
+                                                          maxLines: 1,
+                                                          style: TextStyle(
+                                                              fontSize: 15.sp,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w700,
+                                                              color: Color(
+                                                                  0xFF14487C)),
+                                                          softWrap: true,
+                                                          overflow:
+                                                              TextOverflow.fade,
                                                         ),
                                                       ),
                                                     ),

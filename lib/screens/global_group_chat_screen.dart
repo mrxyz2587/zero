@@ -338,7 +338,8 @@ class _GlobalGroupChatScreenState extends State<GlobalGroupChatScreen> {
                           style: TextStyle(
                               color: blueColor, fontWeight: FontWeight.bold),
                         ),
-                        content: Text('AlertDialog description'),
+                        content: Text(
+                            'Please do not share pornographic content or abusive content'),
                         // actions: <Widget>[
                         //   TextButton(
                         //     onPressed: () => Navigator.pop(context, 'Cancel'),
@@ -415,7 +416,10 @@ class _GlobalGroupChatScreenState extends State<GlobalGroupChatScreen> {
               width: size.width,
               alignment: Alignment.bottomCenter,
               child: Container(
-                height: size.height / 15.5,
+                constraints: BoxConstraints(
+                  maxHeight: 150,
+                  minHeight: size.height / 15.5,
+                ),
                 width: size.width,
                 decoration: BoxDecoration(
                     color: Colors.white,

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 
 import 'dart:io';
@@ -298,15 +299,50 @@ class _ChatRoomState extends State<ChatRoom> {
     if (map['type'] == "text") {
       return GestureDetector(
         onLongPress: () async {
-          if (map['sendby'] == _auth.currentUser!.uid)
-          //TODO abh1: Add dialog ui and a warning message that says if you delete the message it will be permanently deleted
-          {
-            await _firestore
-                .collection('chatroom')
-                .doc(chatDocId)
-                .collection('chats')
-                .doc(chatId)
-                .delete();
+          if (map['sendby'] == _auth.currentUser!.uid) {
+            showModalBottomSheet(
+                context: context,
+                enableDrag: true,
+                isScrollControlled: true,
+                isDismissible: true,
+                builder: (BuildContext ctx) {
+                  return Container(
+                    color: Colors.black.withOpacity(0.1),
+                    child: Container(
+                      height: MediaQuery.of(context).size.height * 0.15,
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                              topRight: Radius.circular(5),
+                              topLeft: Radius.circular(5))),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 5,
+                        vertical: 10,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(children: [
+                          ListTile(
+                            onTap: () async {
+                              await _firestore
+                                  .collection('chatroom')
+                                  .doc(chatDocId)
+                                  .collection('chats')
+                                  .doc(chatId)
+                                  .delete();
+                            },
+                            title: Text(
+                              'Delete',
+                              style: TextStyle(
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ]),
+                      ),
+                    ),
+                  );
+                });
           }
         },
         child: Container(
@@ -418,16 +454,50 @@ class _ChatRoomState extends State<ChatRoom> {
     } else if (map['type'] == "img") {
       return GestureDetector(
         onLongPress: () async {
-          if (map['sendby'] == _auth.currentUser!.uid)
-          //TODO abh1.1: Add dialog ui and a warning message that says if you delete the message it will be permanently deleted
-
-          {
-            await _firestore
-                .collection('chatroom')
-                .doc(chatDocId)
-                .collection('chats')
-                .doc(chatId)
-                .delete();
+          if (map['sendby'] == _auth.currentUser!.uid) {
+            showModalBottomSheet(
+                context: context,
+                enableDrag: true,
+                isScrollControlled: true,
+                isDismissible: true,
+                builder: (BuildContext ctx) {
+                  return Container(
+                    color: Colors.black.withOpacity(0.1),
+                    child: Container(
+                      height: MediaQuery.of(context).size.height * 0.15,
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                              topRight: Radius.circular(5),
+                              topLeft: Radius.circular(5))),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 5,
+                        vertical: 10,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(children: [
+                          ListTile(
+                            onTap: () async {
+                              await _firestore
+                                  .collection('chatroom')
+                                  .doc(chatDocId)
+                                  .collection('chats')
+                                  .doc(chatId)
+                                  .delete();
+                            },
+                            title: Text(
+                              'Delete',
+                              style: TextStyle(
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ]),
+                      ),
+                    ),
+                  );
+                });
           }
         },
         child: Container(
@@ -481,15 +551,51 @@ class _ChatRoomState extends State<ChatRoom> {
             ),
           ),
         ),
-        onLongPress: () async {
-          if (map['sendby'] == _auth.currentUser!.uid) {
-            await _firestore
-                .collection('chatroom')
-                .doc(chatDocId)
-                .collection('chats')
-                .doc(chatId)
-                .delete();
-          }
+        onLongPress: () {
+          if (map['sendby'] == _auth.currentUser!.uid)
+            showModalBottomSheet(
+                context: context,
+                enableDrag: true,
+                isScrollControlled: true,
+                isDismissible: true,
+                builder: (BuildContext ctx) {
+                  return Container(
+                    color: Colors.black.withOpacity(0.1),
+                    child: Container(
+                      height: MediaQuery.of(context).size.height * 0.15,
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                              topRight: Radius.circular(5),
+                              topLeft: Radius.circular(5))),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 5,
+                        vertical: 10,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(children: [
+                          ListTile(
+                            onTap: () async {
+                              await _firestore
+                                  .collection('chatroom')
+                                  .doc(chatDocId)
+                                  .collection('chats')
+                                  .doc(chatId)
+                                  .delete();
+                            },
+                            title: Text(
+                              'Delete',
+                              style: TextStyle(
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ]),
+                      ),
+                    ),
+                  );
+                });
         },
         child: Container(
           width: size.width,
@@ -542,13 +648,17 @@ class _ChatRoomState extends State<ChatRoom> {
                           ],
                         ),
                       ),
-                      Image.network(
-                        map['message'],
-                        fit: BoxFit.cover,
+                      Container(
+                        height: size.height / 2.5,
+                        width: size.width,
+                        child: Image.network(
+                          map['message'],
+                          fit: BoxFit.cover,
+                        ),
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(
-                            vertical: 4, horizontal: 15),
+                            vertical: 4, horizontal: 10),
                         child: Container(
                           height: 34,
                           child: Center(
@@ -899,11 +1009,52 @@ class _ChatRoomState extends State<ChatRoom> {
                 actions: [
                   IconButton(
                       onPressed: () {
-                        DropdownMenuItem(
-                          child: Text("Report"),
-                          enabled: true,
-                          onTap: () {},
-                        );
+                        showModalBottomSheet(
+                            context: context,
+                            enableDrag: true,
+                            isScrollControlled: true,
+                            isDismissible: true,
+                            builder: (BuildContext ctx) {
+                              return Container(
+                                color: Colors.black.withOpacity(0.1),
+                                child: Container(
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.15,
+                                  decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.only(
+                                          topRight: Radius.circular(5),
+                                          topLeft: Radius.circular(5))),
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 5,
+                                    vertical: 10,
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Column(children: [
+                                      ListTile(
+                                        onTap: () async {
+                                          Fluttertoast.showToast(
+                                              msg: "User Reported ",
+                                              toastLength: Toast.LENGTH_SHORT,
+                                              gravity: ToastGravity.CENTER,
+                                              timeInSecForIosWeb: 1,
+                                              backgroundColor: Colors.black12,
+                                              textColor: Colors.white,
+                                              fontSize: 16);
+                                        },
+                                        title: Text(
+                                          'Report User',
+                                          style: TextStyle(
+                                              color: Colors.red,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                    ]),
+                                  ),
+                                ),
+                              );
+                            });
                       },
                       icon: Icon(
                         Icons.more_vert,
@@ -976,6 +1127,10 @@ class _ChatRoomState extends State<ChatRoom> {
                     width: size.width,
                     alignment: Alignment.bottomCenter,
                     child: Container(
+                      constraints: BoxConstraints(
+                        maxHeight: 150,
+                        minHeight: size.height / 15.5,
+                      ),
                       width: size.width,
                       decoration: BoxDecoration(
                           color: Colors.white,

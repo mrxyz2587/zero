@@ -1,4 +1,4 @@
-package com.example.zero_fin
+package com.zeromonk.zero
 
 import io.flutter.embedding.android.FlutterActivity
 

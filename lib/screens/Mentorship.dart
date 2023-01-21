@@ -43,8 +43,8 @@ class _MentorshipCoursesState extends State<MentorshipCourses> {
   void getdata() async {
     try {
       await FirebaseFirestore.instance
-          .collection('quiz')
-          .doc('dailyquiz')
+          .collection('applyMentorCard')
+          .doc('card')
           .get()
           .then((value) {
         imageUrl = value.data()!["imageUrl"].toString();
@@ -482,7 +482,14 @@ class _MentorshipCoursesState extends State<MentorshipCourses> {
                         ),
                       ],
                     ))
-                : Container();
+                : Scaffold(
+                    backgroundColor: Colors.white,
+                    body: Center(
+                        child: CircularProgressIndicator(
+                      color: Colors.grey.shade300,
+                      strokeWidth: 1.5,
+                    )),
+                  );
           });
         });
   }

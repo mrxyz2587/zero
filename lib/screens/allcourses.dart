@@ -465,7 +465,7 @@ class _CertificationCOursesState extends State<CertificationCOurses>
                                                                 .data()[
                                                                     "certificationlevel"]
                                                                 .toString() +
-                                                            " ⌚ " +
+                                                            " | " +
                                                             snapshot.data!
                                                                 .docs[index]
                                                                 .data()[

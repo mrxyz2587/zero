@@ -60,9 +60,10 @@ class AuthMethods {
             followers: [],
             following: [],
             university: university,
-            latitudeCoordinates: "",
-            longCoordinates: "",
-            bio: "Heyy I am also a zero");
+            latitudeCoordinates: "29.564",
+            longCoordinates: "85.562",
+            bio: "Heyy I am also a zero",
+            status: "Online");
         await _firestore
             .collection("users")
             .doc(cred.user!.uid)

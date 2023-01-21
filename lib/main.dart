@@ -1,3 +1,4 @@
+import 'package:feature_discovery/feature_discovery.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
@@ -55,11 +56,15 @@ class MyApp extends StatelessWidget {
           create: (_) => UserProvider(),
         ),
       ],
-      child: MaterialApp(
-        color: Colors.white,
-        debugShowCheckedModeBanner: false,
-        title: 'zero',
-        home: Splash(),
+      child: FeatureDiscovery(
+        recordStepsInSharedPreferences: true,
+        sharedPreferencesPrefix: 'steps_of_feature',
+        child: MaterialApp(
+          color: Colors.white,
+          debugShowCheckedModeBanner: false,
+          title: 'zero',
+          home: Splash(),
+        ),
       ),
     );
   }
