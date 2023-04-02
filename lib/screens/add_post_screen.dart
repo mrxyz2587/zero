@@ -7,7 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
+import '../resources/auth_methods.dart';
 import '/providers/user_provider.dart';
 import '/resources/firestore_methods.dart';
 import '/utils/colors.dart';
@@ -15,6 +17,7 @@ import '/utils/utils.dart';
 import 'package:provider/provider.dart';
 
 import 'add_reel_screen.dart';
+import 'login_screen.dart';
 
 class AddPostScreen extends StatefulWidget {
   const AddPostScreen({Key? key}) : super(key: key);
@@ -45,7 +48,9 @@ class _AddPostScreenState extends State<AddPostScreen> {
   }
 
   _setImageFromGallery() async {
-    Uint8List file = await pickImage(ImageSource.gallery);
+    Uint8List file = await pickImage(
+      ImageSource.gallery,
+    );
     setState(() {
       _file = file;
     });
@@ -99,12 +104,12 @@ class _AddPostScreenState extends State<AddPostScreen> {
     try {
       // upload to storage and db
       String res = await FireStoreMethods().uploadPost(
-        _descriptionController.text,
-        _file!,
-        uid,
-        username,
-        profImage,
-      );
+          _descriptionController.text,
+          _file!,
+          uid,
+          username,
+          profImage,
+          selectedText.toString());
       if (res == "success") {
         setState(() {
           isLoading = false;
@@ -162,7 +167,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
                 padding: const EdgeInsets.only(left: 5),
                 child: IconButton(
                   icon: const Icon(
-                    FontAwesomeIcons.chevronLeft,
+                    Icons.add_box_outlined,
                     color: Colors.black,
                   ),
                   onPressed: clearImage,
@@ -227,7 +232,85 @@ class _AddPostScreenState extends State<AddPostScreen> {
                                       width: 1.2, color: Colors.lightBlue),
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(5))),
-                              onPressed: () {},
+                              onPressed: () {
+                                showModalBottomSheet(
+                                    context: context,
+                                    enableDrag: true,
+                                    isScrollControlled: true,
+                                    isDismissible: true,
+                                    builder: (BuildContext ctx) {
+                                      return Container(
+                                        color: Colors.black.withOpacity(0.1),
+                                        child: Container(
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.26,
+                                          decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius: BorderRadius.only(
+                                                  topRight: Radius.circular(5),
+                                                  topLeft: Radius.circular(5))),
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 5,
+                                            vertical: 10,
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Column(children: [
+                                              ListTile(
+                                                onTap: () {
+                                                  setState(() {
+                                                    selectedText = "All";
+                                                  });
+                                                  Navigator.pop(context);
+                                                },
+                                                title: Text(
+                                                  'All',
+                                                  style: TextStyle(
+                                                      color: btnCOlorblue,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              ),
+                                              ListTile(
+                                                onTap: () {
+                                                  setState(() {
+                                                    selectedText =
+                                                        "Only Students";
+                                                  });
+                                                  Navigator.pop(context);
+                                                },
+                                                title: Text(
+                                                  'Only Students',
+                                                  style: TextStyle(
+                                                      color: btnCOlorblue,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              ),
+                                              ListTile(
+                                                onTap: () {
+                                                  setState(() {
+                                                    selectedText =
+                                                        "Only Faculty";
+                                                  });
+                                                  Navigator.pop(context);
+                                                },
+                                                title: Text(
+                                                  'Only Faculty',
+                                                  style: TextStyle(
+                                                      color: btnCOlorblue,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              ),
+                                            ]),
+                                          ),
+                                        ),
+                                      );
+                                    });
+                              },
                               child: Text(
                                 selectedText.toString(),
                                 style: TextStyle(
@@ -386,7 +469,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
                 padding: const EdgeInsets.only(left: 5),
                 child: IconButton(
                   icon: const Icon(
-                    FontAwesomeIcons.chevronLeft,
+                    Icons.add_box_outlined,
                     color: Colors.black,
                   ),
                   onPressed: clearImage,
@@ -452,46 +535,125 @@ class _AddPostScreenState extends State<AddPostScreen> {
                                     width: 1.2, color: Color(0xFF000000)),
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(5))),
-                            onPressed: () => showDialog(
-                              useSafeArea: true,
-                              useRootNavigator: false,
-                              context: context,
-                              builder: (context) {
-                                return Dialog(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      SimpleDialogOption(
-                                        child: Text("All"),
-                                        onPressed: () {
-                                          setState(() {
-                                            selectedText = "All";
-                                          });
-                                          Navigator.pop(context);
-                                        },
+                            onPressed: () {
+                              showModalBottomSheet(
+                                  context: context,
+                                  enableDrag: true,
+                                  isScrollControlled: true,
+                                  isDismissible: true,
+                                  builder: (BuildContext ctx) {
+                                    return Container(
+                                      color: Colors.black.withOpacity(0.1),
+                                      child: Container(
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                                0.26,
+                                        decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.only(
+                                                topRight: Radius.circular(5),
+                                                topLeft: Radius.circular(5))),
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 5,
+                                          vertical: 10,
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Column(children: [
+                                            ListTile(
+                                              onTap: () {
+                                                setState(() {
+                                                  selectedText = "All";
+                                                });
+                                                Navigator.pop(context);
+                                              },
+                                              title: Text(
+                                                'All',
+                                                style: TextStyle(
+                                                    color: btnCOlorblue,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                            ),
+                                            ListTile(
+                                              onTap: () {
+                                                setState(() {
+                                                  selectedText =
+                                                      "Only Students";
+                                                });
+                                                Navigator.pop(context);
+                                              },
+                                              title: Text(
+                                                'Only Students',
+                                                style: TextStyle(
+                                                    color: btnCOlorblue,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                            ),
+                                            ListTile(
+                                              onTap: () {
+                                                setState(() {
+                                                  selectedText = "Only Faculty";
+                                                });
+                                                Navigator.pop(context);
+                                              },
+                                              title: Text(
+                                                'Only Faculty',
+                                                style: TextStyle(
+                                                    color: btnCOlorblue,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                            ),
+                                          ]),
+                                        ),
                                       ),
-                                      SimpleDialogOption(
-                                          child: Text(" Only Students"),
-                                          onPressed: () {
-                                            setState(() {
-                                              selectedText = "Only Students";
-                                            });
-                                            Navigator.pop(context);
-                                          }),
-                                      SimpleDialogOption(
-                                          child: Text("Only Faculty"),
-                                          onPressed: () {
-                                            setState(() {
-                                              selectedText = "Only Faculty";
-                                            });
-                                            Navigator.pop(context);
-                                          }),
-                                    ],
-                                  ),
-                                );
-                              },
-                            ),
+                                    );
+                                  });
+                            }
+
+                            //     showDialog(
+                            //   useSafeArea: true,
+                            //   useRootNavigator: false,
+                            //   context: context,
+                            //   builder: (context) {
+                            //     return Dialog(
+                            //       child: Column(
+                            //         crossAxisAlignment:
+                            //             CrossAxisAlignment.start,
+                            //         children: [
+                            //           SimpleDialogOption(
+                            //             child: Text("All"),
+                            //             onPressed: () {
+                            //               setState(() {
+                            //                 selectedText = "All";
+                            //               });
+                            //               Navigator.pop(context);
+                            //             },
+                            //           ),
+                            //           SimpleDialogOption(
+                            //               child: Text(" Only Students"),
+                            //               onPressed: () {
+                            //                 setState(() {
+                            //                   selectedText = "Only Students";
+                            //                 });
+                            //                 Navigator.pop(context);
+                            //               }),
+                            //           SimpleDialogOption(
+                            //               child: Text("Only Faculty"),
+                            //               onPressed: () {
+                            //                 setState(() {
+                            //                   selectedText = "Only Faculty";
+                            //                 });
+                            //                 Navigator.pop(context);
+                            //               }),
+                            //         ],
+                            //       ),
+                            //     );
+                            //   },
+                            // ),
+                            ,
                             child: Text(
                               selectedText.toString(),
                               style: TextStyle(
@@ -556,16 +718,16 @@ class _AddPostScreenState extends State<AddPostScreen> {
                                   //     .UploadResume(file!);
                                 }
                                 if (file != null) {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) {
-                                        return AddReelsScreen(
-                                          filePath: file,
-                                        );
-                                      },
-                                    ),
-                                  );
+                                  // Navigator.push(
+                                  //   context,
+                                  //   MaterialPageRoute(
+                                  //     builder: (context) {
+                                  //       return AddReelsScreen(
+                                  //         filePath: file,
+                                  //       );
+                                  //     },
+                                  //   ),
+                                  // );
                                 }
                               },
                               icon: Icon(

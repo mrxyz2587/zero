@@ -14,6 +14,7 @@ class User {
   final List following;
   final String longCoordinates;
   final String latitudeCoordinates;
+  final String status;
 
   const User(
       {required this.username,
@@ -28,7 +29,8 @@ class User {
       required this.bio,
       required this.university,
       required this.longCoordinates,
-      required this.latitudeCoordinates});
+      required this.latitudeCoordinates,
+      required this.status});
 
   static User fromSnap(DocumentSnapshot snap) {
     var snapshot = snap.data() as Map<String, dynamic>;
@@ -46,7 +48,8 @@ class User {
         bio: snapshot["bio"],
         university: snapshot["university"],
         longCoordinates: snapshot['longCoordinates'],
-        latitudeCoordinates: snapshot['latitudeCoordinates']);
+        latitudeCoordinates: snapshot['latitudeCoordinates'],
+        status: snapshot['status']);
   }
 
   Map<String, dynamic> toJson() => {
@@ -62,6 +65,7 @@ class User {
         "bio": bio,
         "university": university,
         "longCoordinates": longCoordinates,
-        "latitudeCoordinates": latitudeCoordinates
+        "latitudeCoordinates": latitudeCoordinates,
+        "status": status
       };
 }

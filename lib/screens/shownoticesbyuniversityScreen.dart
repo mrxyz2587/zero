@@ -57,18 +57,19 @@ class _ShowAllNoticeByUniverSityState extends State<ShowAllNoticeByUniverSity> {
                       Navigator.of(context).push(MaterialPageRoute(
                           builder: (context) => PdfViewerPage(url: url)));
                     },
-                    child: Card(
-                      margin: const EdgeInsets.only(
-                          bottom: 10.0, right: 18.0, left: 18),
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        side: BorderSide(
-                          color: Theme.of(context).colorScheme.outline,
+                    child: Container(
+                      height: 90,
+                      child: Card(
+                        margin: const EdgeInsets.only(
+                            bottom: 10.0, right: 18.0, left: 18),
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          side: BorderSide(
+                            color: Theme.of(context).colorScheme.outline,
+                          ),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(12)),
                         ),
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(12)),
-                      ),
-                      child: Expanded(
                         child: Row(
                           children: [
                             Padding(

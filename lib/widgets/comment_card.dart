@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:zero_fin/screens/profile_screen.dart';
 
 import '../resources/firestore_methods.dart';
 import '../utils/colors.dart';
@@ -47,11 +48,20 @@ class _CommentCardState extends State<CommentCard> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CircleAvatar(
-                backgroundImage: NetworkImage(
-                  widget.snap.data()['profilePic'],
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              ProfileScreen(uid: widget.snap.data()['uid'])));
+                },
+                child: CircleAvatar(
+                  backgroundImage: NetworkImage(
+                    widget.snap.data()['profilePic'],
+                  ),
+                  radius: 18,
                 ),
-                radius: 18,
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 10),
@@ -68,20 +78,39 @@ class _CommentCardState extends State<CommentCard> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      RichText(
-                        text: TextSpan(
-                          text: widget.snap.data()['name'],
-                          style: TextStyle(
-                              color: Color(0xFF000000),
-                              fontSize: 15,
-                              fontWeight: FontWeight.w700,
-                              fontFamily: 'Roboto'),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ProfileScreen(
+                                      uid: widget.snap.data()['uid'])));
+                        },
+                        child: RichText(
+                          text: TextSpan(
+                            text: widget.snap.data()['name'],
+                            style: TextStyle(
+                                color: Color(0xFF000000),
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
+                                fontFamily: 'Roboto'),
+                          ),
                         ),
                       ),
-                      Text(
-                          //TODO 1. import university data
-                          widget.snap.data()['universityname'],
-                          style: TextStyle(fontSize: 10, fontFamily: 'Roboto')),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ProfileScreen(
+                                      uid: widget.snap.data()['uid'])));
+                        },
+                        child: Text(
+                            //TODO 1. import university data
+                            widget.snap.data()['universityname'],
+                            style:
+                                TextStyle(fontSize: 10, fontFamily: 'Roboto')),
+                      ),
                       SizedBox(
                         height: 10,
                       ),

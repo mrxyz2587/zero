@@ -1,5 +1,8 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expandable_text/expandable_text.dart';
@@ -16,6 +19,7 @@ import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 import 'package:zero_fin/resources/storage_methods.dart';
+import 'package:zero_fin/screens/SharedPostDisplay.dart';
 import 'package:zero_fin/screens/followers_follower_screen.dart';
 import 'package:zero_fin/screens/profile_posts_display.dart';
 import 'package:zero_fin/widgets/text_field_input.dart';
@@ -174,6 +178,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  var usernamecurrent = "";
   getData() async {
     setState(() {
       isLoading = true;
@@ -189,6 +194,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
           print(quoteImageUrl);
         });
       });
+
+      var uCsnap = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .get();
+
+      usernamecurrent = (uCsnap.data()! as dynamic)['username'];
+
       var userSnap = await FirebaseFirestore.instance
           .collection('users')
           .doc(widget.uid)
@@ -404,6 +417,42 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _refreshController.refreshCompleted();
   }
 
+  sendNotification(String title, String token) async {
+    final data = {
+      'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+      'id': '1',
+      'status': 'done',
+      'message': title,
+    };
+
+    try {
+      http.Response response =
+          await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
+              headers: <String, String>{
+                'Content-Type': 'application/json',
+                'Authorization':
+                    'key=AAAAdVXFb4U:APA91bHPFxenxhJYUOgnxYUqRsIWGhpjxkxG_1p8VLBsaHjDlOwN9deEwDjs4O1I-ytIOaOajx6k0dzQ3mTaT4VBUB6LDRA_kKscvqomy_ps59Q0y-nBcKqaaanNeBY17Dy2VlCs-qvR'
+              },
+              body: jsonEncode(<String, dynamic>{
+                'notification': <String, dynamic>{
+                  'title': 'zero',
+                  'body': '${usernamecurrent.toString()} started following you',
+                },
+                'priority': 'high',
+                'data': data,
+                'to': token
+              }));
+
+      if (response.statusCode == 200) {
+        print("Yeh notificatin is sended");
+      } else {
+        print(response.reasonPhrase);
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final UserProvider userProvider = Provider.of<UserProvider>(context);
@@ -452,7 +501,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     fit: BoxFit.cover,
                                     filterQuality: FilterQuality.high,
                                   )
-                                : Image.asset('images/two.png'),
+                                : Image.asset('images/cover_default.png'),
                           ),
                         ),
                         Positioned(
@@ -506,28 +555,239 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ),
                         ),
-                        if (FirebaseAuth.instance.currentUser!.uid ==
-                            widget.uid)
-                          Positioned(
-                            right: 20,
-                            top: 15,
-                            child: GestureDetector(
-                              onTap: () {
-                                bottomSheet1(context, "Choose Cover Photo");
-                              },
-                              child: CircleAvatar(
-                                backgroundColor: Colors.white,
-                                radius: 18,
-                                child: CircleAvatar(
-                                    backgroundColor: Color(0xFFFFA100),
-                                    child: Icon(
-                                      Icons.create,
-                                      color: Colors.white,
-                                    ),
-                                    radius: 16),
+                        FirebaseAuth.instance.currentUser!.uid == widget.uid
+                            ? Positioned(
+                                right: 20,
+                                top: 15,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    bottomSheet1(context, "Choose Cover Photo");
+                                  },
+                                  child: CircleAvatar(
+                                    backgroundColor: Colors.white,
+                                    radius: 18,
+                                    child: CircleAvatar(
+                                        backgroundColor: Color(0xFFFFA100),
+                                        child: Icon(
+                                          Icons.create,
+                                          color: Colors.white,
+                                        ),
+                                        radius: 16),
+                                  ),
+                                ),
+                              )
+                            : Positioned(
+                                right: 20,
+                                top: 15,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    showModalBottomSheet(
+                                        context: context,
+                                        enableDrag: true,
+                                        isScrollControlled: true,
+                                        isDismissible: true,
+                                        builder: (BuildContext ctx) {
+                                          return Container(
+                                            color:
+                                                Colors.black.withOpacity(0.1),
+                                            child: Container(
+                                              height: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.25,
+                                              decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  borderRadius:
+                                                      BorderRadius.only(
+                                                          topRight:
+                                                              Radius.circular(
+                                                                  5),
+                                                          topLeft:
+                                                              Radius.circular(
+                                                                  5))),
+                                              padding: EdgeInsets.symmetric(
+                                                horizontal: 5,
+                                                vertical: 10,
+                                              ),
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: Column(children: [
+                                                  ListTile(
+                                                    onTap: () async {
+                                                      showModalBottomSheet(
+                                                          context: context,
+                                                          enableDrag: true,
+                                                          isScrollControlled:
+                                                              true,
+                                                          isDismissible: true,
+                                                          builder: (BuildContext
+                                                              ctx) {
+                                                            return Padding(
+                                                              padding: EdgeInsets.only(
+                                                                  bottom: MediaQuery.of(
+                                                                          context)
+                                                                      .viewInsets
+                                                                      .bottom),
+                                                              child: Container(
+                                                                color: Colors
+                                                                    .black
+                                                                    .withOpacity(
+                                                                        0.1),
+                                                                child:
+                                                                    Container(
+                                                                  height: MediaQuery.of(
+                                                                              context)
+                                                                          .size
+                                                                          .height *
+                                                                      0.30,
+                                                                  decoration: BoxDecoration(
+                                                                      color: Colors
+                                                                          .white,
+                                                                      borderRadius: BorderRadius.only(
+                                                                          topRight: Radius.circular(
+                                                                              5),
+                                                                          topLeft:
+                                                                              Radius.circular(5))),
+                                                                  padding:
+                                                                      EdgeInsets
+                                                                          .symmetric(
+                                                                    horizontal:
+                                                                        5,
+                                                                    vertical:
+                                                                        10,
+                                                                  ),
+                                                                  child:
+                                                                      Padding(
+                                                                    padding:
+                                                                        const EdgeInsets.all(
+                                                                            8.0),
+                                                                    child: Column(
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.center,
+                                                                        children: [
+                                                                          Text(
+                                                                              'Reason for Reporting. This will help us to make the platform more secure'),
+                                                                          TextFieldInput(
+                                                                              textEditingController: TextEditingController(),
+                                                                              hintText: 'Write here....',
+                                                                              textInputType: TextInputType.multiline),
+                                                                          ElevatedButton(
+                                                                              onPressed: () {
+                                                                                Fluttertoast.showToast(msg: "User is Reported ", toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.CENTER, timeInSecForIosWeb: 1, backgroundColor: Colors.black12, textColor: Colors.white, fontSize: 16);
+                                                                              },
+                                                                              child: Text('Report User'))
+                                                                        ]),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            );
+                                                          });
+                                                    },
+                                                    title: Text(
+                                                      'Report User',
+                                                      style: TextStyle(
+                                                          color: Colors.red,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                  ),
+                                                  ListTile(
+                                                    onTap: () {
+                                                      showModalBottomSheet(
+                                                          context: context,
+                                                          enableDrag: true,
+                                                          isScrollControlled:
+                                                              true,
+                                                          isDismissible: true,
+                                                          builder: (BuildContext
+                                                              ctx) {
+                                                            return Padding(
+                                                              padding: EdgeInsets.only(
+                                                                  bottom: MediaQuery.of(
+                                                                          context)
+                                                                      .viewInsets
+                                                                      .bottom),
+                                                              child: Container(
+                                                                color: Colors
+                                                                    .black
+                                                                    .withOpacity(
+                                                                        0.1),
+                                                                child:
+                                                                    Container(
+                                                                  height: MediaQuery.of(
+                                                                              context)
+                                                                          .size
+                                                                          .height *
+                                                                      0.30,
+                                                                  decoration: BoxDecoration(
+                                                                      color: Colors
+                                                                          .white,
+                                                                      borderRadius: BorderRadius.only(
+                                                                          topRight: Radius.circular(
+                                                                              5),
+                                                                          topLeft:
+                                                                              Radius.circular(5))),
+                                                                  padding:
+                                                                      EdgeInsets
+                                                                          .symmetric(
+                                                                    horizontal:
+                                                                        5,
+                                                                    vertical:
+                                                                        10,
+                                                                  ),
+                                                                  child:
+                                                                      Padding(
+                                                                    padding:
+                                                                        const EdgeInsets.all(
+                                                                            8.0),
+                                                                    child: Column(
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.center,
+                                                                        children: [
+                                                                          Text(
+                                                                              'Reason for Blocking. This will help us to make the platform more secure'),
+                                                                          TextFieldInput(
+                                                                              textEditingController: TextEditingController(),
+                                                                              hintText: 'Write here....',
+                                                                              textInputType: TextInputType.multiline),
+                                                                          ElevatedButton(
+                                                                              onPressed: () {
+                                                                                Fluttertoast.showToast(msg: "User will be blocked ", toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.CENTER, timeInSecForIosWeb: 1, backgroundColor: Colors.black12, textColor: Colors.white, fontSize: 16);
+                                                                              },
+                                                                              child: Text('Block User'))
+                                                                        ]),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            );
+                                                          });
+                                                    },
+                                                    title: Text(
+                                                      'Block',
+                                                      style: TextStyle(
+                                                          color: Colors.red,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                  ),
+                                                ]),
+                                              ),
+                                            ),
+                                          );
+                                        });
+                                  },
+                                  child: CircleAvatar(
+                                    backgroundColor: Colors.white,
+                                    radius: 18,
+                                    child: CircleAvatar(
+                                        backgroundColor: Color(0xFFFFA100),
+                                        child: Icon(Icons.more_vert,
+                                            color: Colors.white),
+                                        radius: 16),
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
                       ],
                     ),
                     Padding(
@@ -546,7 +806,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     fontWeight: FontWeight.w700,
                                     fontSize: 18),
                               ),
-                              Text('Quantum University, Roorkee',
+                              Text(userData['university'],
                                   style: TextStyle(
                                       fontSize: 12, color: Colors.black)),
                             ],
@@ -919,6 +1179,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           userData['status'],
                                           userData['token'],
                                         );
+                                        sendNotification(userData['username'],
+                                            userData['token']);
                                       },
                                       child: Container(
                                         padding: const EdgeInsets.only(top: 2),
@@ -1670,8 +1932,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                              PostProfileLinearDisplay(
-                                                uid: snap['uid'],
+                                              SharedPostsDiplay(
+                                                postId: snap['postId'],
                                               )));
                                 },
                                 child: Container(
@@ -1849,8 +2111,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                              PostProfileLinearDisplay(
-                                                uid: snap['uid'],
+                                              SharedPostsDiplay(
+                                                postId: snap['postId'],
                                               )));
                                 },
                                 child: Container(

@@ -41,13 +41,13 @@ class _InternshipScreenState extends State<InternshipScreen> {
   void getdata() async {
     try {
       await FirebaseFirestore.instance
-          .collection('quiz')
-          .doc('dailyquiz')
+          .collection('applyIntershipCardd')
+          .doc('applyCard')
           .get()
           .then((value) {
         imageUrl = value.data()!["imageUrl"].toString();
         print(imageUrl.toString());
-        // quizUrl = value.data()!["quizUrl"].toString();
+        quizUrl = value.data()!["quizUrl"].toString();
       });
       setState(() {
         isSubmitted = true;
@@ -78,7 +78,22 @@ class _InternshipScreenState extends State<InternshipScreen> {
                       'Internships',
                       style: TextStyle(
                           color: Colors.black, fontWeight: FontWeight.bold),
-                    )),
+                    ),
+                    actions: [
+                      IconButton(
+                          onPressed: () async {
+                            if (await canLaunch('quizUrl')) {
+                              await launch('quizUrl',
+                                  enableDomStorage: true,
+                                  enableJavaScript: true,
+                                  forceWebView: true);
+                            }
+                          },
+                          icon: Icon(
+                            FontAwesomeIcons.circlePlus,
+                            color: webBackgroundColor,
+                          ))
+                    ]),
                 body: isSubmitted
                     ? ListView(
                         children: [

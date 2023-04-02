@@ -169,6 +169,7 @@ class _EventScreenState extends State<EventScreen>
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(5)),
                           child: TabBar(
+                            physics: ClampingScrollPhysics(),
                             labelPadding: EdgeInsets.symmetric(vertical: 0),
                             padding: EdgeInsets.symmetric(vertical: 0),
                             indicatorColor: Colors.black,
@@ -188,6 +189,7 @@ class _EventScreenState extends State<EventScreen>
                           child: Container(
                             color: Color(0xFFEFEFEF),
                             child: TabBarView(
+                                physics: ClampingScrollPhysics(),
                                 controller: tabController,
                                 children: [
                                   StreamBuilder(
@@ -207,6 +209,7 @@ class _EventScreenState extends State<EventScreen>
                                       }
                                       return ListView.builder(
                                         shrinkWrap: true,
+                                        physics: ClampingScrollPhysics(),
                                         controller: ScrollController(
                                             keepScrollOffset: true),
                                         scrollDirection: Axis.vertical,
@@ -522,6 +525,7 @@ class _EventScreenState extends State<EventScreen>
                                       }
                                       return ListView.builder(
                                         shrinkWrap: true,
+                                        physics: ClampingScrollPhysics(),
                                         controller: ScrollController(
                                             keepScrollOffset: true),
                                         scrollDirection: Axis.vertical,

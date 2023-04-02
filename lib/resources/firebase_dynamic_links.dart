@@ -23,7 +23,7 @@ class FirebaseDynamicLinksService {
     linkMessage = dynamicLink.toString();
     print('methods \n\n\n');
     print(dynamicLink.toString());
-    return linkMessage;
+    return dynamicLink.toString();
   }
 
   static Future<void> initDynamicLink(BuildContext context) async {

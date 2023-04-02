@@ -91,7 +91,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
               body: jsonEncode(<String, dynamic>{
                 'notification': <String, dynamic>{
                   'title': widget.name.toString(),
-                  'body': 'This betichod commented on your post'
+                  'body': 'commented on your post'
                 },
                 'priority': 'high',
                 'data': data,
@@ -155,22 +155,62 @@ class _CommentsScreenState extends State<CommentsScreen> {
             itemCount: snapshot.data!.docs.length,
             itemBuilder: (ctx, index) => GestureDetector(
               onLongPress: () async {
-                final postpersonId = await FirebaseFirestore.instance
-                    .collection('posts')
-                    .doc(widget.snap['postId'])
-                    .get();
+                showModalBottomSheet(
+                    context: context,
+                    enableDrag: true,
+                    isScrollControlled: true,
+                    isDismissible: true,
+                    builder: (BuildContext ctx) {
+                      return Container(
+                        color: Colors.black.withOpacity(0.1),
+                        child: Container(
+                          height: MediaQuery.of(context).size.height * 0.15,
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.only(
+                                  topRight: Radius.circular(5),
+                                  topLeft: Radius.circular(5))),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 5,
+                            vertical: 10,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(children: [
+                              ListTile(
+                                onTap: () async {
+                                  final postpersonId = await FirebaseFirestore
+                                      .instance
+                                      .collection('posts')
+                                      .doc(widget.snap['postId'])
+                                      .get();
 
-                if (snapshot.data!.docs[index].data()['uid'] ==
-                        user.uid.toString() ||
-                    postpersonId.data()!['uid'].toString() ==
-                        user.uid.toString()) {
-                  await FirebaseFirestore.instance
-                      .collection('posts')
-                      .doc(widget.snap['postId'])
-                      .collection('comments')
-                      .doc(snapshot.data!.docs[index].data()['commentId'])
-                      .delete();
-                }
+                                  if (snapshot.data!.docs[index]
+                                              .data()['uid'] ==
+                                          user.uid.toString() ||
+                                      postpersonId.data()!['uid'].toString() ==
+                                          user.uid.toString()) {
+                                    await FirebaseFirestore.instance
+                                        .collection('posts')
+                                        .doc(widget.snap['postId'])
+                                        .collection('comments')
+                                        .doc(snapshot.data!.docs[index]
+                                            .data()['commentId'])
+                                        .delete();
+                                  }
+                                },
+                                title: Text(
+                                  'Delete',
+                                  style: TextStyle(
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ]),
+                          ),
+                        ),
+                      );
+                    });
               },
               child: CommentCard(
                 snap: snapshot.data!.docs[index],
