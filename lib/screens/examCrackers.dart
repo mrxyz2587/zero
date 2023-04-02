@@ -100,15 +100,31 @@ class _ExamCrackersState extends State<ExamCrackers>
             return Scaffold(
                 backgroundColor: Color(0xFFEFEFEF),
                 appBar: AppBar(
-                    elevation: 0,
-                    backgroundColor: Colors.white,
-                    leading: Icon(FontAwesomeIcons.graduationCap,
-                        color: Colors.black),
-                    title: Text(
-                      'Exam Crackers',
-                      style: TextStyle(
-                          color: Colors.black, fontWeight: FontWeight.bold),
-                    )),
+                  elevation: 0,
+                  backgroundColor: Colors.white,
+                  leading:
+                      Icon(FontAwesomeIcons.graduationCap, color: Colors.black),
+                  title: Text(
+                    'Exam Crackers',
+                    style: TextStyle(
+                        color: Colors.black, fontWeight: FontWeight.bold),
+                  ),
+                  actions: [
+                    IconButton(
+                        onPressed: () async {
+                          if (await canLaunch('quizUrl')) {
+                            await launch('quizUrl',
+                                enableDomStorage: true,
+                                enableJavaScript: true,
+                                forceWebView: true);
+                          }
+                        },
+                        icon: Icon(
+                          FontAwesomeIcons.circlePlus,
+                          color: webBackgroundColor,
+                        ))
+                  ],
+                ),
                 body: Column(
                   children: [
                     Container(

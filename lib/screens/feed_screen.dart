@@ -4,23 +4,33 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:badges/badges.dart' as badges;
+
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import 'package:scroll_to_top/scroll_to_top.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:zero_fin/resources/firebase_dynamic_links.dart';
+import 'package:zero_fin/screens/Creative_club_chat.dart';
 import 'package:zero_fin/screens/HomeScreen.dart';
+import 'package:zero_fin/screens/finance_club_chat.dart';
+import 'package:zero_fin/screens/meme_club_chat.dart';
 import 'package:zero_fin/screens/profile_screen.dart';
 import 'package:zero_fin/screens/search_screen.dart';
+import 'package:zero_fin/screens/startup_club_chat.dart';
 import '../providers/user_provider.dart';
 import '../utils/local_notification_services.dart';
 import '/utils/colors.dart';
 import '/utils/global_variable.dart';
 import '/widgets/post_card.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'global_group_chat_screen.dart';
 import 'notice_screen.dart';
 
 class FeedScreen extends StatefulWidget {
@@ -290,7 +300,8 @@ class _FeedScreenState extends State<FeedScreen> {
     if (state == AppLifecycleState.resumed) {
       // online
       setStatus("Online");
-    } else {
+    }
+    if (state == AppLifecycleState.inactive) {
       // offline
       setStatus("Offline");
     }
@@ -322,33 +333,11 @@ class _FeedScreenState extends State<FeedScreen> {
         print(longitude.toString() + "" + latitude.toString());
       }
     });
-    getdistance();
 
     isLoading = false;
   }
 
   int i = 0;
-
-  void getdistance() async {
-    await FirebaseFirestore.instance
-        .collection("users")
-        .where("uid", isNotEqualTo: FirebaseAuth.instance.currentUser!.uid)
-        .get()
-        .then((value) {
-      for (var docs in value.docs) {
-        if (docs.data()["uid"].toString() !=
-            FirebaseAuth.instance.currentUser!.uid.toString()) {
-          otherlatitude = double.parse(docs.data()['latitudeCoordinates']);
-          otherlongitude = double.parse(docs.data()['longCoordinates']);
-          print(otherlongitude.toString() + otherlatitude.toString());
-          distanceInMeters = Geolocator.distanceBetween(
-              latitude, longitude, otherlatitude, otherlongitude);
-          print("distance$distanceInMeters  $i");
-          i++;
-        }
-      }
-    });
-  }
 
   bool badgeShown = false;
   void getData() async {
@@ -440,7 +429,7 @@ class _FeedScreenState extends State<FeedScreen> {
               title: Image.asset('images/logoofzeroappbar.png', height: 38),
               actions: [
                 IconButton(
-                  icon: Badge(
+                  icon: badges.Badge(
                     ignorePointer: true,
                     badgeContent: Text('1',
                         style: TextStyle(
@@ -578,6 +567,198 @@ class _FeedScreenState extends State<FeedScreen> {
                       // );
                     },
                   ),
+                  if (userProvider.getUser.designation.toString() == "student")
+                    Container(
+                        height: 54,
+                        width: MediaQuery.of(context).size.width,
+                        color: Colors.white,
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 13.0),
+                            child: Text(
+                              'Top Clubs',
+                              style: TextStyle(
+                                fontSize: 19,
+                                color: Colors.black,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                          ),
+                        )),
+                  if (userProvider.getUser.designation.toString() == "student")
+                    SizedBox(height: 5),
+                  if (userProvider.getUser.designation.toString() == "student")
+                    Container(
+                        height: 98,
+                        width: MediaQuery.of(context).size.width,
+                        color: Colors.white,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            GestureDetector(
+                              onTap: () => Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => GlobalGroupChatScreen(),
+                                ),
+                              ),
+                              child: Container(
+                                child: Column(
+                                  children: [
+                                    CircleAvatar(
+                                      backgroundImage: AssetImage(
+                                          'images/confession_club.png'),
+                                      radius: 25.5,
+                                    ),
+                                    SizedBox(height: 10),
+                                    Text(
+                                      'Confession Club',
+                                      style: TextStyle(
+                                          fontSize: 10,
+                                          color: Color(0xFF1D1C1D),
+                                          fontFamily: 'Roboto'),
+                                      softWrap: true,
+                                      overflow: TextOverflow.fade,
+                                    )
+                                  ],
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                ),
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () => Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => StartupClubChatScreen(
+                                      usernamecurrent:
+                                          userProvider.getUser.username),
+                                ),
+                              ),
+                              child: Container(
+                                child: Column(
+                                  children: [
+                                    CircleAvatar(
+                                      backgroundImage:
+                                          AssetImage('images/startup_club.png'),
+                                      radius: 25.5,
+                                    ),
+                                    SizedBox(height: 10),
+                                    Text(
+                                      'Startup Club',
+                                      style: TextStyle(
+                                          fontSize: 10,
+                                          color: Color(0xFF1D1C1D),
+                                          fontFamily: 'Roboto'),
+                                      softWrap: true,
+                                      overflow: TextOverflow.fade,
+                                    )
+                                  ],
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                ),
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () => Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => FinanceClubChatScreen(
+                                      usernamecurrent:
+                                          userProvider.getUser.username),
+                                ),
+                              ),
+                              child: Container(
+                                child: Column(
+                                  children: [
+                                    CircleAvatar(
+                                      backgroundImage:
+                                          AssetImage('images/finance_club.png'),
+                                      radius: 25.5,
+                                    ),
+                                    SizedBox(height: 10),
+                                    Text(
+                                      'Finance Club',
+                                      style: TextStyle(
+                                          fontSize: 10,
+                                          color: Color(0xFF1D1C1D),
+                                          fontFamily: 'Roboto'),
+                                      softWrap: true,
+                                      overflow: TextOverflow.fade,
+                                    )
+                                  ],
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                ),
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () => Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => MemeClubChatScreen(
+                                      usernamecurrent:
+                                          userProvider.getUser.username),
+                                ),
+                              ),
+                              child: Container(
+                                child: Column(
+                                  children: [
+                                    CircleAvatar(
+                                      backgroundImage:
+                                          AssetImage('images/meme_club.png'),
+                                      radius: 25.5,
+                                    ),
+                                    SizedBox(height: 10),
+                                    Text(
+                                      'Meme Club',
+                                      style: TextStyle(
+                                          fontSize: 10,
+                                          color: Color(0xFF1D1C1D),
+                                          fontFamily: 'Roboto'),
+                                      softWrap: true,
+                                      overflow: TextOverflow.fade,
+                                    )
+                                  ],
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                ),
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () => Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => CreativeClubChatScreen(
+                                      usernamecurrent:
+                                          userProvider.getUser.username),
+                                ),
+                              ),
+                              child: Container(
+                                child: Column(
+                                  children: [
+                                    CircleAvatar(
+                                      backgroundImage:
+                                          AssetImage('images/one.png'),
+                                      radius: 25.5,
+                                    ),
+                                    SizedBox(height: 10),
+                                    Text(
+                                      'Creative Club',
+                                      style: TextStyle(
+                                          fontSize: 10,
+                                          color: Color(0xFF1D1C1D),
+                                          fontFamily: 'Roboto'),
+                                      softWrap: true,
+                                      overflow: TextOverflow.fade,
+                                    )
+                                  ],
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                ),
+                              ),
+                            ),
+                          ],
+                        )),
+                  if (userProvider.getUser.designation.toString() == "student")
+                    SizedBox(height: 5),
                   StreamBuilder(
                     stream: FirebaseFirestore.instance
                         .collection('posts')

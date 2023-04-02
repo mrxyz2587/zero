@@ -1,8 +1,11 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -28,31 +31,16 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
   @override
   void dispose() {
     super.dispose();
-    _emailController.dispose();
-    _passwordController.dispose();
   }
-
-  bool showOnboardScreen = false;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
 
-    SharedPreferences.getInstance().then((prefs) {
-      final int dialogOpen = prefs.getInt('show_intro') ?? 0;
-      if (dialogOpen == 0) {
-        setState(() {
-          showOnboardScreen = true;
-        });
-        prefs.setInt("show_intro", 1);
-      }
-    });
     SharedPreferences.getInstance().then((prefs) {
       final int dialogOpen = prefs.getInt('show_dialog') ?? 0;
       if (dialogOpen == 0) {
@@ -81,306 +69,166 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
-  void loginUser() async {
-    setState(() {});
+  void signInWithGoogle() async {
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
-    String res = await AuthMethods().loginUser(
-        email: _emailController.text, password: _passwordController.text);
-    if (res == 'success') {
-      Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(
-            builder: (context) => const ResponsiveLayout(
-              mobileScreenLayout: MobileScreenLayout(),
-              webScreenLayout: WebScreenLayout(),
-            ),
-          ),
-          (route) => false);
+    // Obtain the auth details from the request
+    final GoogleSignInAuthentication? googleAuth =
+        await googleUser?.authentication;
 
-      setState(() {});
-    } else {
-      setState(() {});
-      Navigator.of(context).pop();
-      Fluttertoast.showToast(
-          msg: "Please enter the correct credentials",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.black87,
-          textColor: Colors.white,
-          fontSize: 16.0);
-    }
+    // Create a new credential
+
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth?.accessToken,
+      idToken: googleAuth?.idToken,
+    );
+
+    final credentials = await FirebaseAuth.instance
+        .signInWithCredential(credential)
+        .then((value) {
+      final doc = FirebaseFirestore.instance
+          .collection('users')
+          .doc(value.user!.uid.toString())
+          .get();
+      print(value.user!.uid.toString() + 'laura');
+
+      if (doc != null) {
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => SignupScreen()));
+      }
+    });
+
+    // if (docexist) {
+    //   Navigator.push(
+    //       context,
+    //       MaterialPageRoute(
+    //           builder: (context) => ResponsiveLayout(
+    //               mobileScreenLayout: MobileScreenLayout(),
+    //               webScreenLayout: WebScreenLayout())));
+    // }
   }
 
   bool showDone = false;
-  PageController _pageController = PageController();
+  int num = 0;
+  CarouselController _pageController = CarouselController();
   @override
   Widget build(BuildContext context) {
-    return showOnboardScreen == true
-        ? Scaffold(
-            body: Stack(fit: StackFit.expand, children: [
-              PageView(
-                onPageChanged: (val) {
-                  if (val == 3) {
-                    setState(() {
-                      showDone = true;
-                    });
-                  }
-                },
-                controller: _pageController,
-                children: [
-                  Image.asset('images/screen_1.png', fit: BoxFit.fill),
-                  Image.asset('images/screen_2.png', fit: BoxFit.fill),
-                  Image.asset('images/screen_3.png', fit: BoxFit.fill),
-                  Image.asset('images/screen_4.png', fit: BoxFit.fill),
-                ],
-              ),
-              Container(
-                alignment: Alignment(0, 0.95),
-                child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      InkWell(
-                        child: Container(
-                          child: Text(
-                            'Skip',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                        onTap: () {
-                          setState(() {
-                            _pageController.jumpToPage(3);
-                          });
-                        },
-                      ),
-                      SmoothPageIndicator(
-                        controller: _pageController,
-                        count: 4,
-                        effect: WormEffect(
-                            dotHeight: 10,
-                            dotWidth: 10,
-                            activeDotColor: Colors.white,
-                            dotColor: Colors.black.withOpacity(0.1)),
-                      ),
-                      (showDone == true)
-                          ? InkWell(
-                              child: Container(
-                                child: Text(
-                                  'Done',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ),
-                              onTap: () {
-                                setState(() {
-                                  showOnboardScreen = false;
-                                });
-                              },
-                            )
-                          : InkWell(
-                              child: Container(
-                                child: Text(
-                                  'Next',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ),
-                              onTap: () {
-                                _pageController.nextPage(
-                                    duration: Duration(milliseconds: 500),
-                                    curve: Curves.fastOutSlowIn);
-                              },
-                            ),
-                    ]),
-              )
-            ]),
-          )
-        : Scaffold(
-            backgroundColor: Colors.white,
-            body: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Flexible(
-                    fit: FlexFit.loose,
-                    child: Image(
-                        image: AssetImage('images/zero_logo.png'),
-                        height: 100)),
-                SizedBox(
-                  height: 20,
-                ),
-                Center(
-                  child: Text(
-                    "Be 10 Times Better",
-                    style: TextStyle(
-                        fontSize: 20,
-                        fontFamily: 'Comfortaa',
-                        color: Colors.black87,
-                        fontWeight: FontWeight.bold),
-                  ),
-                ),
-                SizedBox(
-                  height: 40,
-                ),
-                TextFieldInput(
-                  hintText: 'Enter your email',
-                  textInputType: TextInputType.emailAddress,
-                  textEditingController: _emailController,
-                ),
-                TextFieldInput(
-                  hintText: 'password',
-                  textInputType: TextInputType.text,
-                  textEditingController: _passwordController,
-                  isPass: true,
-                ),
-                SizedBox(height: 15),
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      alertProgressIndicator(context, 'Loging In');
-
-                      (_emailController.text.isEmpty ||
-                              !_emailController.text.contains('@'))
-                          ? showAlertDialog()
-                          : loginUser();
-                    });
-                  },
-                  child: Container(
-                    margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 40),
-                    padding: EdgeInsets.all(13),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                          colors: [
-                            Color(0xFF2B2B2B),
-                            Color(0xFF000000),
-                          ],
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight),
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(11),
-                      ),
-                    ),
-                    child: Center(
-                      child: Text('Login',
-                          style: TextStyle(
-                              color: Color(0xFFFFFFFF),
-                              fontSize: 15,
-                              fontFamily: 'Roboto')),
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 15,
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Divider(
-                        height: 1.5,
-                        color: Colors.black45,
-                        indent: 40,
-                        endIndent: 20,
-                      ),
-                    ),
-                    Text(
-                      'or',
-                      style: TextStyle(fontSize: 14, color: Color(0xFFA3A3A3)),
-                    ),
-                    Expanded(
-                      child: Divider(
-                        height: 1.5,
-                        color: Colors.black45,
-                        indent: 20,
-                        endIndent: 40,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 15,
-                ),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => const SignupScreen(),
-                      ),
-                    );
-                  },
-                  child: Container(
-                    margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 40),
-                    padding: EdgeInsets.all(13),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                          colors: [
-                            Color(0xFF2B2B2B),
-                            Color(0xFF000000),
-                          ],
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight),
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(11),
-                      ),
-                    ),
-                    child: Center(
-                      child: Text('Create Account',
-                          style: TextStyle(
-                              color: Color(0xFFFFFFFF),
-                              fontSize: 15,
-                              fontFamily: 'Roboto')),
-                    ),
-                  ),
-                ),
-              ],
+    return Scaffold(
+      body: Stack(children: [
+        Container(
+          height: MediaQuery.of(context).size.height * 1,
+          child: CarouselSlider(
+            carouselController: _pageController,
+            items: [
+              Image.asset('images/login_one.png',
+                  height: MediaQuery.of(context).size.height,
+                  fit: BoxFit.cover,
+                  width: MediaQuery.of(context).size.width),
+              Image.asset('images/login_two.png',
+                  height: MediaQuery.of(context).size.height,
+                  fit: BoxFit.cover,
+                  width: MediaQuery.of(context).size.width),
+              Image.asset('images/login_three.png',
+                  height: MediaQuery.of(context).size.height,
+                  fit: BoxFit.cover,
+                  width: MediaQuery.of(context).size.width),
+            ],
+            options: CarouselOptions(
+                padEnds: false,
+                viewportFraction: 1,
+                height: MediaQuery.of(context).size.height,
+                autoPlay: true,
+                initialPage: 0,
+                onPageChanged: (index, reason) {
+                  setState(() {
+                    num = index;
+                  });
+                }),
+          ),
+        ),
+        Align(
+          heightFactor: 29,
+          child: AnimatedSmoothIndicator(
+            activeIndex: num,
+            count: 3,
+            axisDirection: Axis.horizontal,
+            effect: SlideEffect(
+                spacing: 8.0,
+                radius: 4.0,
+                dotWidth: 23.0,
+                dotHeight: 3.0,
+                dotColor: Color(0xFF4F4F4F).withOpacity(0.64),
+                activeDotColor: Colors.white),
+          ),
+        ),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(25), topLeft: Radius.circular(25)),
             ),
-          );
-  }
-
-  alertProgressIndicator(context, text) {
-    showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-              scrollable: false,
-              backgroundColor: Colors.white,
-              title: Text(text),
-              content: LinearProgressIndicator(
-                color: Colors.blue,
-              ),
-            ));
-  }
-
-  void showAlertDialog() {
-    Alert(
-      context: context,
-      title: "Enter a valid email",
-      style: AlertStyle(
-          descStyle: TextStyle(
-            color: Colors.black54,
-            fontSize: 16,
+            height: MediaQuery.of(context).size.height * 0.25,
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                        color: Color(0xFF3D3939),
+                        borderRadius: BorderRadius.circular(2)),
+                    width: 69,
+                    height: 3,
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      signInWithGoogle();
+                    },
+                    child: Container(
+                      width: 322,
+                      height: 47,
+                      decoration: BoxDecoration(
+                        color: Color(0xFF4286F5),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              height: 40,
+                              width: 40,
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(8)),
+                              child: Center(
+                                child: Icon(
+                                  FontAwesomeIcons.google,
+                                  color: Color(0xFF4286F5),
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              width: 50,
+                            ),
+                            Text(
+                              'Continue with Google',
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700,
+                                  fontFamily: 'Roboto'),
+                            ),
+                            SizedBox(
+                              width: 50,
+                            ),
+                          ]),
+                    ),
+                  )
+                ]),
           ),
-          descTextAlign: TextAlign.justify),
-      desc: "Please enter your college domain email id "
-          "or the email reistered by you in your college",
-      buttons: [
-        DialogButton(
-          child: Text(
-            "Ok",
-            style: TextStyle(color: Colors.white, fontSize: 20),
-          ),
-          onPressed: () => Navigator.pop(context),
-          width: 120,
-          color: Colors.black,
         )
-      ],
-    ).show();
+      ]),
+    );
   }
 }

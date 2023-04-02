@@ -806,7 +806,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     fontWeight: FontWeight.w700,
                                     fontSize: 18),
                               ),
-                              Text('Quantum University, Roorkee',
+                              Text(userData['university'],
                                   style: TextStyle(
                                       fontSize: 12, color: Colors.black)),
                             ],

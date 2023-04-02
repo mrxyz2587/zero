@@ -73,21 +73,37 @@ class _MentorshipCoursesState extends State<MentorshipCourses> {
                 ? Scaffold(
                     backgroundColor: Color(0xFFEFEFEF),
                     appBar: AppBar(
-                        elevation: 1,
-                        backgroundColor: Colors.white,
-                        titleSpacing: 15,
-                        leading: Padding(
-                          padding: const EdgeInsets.only(left: 18),
-                          child: Image.asset(
-                            'images/mentorship_icon.png',
-                          ),
+                      elevation: 1,
+                      backgroundColor: Colors.white,
+                      titleSpacing: 15,
+                      leading: Padding(
+                        padding: const EdgeInsets.only(left: 18),
+                        child: Image.asset(
+                          'images/mentorship_icon.png',
                         ),
-                        leadingWidth: 40,
-                        title: Text(
-                          'Mentors',
-                          style: TextStyle(
-                              color: Colors.black, fontWeight: FontWeight.bold),
-                        )),
+                      ),
+                      leadingWidth: 40,
+                      title: Text(
+                        'Mentors',
+                        style: TextStyle(
+                            color: Colors.black, fontWeight: FontWeight.bold),
+                      ),
+                      actions: [
+                        IconButton(
+                            onPressed: () async {
+                              if (await canLaunch(quizUrl)) {
+                                await launch(quizUrl,
+                                    enableDomStorage: true,
+                                    enableJavaScript: true,
+                                    forceWebView: true);
+                              }
+                            },
+                            icon: Icon(
+                              FontAwesomeIcons.circlePlus,
+                              color: webBackgroundColor,
+                            ))
+                      ],
+                    ),
                     body: ListView(
                       children: [
                         Padding(
@@ -117,9 +133,7 @@ class _MentorshipCoursesState extends State<MentorshipCourses> {
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(20)),
                                   child: Image(
-                                    image: NetworkImage(
-                                      imageUrl,
-                                    ),
+                                    image: NetworkImage(imageUrl),
                                     fit: BoxFit.cover,
                                   ),
                                 ),

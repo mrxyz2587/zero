@@ -290,7 +290,9 @@ class _GlobalGroupChatScreenState extends State<GlobalGroupChatScreen> {
   Future getImage() async {
     ImagePicker _picker = ImagePicker();
 
-    await _picker.pickImage(source: ImageSource.gallery).then((xFile) {
+    await _picker
+        .pickImage(source: ImageSource.gallery, imageQuality: 5)
+        .then((xFile) {
       if (xFile != null) {
         imageFile = File(xFile.path);
         uploadImage();
@@ -622,7 +624,7 @@ class DialogExample extends StatelessWidget {
         ),
       ),
       child: const Text(
-        'Messages Global',
+        'Confession Club',
         style: TextStyle(
             color: Colors.black, fontWeight: FontWeight.w700, fontSize: 16),
       ),

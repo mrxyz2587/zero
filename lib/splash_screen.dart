@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:data_connection_checker_tv/data_connection_checker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:zero_fin/resources/firebase_dynamic_links.dart';
 import 'package:zero_fin/screens/email_verification.dart';
 
 import '/responsive/mobile_screen_layout.dart';
@@ -16,6 +18,7 @@ class Splash extends StatefulWidget {
 }
 
 class _SplashState extends State<Splash> {
+  String uid = "";
   void initState() {
     super.initState();
     process();
@@ -27,6 +30,7 @@ class _SplashState extends State<Splash> {
 * using snapshot.ConnectionState
 *
 * */
+  @override
   void process() async {
     await DataConnectionChecker().onStatusChange.listen((event) {
       switch (event) {
@@ -43,12 +47,10 @@ class _SplashState extends State<Splash> {
                       // Checking if the snapshot has any data or not
                       if (snapshot.hasData) {
                         // if snapshot has data which means user is logged in then we check the width of screen and accordingly display the screen layout
-                        if (FirebaseAuth.instance.currentUser!.emailVerified) {
+                        if (FirebaseAuth.instance.currentUser!.emailVerified)
                           return ResponsiveLayout(
                               mobileScreenLayout: MobileScreenLayout(),
                               webScreenLayout: WebScreenLayout());
-                        }
-                        return EmailVerificationScreen();
                       } else if (snapshot.hasError) {
                         return Center(
                           child: Text('${snapshot.error}'),

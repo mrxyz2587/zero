@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:feature_discovery/feature_discovery.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
@@ -15,7 +17,8 @@ class MobileScreenLayout extends StatefulWidget {
   State<MobileScreenLayout> createState() => _MobileScreenLayoutState();
 }
 
-class _MobileScreenLayoutState extends State<MobileScreenLayout> {
+class _MobileScreenLayoutState extends State<MobileScreenLayout>
+    with WidgetsBindingObserver {
   int _page = 0;
   late PageController pageController; // for tabs animation
 
@@ -23,8 +26,8 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
   void initState() {
     super.initState();
     pageController = PageController();
-    FirebaseDynamicLinksService.initDynamicLink(context);
     print('homeScreenCalled');
+    WidgetsBinding.instance.addObserver(this);
 
     FirebaseMessaging.onMessage.listen((event) {
       print("Fcm Recieved");
@@ -35,7 +38,18 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      Timer(const Duration(milliseconds: 1000), () {
+        FirebaseDynamicLinksService.initDynamicLink(context);
+      });
+    }
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+
     super.dispose();
     pageController.dispose();
   }

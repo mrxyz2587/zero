@@ -18,6 +18,7 @@ class ImageViewing extends StatefulWidget {
 class _ImageViewingState extends State<ImageViewing> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   String phoneNumber = '';
+  int callBtnClicked = 0;
   @override
   void initState() {
     // TODO: implement initState
@@ -32,6 +33,7 @@ class _ImageViewingState extends State<ImageViewing> {
         .get()
         .then((value) {
       phoneNumber = value.data()!['call'].toString();
+      callBtnClicked = value.data()!['callBtnClicked'];
     });
   }
 
@@ -55,7 +57,7 @@ class _ImageViewingState extends State<ImageViewing> {
             children: [
               Expanded(
                 child: StreamBuilder(
-                  stream: FirebaseFirestore.instance
+                  stream: _firestore
                       .collection('restuarants')
                       .doc(widget.docId)
                       .collection('menuandcall')
@@ -115,6 +117,11 @@ class _ImageViewingState extends State<ImageViewing> {
               ),
               InkWell(
                 onTap: () async {
+                  _firestore
+                      .collection('restuarants')
+                      .doc(widget.docId)
+                      .update({'callBtnClicked': callBtnClicked + 1});
+
                   await FlutterPhoneDirectCaller.callNumber(
                       phoneNumber.toString());
                 },

@@ -48,7 +48,9 @@ class _AddPostScreenState extends State<AddPostScreen> {
   }
 
   _setImageFromGallery() async {
-    Uint8List file = await pickImage(ImageSource.gallery);
+    Uint8List file = await pickImage(
+      ImageSource.gallery,
+    );
     setState(() {
       _file = file;
     });

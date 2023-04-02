@@ -41,32 +41,32 @@ class _CertificationCOursesState extends State<CertificationCOurses>
     getdata();
 
     super.initState();
-    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
-    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
-    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+    // _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    // _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    // _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
   }
 
   String courseId = "";
   String currentusermaol = "";
 
-  void _handlePaymentSuccess(
-    PaymentSuccessResponse response,
-  ) {
-    String? paymentId = response.paymentId;
-
-    print("payment Success");
-    FirebaseFirestore.instance
-        .collection('coursesection')
-        .doc('certification')
-        .collection('allCourses')
-        .doc(courseId)
-        .update({
-      'paymentId': FieldValue.arrayUnion([paymentId]),
-      'registeredemails': FieldValue.arrayUnion([currentusermaol.toString()])
-    });
-    print(courseId + "edetailing" + currentusermaol);
-    setState(() {});
-  }
+  // void _handlePaymentSuccess(
+  //   PaymentSuccessResponse response,
+  // ) {
+  //   String? paymentId = response.paymentId;
+  //
+  //   print("payment Success");
+  //   FirebaseFirestore.instance
+  //       .collection('coursesection')
+  //       .doc('certification')
+  //       .collection('allCourses')
+  //       .doc(courseId)
+  //       .update({
+  //     'paymentId': FieldValue.arrayUnion([paymentId]),
+  //     'registeredemails': FieldValue.arrayUnion([currentusermaol.toString()])
+  //   });
+  //   print(courseId + "edetailing" + currentusermaol);
+  //   setState(() {});
+  // }
 
   void getdata() async {
     await FirebaseFirestore.instance
@@ -77,19 +77,18 @@ class _CertificationCOursesState extends State<CertificationCOurses>
       currentusermaol = value.data()!["email"].toString();
     });
   }
-
-  void _handlePaymentError(PaymentFailureResponse response) {
-    // Do something when payment fails
-    print("paymentfailed");
-  }
-
-  void _handleExternalWallet(ExternalWalletResponse response) {
-    // Do something when an external wallet was selected
-  }
+  //
+  // void _handlePaymentError(PaymentFailureResponse response) {
+  //   // Do something when payment fails
+  //   print("paymentfailed");
+  // }
+  //
+  // void _handleExternalWallet(ExternalWalletResponse response) {
+  //   // Do something when an external wallet was selected
+  // }
 
   @override
   Widget build(BuildContext context) {
-    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
     TabController tabController = TabController(length: 2, vsync: this);
     return ScreenUtilInit(
         designSize: const Size(360, 690),
@@ -108,7 +107,22 @@ class _CertificationCOursesState extends State<CertificationCOurses>
                       'Certification',
                       style: TextStyle(
                           color: Colors.black, fontWeight: FontWeight.bold),
-                    )),
+                    ),
+                    actions: [
+                      IconButton(
+                          onPressed: () async {
+                            if (await canLaunch('quizUrl')) {
+                              await launch('quizUrl',
+                                  enableDomStorage: true,
+                                  enableJavaScript: true,
+                                  forceWebView: true);
+                            }
+                          },
+                          icon: Icon(
+                            FontAwesomeIcons.circlePlus,
+                            color: webBackgroundColor,
+                          ))
+                    ]),
                 body: Column(
                   children: [
                     Container(
@@ -516,33 +530,19 @@ class _CertificationCOursesState extends State<CertificationCOurses>
                                                                                 BorderRadius.all(Radius.circular(7))),
                                                                       ),
                                                                       onPressed:
-                                                                          () {
-                                                                        var options =
-                                                                            {
-                                                                          'key':
-                                                                              'rzp_test_cLikbNvwBHO1tH',
-                                                                          'amount': (snapshot
-                                                                              .data!
-                                                                              .docs[index]
-                                                                              .data()["price"]
-                                                                              .toString()),
-                                                                          'name': snapshot
-                                                                              .data!
-                                                                              .docs[index]
-                                                                              .data()["price"]
-                                                                              .toString()
-                                                                              .substring(0, 5),
-                                                                          'description':
-                                                                              " lund lund lund lund lund ldunv",
-                                                                        };
-                                                                        _razorpay
-                                                                            .open(options);
-
-                                                                        courseId = snapshot
+                                                                          () async {
+                                                                        final url = snapshot
                                                                             .data!
                                                                             .docs[index]
-                                                                            .data()["id"]
+                                                                            .data()["url"]
                                                                             .toString();
+                                                                        if (await canLaunch(
+                                                                            url)) {
+                                                                          await launch(
+                                                                              url,
+                                                                              enableJavaScript: true,
+                                                                              forceWebView: true);
+                                                                        }
                                                                       },
                                                                       // color: btnCOlorblue,
                                                                       child:

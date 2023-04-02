@@ -29,29 +29,21 @@ class AuthMethods {
       required String dateOfBirth,
       required Uint8List file,
       required String university}) async {
-    var ref = FirebaseFirestore.instance.collection("unregisteredusers").get();
-
     String res = "Some error Occurred";
     try {
-      if (email.isNotEmpty ||
-          password.isNotEmpty ||
-          username.isNotEmpty ||
+      if (username.isNotEmpty ||
           designation.isNotEmpty ||
           department.isNotEmpty ||
           dateOfBirth.isNotEmpty ||
           file != null) {
         // registering user in auth with email and password
-        UserCredential cred = await _auth.createUserWithEmailAndPassword(
-          email: email,
-          password: password,
-        );
 
         String photoUrl = await StorageMethods()
             .uploadImageToStorage('profilePics', file, false);
 
         model.User _user = model.User(
             username: username.toLowerCase(),
-            uid: cred.user!.uid,
+            uid: _auth.currentUser!.uid,
             photoUrl: photoUrl,
             email: email,
             designation: designation,
@@ -66,7 +58,7 @@ class AuthMethods {
             status: "Online");
         await _firestore
             .collection("users")
-            .doc(cred.user!.uid)
+            .doc(_auth.currentUser!.uid)
             .set(_user.toJson());
         // adding user in our database
 
