@@ -986,9 +986,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                                         bioCOntrolee,
                                                                     keyboardType:
                                                                         TextInputType
-                                                                            .text,
+                                                                            .multiline,
                                                                     maxLines: 3,
-                                                                    // maxLength: 50,
                                                                     style:
                                                                         TextStyle(
                                                                       fontFamily:

@@ -27,11 +27,10 @@ import 'package:http/http.dart' as http;
 
 class PostCard extends StatefulWidget {
   final snap;
+  final currentusername;
 
-  const PostCard({
-    Key? key,
-    required this.snap,
-  }) : super(key: key);
+  const PostCard({Key? key, required this.snap, required this.currentusername})
+      : super(key: key);
 
   @override
   State<PostCard> createState() => _PostCardState();
@@ -1084,7 +1083,7 @@ class _PostCardState extends State<PostCard> {
               },
               body: jsonEncode(<String, dynamic>{
                 'notification': <String, dynamic>{
-                  'title': widget.snap['username'].toString(),
+                  'title': widget.currentusername.toString(),
                   'body': 'Liked your Post',
                 },
                 'priority': 'high',
@@ -1467,7 +1466,7 @@ class _PostCardState extends State<PostCard> {
                       MaterialPageRoute(
                         builder: (context) => CommentsScreen(
                           snap: widget.snap,
-                          name: widget.snap['username'],
+                          name: widget.currentusername.toString(),
                           token: tokenpst,
                         ),
                       ),

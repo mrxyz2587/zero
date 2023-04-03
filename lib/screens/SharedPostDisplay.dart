@@ -101,6 +101,7 @@ class _SharedPostsDiplayState extends State<SharedPostsDiplay> {
 
                         return PostCard(
                           snap: snap,
+                          currentusername: '',
                         );
                       },
                     );

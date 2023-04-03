@@ -153,7 +153,7 @@ class _CommentCardState extends State<CommentCard> {
           ),
           GestureDetector(
             onTap: () {
-              FireStoreMethods().likeComment(
+              FireStoreMethods().likeCommentMensFashion(
                 widget.snap.data()['commentId'],
                 FirebaseAuth.instance.currentUser!.uid.toString(),
                 widget.snap.data()['likes'] as List,

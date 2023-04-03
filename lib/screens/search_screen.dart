@@ -13,6 +13,7 @@ import 'package:zero_fin/resources/firestore_methods.dart';
 import 'package:zero_fin/screens/ChatRoom.dart';
 import 'package:zero_fin/screens/HomeScreen.dart';
 import 'package:zero_fin/screens/resturant_showing_screen.dart';
+import 'package:zero_fin/widgets/fashion_card_widget.dart';
 import 'package:zero_fin/widgets/text_field_input.dart';
 import 'package:zero_fin/widgets/video_player_items.dart';
 import 'package:zero_fin/widgets/videoplayersearch.dart';
@@ -28,6 +29,8 @@ class SearchScreen extends StatefulWidget {
   @override
   State<SearchScreen> createState() => _SearchScreenState();
 }
+
+enum options { MEN, WOMEN, BEAUTY }
 
 class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController searchController = TextEditingController();
@@ -86,6 +89,8 @@ class _SearchScreenState extends State<SearchScreen> {
 
     isLoading = false;
   }
+
+  var opt = 'men';
 
   @override
   Widget build(BuildContext context) {
@@ -980,7 +985,6 @@ class _SearchScreenState extends State<SearchScreen> {
                           padding:
                               EdgeInsets.only(left: 22, top: 15, bottom: 5),
                         )),
-
                     Padding(
                       padding: const EdgeInsets.all(6.0),
                       child: GestureDetector(
@@ -1108,7 +1112,6 @@ class _SearchScreenState extends State<SearchScreen> {
                       //   shrinkWrap: true,
                       // ),
                     ),
-
                     // FutureBuilder(
                     //   future: FirebaseFirestore.instance
                     //       .collection('reels')
@@ -1150,7 +1153,6 @@ class _SearchScreenState extends State<SearchScreen> {
                     //     );
                     //   },
                     // ),
-
                     Align(
                         alignment: Alignment.topLeft,
                         child: Container(
@@ -1165,11 +1167,101 @@ class _SearchScreenState extends State<SearchScreen> {
                           padding:
                               EdgeInsets.only(left: 22, top: 15, bottom: 5),
                         )),
-
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  opt = 'men';
+                                });
+                              },
+                              child: Container(
+                                width: 79,
+                                height: 30,
+                                child: Center(
+                                  child: Text(
+                                    'MEN',
+                                    style: TextStyle(
+                                        color: opt == 'men'
+                                            ? Color(0xFF3A8CC9)
+                                            : Color(0xFF1D1C1D),
+                                        fontFamily: 'Roboto',
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 12),
+                                  ),
+                                ),
+                                decoration: BoxDecoration(
+                                    color: Color(
+                                      0xFFF2F6F5,
+                                    ),
+                                    borderRadius: BorderRadius.circular(22)),
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  opt = 'women';
+                                });
+                              },
+                              child: Container(
+                                width: 79,
+                                height: 30,
+                                child: Center(
+                                  child: Text(
+                                    'WOMEN',
+                                    style: TextStyle(
+                                        color: opt == 'women'
+                                            ? Color(0xFF3A8CC9)
+                                            : Color(0xFF1D1C1D),
+                                        fontFamily: 'Roboto',
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 12),
+                                  ),
+                                ),
+                                decoration: BoxDecoration(
+                                    color: Color(
+                                      0xFFF2F6F5,
+                                    ),
+                                    borderRadius: BorderRadius.circular(22)),
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  opt = 'beauty & GROOMING';
+                                });
+                              },
+                              child: Container(
+                                width: 79,
+                                height: 30,
+                                child: Center(
+                                  child: Text(
+                                    'BEAUTY',
+                                    style: TextStyle(
+                                        color: opt == 'beauty'
+                                            ? Color(0xFF3A8CC9)
+                                            : Color(0xFF1D1C1D),
+                                        fontFamily: 'Roboto',
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 12),
+                                  ),
+                                ),
+                                decoration: BoxDecoration(
+                                    color: Color(
+                                      0xFFF2F6F5,
+                                    ),
+                                    borderRadius: BorderRadius.circular(22)),
+                              ),
+                            ),
+                          ]),
+                    ),
                     StreamBuilder(
                       stream: FirebaseFirestore.instance
-                          .collection('posts')
-                          .orderBy('timestamp', descending: true)
+                          .collection('ecommale')
+                          .where('type', isEqualTo: opt)
                           .snapshots(),
                       builder: (context,
                           AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
@@ -1193,7 +1285,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                   width > webScreenSize ? width * 0.3 : 0,
                               vertical: width > webScreenSize ? 15 : 0,
                             ),
-                            child: PostCard(
+                            child: FashionCard(
                               snap: snapshot.data!.docs[index].data(),
                             ),
                           ),
