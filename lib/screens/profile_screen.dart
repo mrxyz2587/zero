@@ -216,11 +216,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
           .collection('posts')
           .where('uid', isEqualTo: widget.uid)
           .get();
-      var reelsSnap = await FirebaseFirestore.instance
-          .collection('reels')
-          .where('uid', isEqualTo: widget.uid)
-          .get();
-      postLen = postSnap.docs.length + reelsSnap.docs.length;
+      // var reelsSnap = await FirebaseFirestore.instance
+      //     .collection('reels')
+      //     .where('uid', isEqualTo: widget.uid)
+      //     .get();
+      postLen = postSnap.docs.length;
 
       following = userSnap.data()!['following'];
       followers = userSnap.data()!['followers'];
@@ -405,8 +405,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   var opt = options.POSTS;
-  RefreshController _refreshController =
-      RefreshController(initialRefresh: false);
+  RefreshController _refreshController = RefreshController(
+    initialRefresh: false,
+  );
 
   void _onRefresh() async {
     // monitor network fetch
@@ -475,6 +476,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 enablePullDown: true,
                 enablePullUp: true,
                 onRefresh: _onRefresh,
+                footer: CustomFooter(
+                  builder: (context, mode) {
+                    Widget body;
+                    if (mode == LoadStatus.idle) {
+                      body = Text("pull up load");
+                    } else if (mode == LoadStatus.loading) {
+                      body = CupertinoActivityIndicator();
+                    } else if (mode == LoadStatus.failed) {
+                      body = Text("Load Failed!Click retry!");
+                    } else if (mode == LoadStatus.canLoading) {
+                      body = Text("release to load more");
+                    } else {
+                      body = Text("No more Data");
+                    }
+                    return Container(
+                      height: 55.0,
+                      child: Center(child: body),
+                    );
+                  },
+                ),
                 header: ClassicHeader(),
                 child: ListView(
                   children: [
@@ -986,9 +1007,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                                         bioCOntrolee,
                                                                     keyboardType:
                                                                         TextInputType
-                                                                            .text,
+                                                                            .multiline,
                                                                     maxLines: 3,
-                                                                    // maxLength: 50,
                                                                     style:
                                                                         TextStyle(
                                                                       fontFamily:
@@ -2126,43 +2146,43 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           );
                         },
                       ),
-                    if (opt == options.REEL)
-                      FutureBuilder(
-                        future: FirebaseFirestore.instance
-                            .collection('reels')
-                            .where('uid', isEqualTo: widget.uid)
-                            .get(),
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData) {
-                            return Center(
-                                child: CircularProgressIndicator(
-                              color: Colors.grey.shade300,
-                              strokeWidth: 1.5,
-                            ));
-                          }
-
-                          return GridView.builder(
-                            controller:
-                                ScrollController(keepScrollOffset: true),
-                            scrollDirection: Axis.vertical,
-                            shrinkWrap: true,
-                            itemCount: (snapshot.data! as dynamic).docs.length,
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3,
-                              crossAxisSpacing: 1.5,
-                              mainAxisSpacing: 1.5,
-                              childAspectRatio: 1,
-                            ),
-                            itemBuilder: (context, index) => Container(
-                              child: VideoPlayerSearch(
-                                videoUrl: (snapshot.data! as dynamic)
-                                    .docs[index]['reelUrl'],
-                              ),
-                            ),
-                          );
-                        },
-                      ),
+                    // if (opt == options.REEL)
+                    //   FutureBuilder(
+                    //     future: FirebaseFirestore.instance
+                    //         .collection('reels')
+                    //         .where('uid', isEqualTo: widget.uid)
+                    //         .get(),
+                    //     builder: (context, snapshot) {
+                    //       if (!snapshot.hasData) {
+                    //         return Center(
+                    //             child: CircularProgressIndicator(
+                    //           color: Colors.grey.shade300,
+                    //           strokeWidth: 1.5,
+                    //         ));
+                    //       }
+                    //
+                    //       return GridView.builder(
+                    //         controller:
+                    //             ScrollController(keepScrollOffset: true),
+                    //         scrollDirection: Axis.vertical,
+                    //         shrinkWrap: true,
+                    //         itemCount: (snapshot.data! as dynamic).docs.length,
+                    //         gridDelegate:
+                    //             const SliverGridDelegateWithFixedCrossAxisCount(
+                    //           crossAxisCount: 3,
+                    //           crossAxisSpacing: 1.5,
+                    //           mainAxisSpacing: 1.5,
+                    //           childAspectRatio: 1,
+                    //         ),
+                    //         itemBuilder: (context, index) => Container(
+                    //           child: VideoPlayerSearch(
+                    //             videoUrl: (snapshot.data! as dynamic)
+                    //                 .docs[index]['reelUrl'],
+                    //           ),
+                    //         ),
+                    //       );
+                    //     },
+                    //   ),
                   ],
                 ),
               ),

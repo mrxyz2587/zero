@@ -55,7 +55,7 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data
-                    android:host="be10timesbetter.page.link"
+                    android:host="zeromonk.page.link"
                     android:scheme="https"/>
             </intent-filter>
         </activity>

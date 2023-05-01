@@ -48,8 +48,14 @@ class FireStoreMethods {
     return res;
   }
 
-  Future<String> uploadPost(String description, Uint8List file, String uid,
-      String username, String profImage, String privacy) async {
+  Future<String> uploadPost(
+      String description,
+      Uint8List file,
+      String uid,
+      String username,
+      String profImage,
+      String privacy,
+      String universityname) async {
     // asking uid here because we dont want to make extra calls to firebase auth when we can just get from our state management
     String res = "Some error occurred";
     try {
@@ -71,7 +77,8 @@ class FireStoreMethods {
           profImage: profImage,
           saves: [],
           privacy: privacy,
-          timestamp: DateTime.now());
+          timestamp: DateTime.now(),
+          universityname: universityname);
       _firestore.collection('posts').doc(postId).set(post.toJson());
       res = "success";
     } catch (err) {
@@ -174,6 +181,37 @@ class FireStoreMethods {
     return res;
   }
 
+  Future<String> likeCommentMensFashion(
+      String commentId, String uid, List likes, String postId) async {
+    String res = "Some error occurred";
+    try {
+      if (likes.contains(uid)) {
+        // if the likes list contains the user uid, we need to remove it
+        _firestore
+            .collection('ecommale')
+            .doc(postId)
+            .collection('comments')
+            .doc(commentId)
+            .update({
+          'likes': FieldValue.arrayRemove([uid])
+        });
+      } else {
+        _firestore
+            .collection('ecommale')
+            .doc(postId)
+            .collection('comments')
+            .doc(commentId)
+            .update({
+          'likes': FieldValue.arrayUnion([uid])
+        });
+      }
+      res = 'success';
+    } catch (err) {
+      res = err.toString();
+    }
+    return res;
+  }
+
   Future<String> likePost(
       String postId, String uid, List likes, Future functions) async {
     String res = "Some error occurred";
@@ -188,6 +226,26 @@ class FireStoreMethods {
           'likes': FieldValue.arrayUnion([uid])
         });
         functions;
+      }
+      res = 'success';
+    } catch (err) {
+      res = err.toString();
+    }
+    return res;
+  }
+
+  Future<String> likeMenfashion(String postId, String uid, List likes) async {
+    String res = "Some error occurred";
+    try {
+      if (likes.contains(uid)) {
+        // if the likes list contains the user uid, we need to remove it
+        _firestore.collection('ecommale').doc(postId).update({
+          'likes': FieldValue.arrayRemove([uid])
+        });
+      } else {
+        _firestore.collection('ecommale').doc(postId).update({
+          'likes': FieldValue.arrayUnion([uid])
+        });
       }
       res = 'success';
     } catch (err) {
@@ -254,6 +312,29 @@ class FireStoreMethods {
     return res;
   }
 
+  Future<String> SavedMenFashion(String postId, String uid, List saved) async {
+    String res = "Some error occurred";
+    try {
+      if (saved.contains(uid)) {
+        // if the likes list contains the user uid, we need to remove it
+        _firestore.collection('ecommale').doc(postId).update({
+          'saves': FieldValue.arrayRemove([uid])
+        });
+        print("array remove called");
+      } else {
+        // else we need to add uid to the likes array
+        _firestore.collection('ecommale').doc(postId).update({
+          'saves': FieldValue.arrayUnion([uid])
+        });
+        print("array Union called");
+      }
+      res = 'success';
+    } catch (err) {
+      res = err.toString();
+    }
+    return res;
+  }
+
   // Post comment
   Future<String> postComment(
       String postId,
@@ -285,6 +366,38 @@ class FireStoreMethods {
         });
         res = 'success';
         functions;
+      } else {
+        res = "Please enter text";
+      }
+    } catch (err) {
+      res = err.toString();
+    }
+    return res;
+  }
+
+  Future<String> postCommentMensFashion(String postId, String text, String uid,
+      String name, String profilePic, String universityname) async {
+    String res = "Some error occurred";
+    try {
+      if (text.isNotEmpty) {
+        // if the likes list contains the user uid, we need to remove it
+        String commentId = const Uuid().v1();
+        _firestore
+            .collection('ecommale')
+            .doc(postId)
+            .collection('comments')
+            .doc(commentId)
+            .set({
+          'profilePic': profilePic,
+          'name': name,
+          'uid': uid,
+          'text': text,
+          'commentId': commentId,
+          'datePublished': DateTime.now(),
+          'universityname': universityname,
+          'likes': []
+        });
+        res = 'success';
       } else {
         res = "Please enter text";
       }

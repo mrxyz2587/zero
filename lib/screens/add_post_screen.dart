@@ -96,7 +96,8 @@ class _AddPostScreenState extends State<AddPostScreen> {
     );
   }
 
-  void postImage(String uid, String username, String profImage) async {
+  void postImage(String uid, String username, String profImage,
+      String universityname) async {
     setState(() {
       isLoading = true;
     });
@@ -109,17 +110,20 @@ class _AddPostScreenState extends State<AddPostScreen> {
           uid,
           username,
           profImage,
-          selectedText.toString());
+          selectedText.toString(),
+          universityname);
       if (res == "success") {
         setState(() {
           isLoading = false;
         });
+        Navigator.pop(context);
         showSnackBar(
           context,
           'Posted!',
         );
         clearImage();
       } else {
+        Navigator.pop(context);
         showSnackBar(context, res);
       }
     } catch (err) {
@@ -157,6 +161,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
     //   controller.setVolume(1);
     //   controller.setLooping(true);
     // }
+
     return _file != null
         ? Scaffold(
             appBar: AppBar(
@@ -423,11 +428,29 @@ class _AddPostScreenState extends State<AddPostScreen> {
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8)),
                               ),
-                              onPressed: () => postImage(
-                                userProvider.getUser.uid,
-                                userProvider.getUser.username,
-                                userProvider.getUser.photoUrl,
-                              ),
+
+                              onPressed: () {
+                                showDialog(
+                                    barrierDismissible: false,
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10)),
+                                          scrollable: false,
+                                          backgroundColor: Colors.white,
+                                          title: Text("Posting to Feeds"),
+                                          content: LinearProgressIndicator(
+                                            color: Colors.blue,
+                                          ),
+                                        ));
+
+                                postImage(
+                                    userProvider.getUser.uid,
+                                    userProvider.getUser.username,
+                                    userProvider.getUser.photoUrl,
+                                    userProvider.getUser.university);
+                              },
                               child: Text('POST',
                                   style: TextStyle(
                                       fontSize: 12,
@@ -518,7 +541,9 @@ class _AddPostScreenState extends State<AddPostScreen> {
                                     fontFamily: 'Roboto'),
                               ),
                               SizedBox(height: 2),
-                              Text('Quantum University, Roorkee',
+                              Text(
+                                  userProvider.getUser.university ??
+                                      'Quantum University, Roorkee',
                                   style: TextStyle(
                                       color: Color(0xFF1F1F1F),
                                       fontSize: 10,

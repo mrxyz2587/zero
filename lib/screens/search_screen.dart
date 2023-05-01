@@ -13,6 +13,7 @@ import 'package:zero_fin/resources/firestore_methods.dart';
 import 'package:zero_fin/screens/ChatRoom.dart';
 import 'package:zero_fin/screens/HomeScreen.dart';
 import 'package:zero_fin/screens/resturant_showing_screen.dart';
+import 'package:zero_fin/widgets/fashion_card_widget.dart';
 import 'package:zero_fin/widgets/text_field_input.dart';
 import 'package:zero_fin/widgets/video_player_items.dart';
 import 'package:zero_fin/widgets/videoplayersearch.dart';
@@ -28,6 +29,8 @@ class SearchScreen extends StatefulWidget {
   @override
   State<SearchScreen> createState() => _SearchScreenState();
 }
+
+enum options { MEN, WOMEN, BEAUTY }
 
 class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController searchController = TextEditingController();
@@ -55,37 +58,7 @@ class _SearchScreenState extends State<SearchScreen> {
     super.dispose();
   }
 
-  void getLocation() async {
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    final LocationSettings locationSettings = LocationSettings(
-      accuracy: LocationAccuracy.high,
-      distanceFilter: 10,
-    );
-    StreamSubscription<Position> positionStream =
-        Geolocator.getPositionStream(locationSettings: locationSettings)
-            .listen((Position? position) async {
-      print(position == null
-          ? 'Unknown'
-          : ' this is locs ${position.latitude.toString()}, ${position.longitude.toString()}');
-      if (position != null) {}
-    });
-    setState(() {
-      longitude = position.longitude;
-      latitude = position.latitude;
-    });
-    print(longitude.toString() + " locas " + latitude.toString());
-
-    await FirebaseFirestore.instance
-        .collection("users")
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .update(<String, String>{
-      "longCoordinates": longitude.toString(),
-      "latitudeCoordinates": latitude.toString(),
-    });
-
-    isLoading = false;
-  }
+  var opt = 'men';
 
   @override
   Widget build(BuildContext context) {
@@ -651,11 +624,15 @@ class _SearchScreenState extends State<SearchScreen> {
                 ),
                 FutureBuilder(
                   future: (selectedText == " ")
-                      ? FirebaseFirestore.instance.collection('users').get()
+                      ? FirebaseFirestore.instance
+                          .collection('users')
+                          .limit(80)
+                          .get()
                       : FirebaseFirestore.instance
                           .collection('users')
                           .where("department",
                               isEqualTo: selectedText.toString())
+                          .limit(40)
                           .get(),
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
@@ -947,259 +924,487 @@ class _SearchScreenState extends State<SearchScreen> {
                   children: [
                     Align(
                         alignment: Alignment.topLeft,
-                        child: Container(
-                          child: Text(
-                            "Nearby Buddies",
-                            style: TextStyle(
-                                color: Colors.black54,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w700,
-                                fontFamily: "Comfortaa"),
-                          ),
-                          padding:
-                              EdgeInsets.only(left: 22, top: 15, bottom: 5),
-                        )),
-                    Container(
-                        height: 110,
-                        width: MediaQuery.of(context).size.width,
-                        child: Center(
-                          child: Text('Comming Soon'),
-                        )),
-                    Divider(height: 0.5, thickness: 0.5, color: Colors.black26),
-                    Align(
-                        alignment: Alignment.topLeft,
-                        child: Container(
-                          child: Text(
-                            "Nearby Stores",
-                            style: TextStyle(
-                                color: Colors.black54,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w700,
-                                fontFamily: "Comfortaa"),
-                          ),
-                          padding:
-                              EdgeInsets.only(left: 22, top: 15, bottom: 5),
-                        )),
-
-                    Padding(
-                      padding: const EdgeInsets.all(6.0),
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      RestuarantShowingScreen()));
-                        },
-                        child: Container(
-                          height: 172,
-                          width: 352,
-                          child: Card(
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(15),
-                              child: Image.asset(
-                                'images/eat_now.png',
-                                fit: BoxFit.fill,
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                              left: 22.0, right: 22, bottom: 5, top: 15),
+                          child: Row(
+                            children: [
+                              Text(
+                                "Nearby Buddies",
+                                style: TextStyle(
+                                    color: Colors.black54,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w700,
+                                    fontFamily: "Comfortaa"),
                               ),
-                            ),
-                            color: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(15),
+                              Expanded(child: SizedBox()),
+                              GestureDetector(
+                                onTap: () async {
+                                  if (await canLaunch(
+                                      'https://rzp.io/l/nearbybookingzeromonk')) {
+                                    await launch(
+                                        'https://rzp.io/l/nearbybookingzeromonk',
+                                        enableDomStorage: true,
+                                        enableJavaScript: true,
+                                        forceWebView: true);
+                                  }
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(25),
+                                      border: Border.all(
+                                          color: btnCOlorblue, width: 0.5)),
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 12, vertical: 4),
+                                  child: Center(
+                                    child: Text(
+                                      "See all",
+                                      style: TextStyle(
+                                          color: btnCOlorblue,
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w700,
+                                          fontFamily: "Roboto"),
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
+                            ],
                           ),
-                        ),
-                      ),
-
-                      // GridView(
-                      //   physics: ClampingScrollPhysics(),
-                      //   controller: ScrollController(keepScrollOffset: true),
-                      //   children: [
-                      //     GestureDetector(
-                      //       onTap: () async {
-                      //         Fluttertoast.showToast(
-                      //             msg: "comming soon",
-                      //             toastLength: Toast.LENGTH_SHORT,
-                      //             gravity: ToastGravity.BOTTOM,
-                      //             timeInSecForIosWeb: 1,
-                      //             backgroundColor: Colors.black54,
-                      //             textColor: Colors.white,
-                      //             fontSize: 14.0);
-                      //       },
-                      //       child: Card(
-                      //         child: ClipRRect(
-                      //           borderRadius: BorderRadius.circular(15),
-                      //           child: Image.asset(
-                      //             'images/zero_store.png',
-                      //             fit: BoxFit.cover,
-                      //           ),
-                      //         ),
-                      //         color: Colors.white,
-                      //         shape: RoundedRectangleBorder(
-                      //           borderRadius: BorderRadius.all(
-                      //             Radius.circular(15),
-                      //           ),
-                      //         ),
-                      //       ),
-                      //     ),
-                      //     GestureDetector(
-                      //       onTap: () async {
-                      //         Fluttertoast.showToast(
-                      //             msg: "comming soon",
-                      //             toastLength: Toast.LENGTH_SHORT,
-                      //             gravity: ToastGravity.BOTTOM,
-                      //             timeInSecForIosWeb: 1,
-                      //             backgroundColor: Colors.black54,
-                      //             textColor: Colors.white,
-                      //             fontSize: 14.0);
-                      //       },
-                      //       child: Card(
-                      //         child: ClipRRect(
-                      //           borderRadius: BorderRadius.circular(15),
-                      //           child: Image.asset(
-                      //             'images/clothing.png',
-                      //             fit: BoxFit.cover,
-                      //           ),
-                      //         ),
-                      //         color: Colors.white,
-                      //         shape: RoundedRectangleBorder(
-                      //           borderRadius: BorderRadius.all(
-                      //             Radius.circular(15),
-                      //           ),
-                      //         ),
-                      //       ),
-                      //     ),
-                      //     GestureDetector(
-                      //       onTap: () {
-                      //         Fluttertoast.showToast(
-                      //             msg: "comming soon",
-                      //             toastLength: Toast.LENGTH_SHORT,
-                      //             gravity: ToastGravity.BOTTOM,
-                      //             timeInSecForIosWeb: 1,
-                      //             backgroundColor: Colors.black54,
-                      //             textColor: Colors.white,
-                      //             fontSize: 14.0);
-                      //       },
-                      //       child: Card(
-                      //         child: ClipRRect(
-                      //           borderRadius: BorderRadius.circular(15),
-                      //           child: Image.asset(
-                      //             'images/shoes.png',
-                      //             fit: BoxFit.cover,
-                      //           ),
-                      //         ),
-                      //         color: Colors.white,
-                      //         shape: RoundedRectangleBorder(
-                      //           borderRadius: BorderRadius.all(
-                      //             Radius.circular(15),
-                      //           ),
-                      //         ),
-                      //       ),
-                      //     ),
-                      //   ],
-                      //   gridDelegate:
-                      //       const SliverGridDelegateWithFixedCrossAxisCount(
-                      //     crossAxisCount: 2,
-                      //     crossAxisSpacing: 1.5,
-                      //     mainAxisSpacing: 1.5,
-                      //     childAspectRatio: 0.9,
-                      //   ),
-                      //   shrinkWrap: true,
-                      // ),
-                    ),
-
-                    // FutureBuilder(
-                    //   future: FirebaseFirestore.instance
-                    //       .collection('reels')
-                    //       .where(
-                    //         'reelId',
-                    //       )
-                    //       .get(),
-                    //   builder: (context, snapshot) {
-                    //     if (!snapshot.hasData) {
-                    //       return const Center(
-                    //         child: CircularProgressIndicator(),
-                    //       );
-                    //     }
-                    //
-                    //     return StaggeredGridView.countBuilder(
-                    //       controller: ScrollController(
-                    //         keepScrollOffset: true,
-                    //       ),
-                    //       shrinkWrap: true,
-                    //       crossAxisCount: 3,
-                    //       itemCount: (snapshot.data! as dynamic).docs.length,
-                    //       itemBuilder: (context, index) => Container(
-                    //         child: VideoPlayerSearch(
-                    //           videoUrl: (snapshot.data! as dynamic)
-                    //               .docs[index]['reelUrl'],
-                    //         ),
-                    //       ),
-                    //       staggeredTileBuilder: (index) =>
-                    //           MediaQuery.of(context).size.width >
-                    //                   webScreenSize
-                    //               ? StaggeredTile.count(
-                    //                   (index % 7 == 0) ? 1 : 1,
-                    //                   (index % 7 == 0) ? 1 : 1)
-                    //               : StaggeredTile.count(
-                    //                   (index % 7 == 0) ? 2 : 1,
-                    //                   (index % 7 == 0) ? 2 : 1),
-                    //       mainAxisSpacing: 2.0,
-                    //       crossAxisSpacing: 2.0,
-                    //     );
-                    //   },
-                    // ),
-
-                    Align(
-                        alignment: Alignment.topLeft,
-                        child: Container(
-                          child: Text(
-                            "Life Style",
-                            style: TextStyle(
-                                color: Colors.black54,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w700,
-                                fontFamily: "Comfortaa"),
-                          ),
-                          padding:
-                              EdgeInsets.only(left: 22, top: 15, bottom: 5),
                         )),
-
                     StreamBuilder(
                       stream: FirebaseFirestore.instance
-                          .collection('posts')
-                          .orderBy('timestamp', descending: true)
+                          .collection('users')
+                          .where("uid",
+                              isNotEqualTo:
+                                  FirebaseAuth.instance.currentUser!.uid)
+                          .limit(7)
                           .snapshots(),
-                      builder: (context,
-                          AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
-                              snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Center(
-                              child: CircularProgressIndicator(
-                            color: Colors.grey.shade300,
-                            strokeWidth: 1.5,
-                          ));
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
                         }
-                        return ListView.builder(
-                          shrinkWrap: true,
-                          controller: ScrollController(),
-                          scrollDirection: Axis.vertical,
-                          itemCount: snapshot.data!.docs.length,
-                          itemBuilder: (ctx, index) => Container(
-                            margin: EdgeInsets.symmetric(
-                              horizontal:
-                                  width > webScreenSize ? width * 0.3 : 0,
-                              vertical: width > webScreenSize ? 15 : 0,
-                            ),
-                            child: PostCard(
-                              snap: snapshot.data!.docs[index].data(),
-                            ),
+
+                        return SizedBox(
+                          height: 110,
+                          width: MediaQuery.of(context).size.width,
+                          child: ListView.builder(
+                            physics: ClampingScrollPhysics(),
+                            scrollDirection: Axis.horizontal,
+                            controller:
+                                ScrollController(keepScrollOffset: true),
+                            shrinkWrap: true,
+                            itemCount: (snapshot.data! as dynamic).docs.length,
+                            itemBuilder: (context, index) {
+                              return Align(
+                                alignment: Alignment.topLeft,
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.only(top: 10, bottom: 5),
+                                  child: InkWell(
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  ProfileScreen(
+                                                    uid: (snapshot.data!
+                                                            as dynamic)
+                                                        .docs[index]['uid']
+                                                        .toString(),
+                                                  )));
+                                    },
+                                    child: Container(
+                                      padding: EdgeInsets.all(4),
+                                      width: 100,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Stack(
+                                            children: [
+                                              CircleAvatar(
+                                                backgroundImage: NetworkImage(
+                                                  (snapshot.data! as dynamic)
+                                                      .docs[index]['photoUrl']
+                                                      .toString(),
+                                                ),
+                                                radius: 30,
+                                              ),
+                                              Positioned(
+                                                bottom: 3,
+                                                right: 6,
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                      color: btnCOlorblue,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                      border: Border.all(
+                                                          color: Colors.white,
+                                                          width: 1)),
+                                                  constraints:
+                                                      BoxConstraints.tight(
+                                                          Size.fromRadius(5)),
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                          SizedBox(
+                                            height: 8,
+                                          ),
+                                          Text(
+                                            (snapshot.data! as dynamic)
+                                                .docs[index]['username']
+                                                .toString(),
+                                            style: TextStyle(
+                                                color: Color(0xFF000000),
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.w700,
+                                                fontFamily: 'Roboto'),
+                                            maxLines: 1,
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
                           ),
                         );
                       },
-                    )
+                    ),
+                    Divider(height: 0.5, thickness: 0.5, color: Colors.black26),
+                    // Align(
+                    //     alignment: Alignment.topLeft,
+                    //     child: Container(
+                    //       child: Text(
+                    //         "Nearby Restuarants",
+                    //         style: TextStyle(
+                    //             color: Colors.black54,
+                    //             fontSize: 15,
+                    //             fontWeight: FontWeight.w700,
+                    //             fontFamily: "Comfortaa"),
+                    //       ),
+                    //       padding:
+                    //           EdgeInsets.only(left: 22, top: 15, bottom: 5),
+                    //     )),
+                    // Padding(
+                    //   padding: const EdgeInsets.all(6.0),
+                    //   child: GestureDetector(
+                    //     onTap: () {
+                    //       Navigator.push(
+                    //           context,
+                    //           MaterialPageRoute(
+                    //               builder: (context) =>
+                    //                   RestuarantShowingScreen()));
+                    //     },
+                    //     child: Container(
+                    //       height: 172,
+                    //       width: 352,
+                    //       child: Card(
+                    //         child: ClipRRect(
+                    //           borderRadius: BorderRadius.circular(15),
+                    //           child: Image.asset(
+                    //             'images/eat_now.png',
+                    //             fit: BoxFit.fill,
+                    //           ),
+                    //         ),
+                    //         color: Colors.white,
+                    //         shape: RoundedRectangleBorder(
+                    //           borderRadius: BorderRadius.all(
+                    //             Radius.circular(15),
+                    //           ),
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   ),
+                    //
+                    //   // GridView(
+                    //   //   physics: ClampingScrollPhysics(),
+                    //   //   controller: ScrollController(keepScrollOffset: true),
+                    //   //   children: [
+                    //   //     GestureDetector(
+                    //   //       onTap: () async {
+                    //   //         Fluttertoast.showToast(
+                    //   //             msg: "comming soon",
+                    //   //             toastLength: Toast.LENGTH_SHORT,
+                    //   //             gravity: ToastGravity.BOTTOM,
+                    //   //             timeInSecForIosWeb: 1,
+                    //   //             backgroundColor: Colors.black54,
+                    //   //             textColor: Colors.white,
+                    //   //             fontSize: 14.0);
+                    //   //       },
+                    //   //       child: Card(
+                    //   //         child: ClipRRect(
+                    //   //           borderRadius: BorderRadius.circular(15),
+                    //   //           child: Image.asset(
+                    //   //             'images/zero_store.png',
+                    //   //             fit: BoxFit.cover,
+                    //   //           ),
+                    //   //         ),
+                    //   //         color: Colors.white,
+                    //   //         shape: RoundedRectangleBorder(
+                    //   //           borderRadius: BorderRadius.all(
+                    //   //             Radius.circular(15),
+                    //   //           ),
+                    //   //         ),
+                    //   //       ),
+                    //   //     ),
+                    //   //     GestureDetector(
+                    //   //       onTap: () async {
+                    //   //         Fluttertoast.showToast(
+                    //   //             msg: "comming soon",
+                    //   //             toastLength: Toast.LENGTH_SHORT,
+                    //   //             gravity: ToastGravity.BOTTOM,
+                    //   //             timeInSecForIosWeb: 1,
+                    //   //             backgroundColor: Colors.black54,
+                    //   //             textColor: Colors.white,
+                    //   //             fontSize: 14.0);
+                    //   //       },
+                    //   //       child: Card(
+                    //   //         child: ClipRRect(
+                    //   //           borderRadius: BorderRadius.circular(15),
+                    //   //           child: Image.asset(
+                    //   //             'images/clothing.png',
+                    //   //             fit: BoxFit.cover,
+                    //   //           ),
+                    //   //         ),
+                    //   //         color: Colors.white,
+                    //   //         shape: RoundedRectangleBorder(
+                    //   //           borderRadius: BorderRadius.all(
+                    //   //             Radius.circular(15),
+                    //   //           ),
+                    //   //         ),
+                    //   //       ),
+                    //   //     ),
+                    //   //     GestureDetector(
+                    //   //       onTap: () {
+                    //   //         Fluttertoast.showToast(
+                    //   //             msg: "comming soon",
+                    //   //             toastLength: Toast.LENGTH_SHORT,
+                    //   //             gravity: ToastGravity.BOTTOM,
+                    //   //             timeInSecForIosWeb: 1,
+                    //   //             backgroundColor: Colors.black54,
+                    //   //             textColor: Colors.white,
+                    //   //             fontSize: 14.0);
+                    //   //       },
+                    //   //       child: Card(
+                    //   //         child: ClipRRect(
+                    //   //           borderRadius: BorderRadius.circular(15),
+                    //   //           child: Image.asset(
+                    //   //             'images/shoes.png',
+                    //   //             fit: BoxFit.cover,
+                    //   //           ),
+                    //   //         ),
+                    //   //         color: Colors.white,
+                    //   //         shape: RoundedRectangleBorder(
+                    //   //           borderRadius: BorderRadius.all(
+                    //   //             Radius.circular(15),
+                    //   //           ),
+                    //   //         ),
+                    //   //       ),
+                    //   //     ),
+                    //   //   ],
+                    //   //   gridDelegate:
+                    //   //       const SliverGridDelegateWithFixedCrossAxisCount(
+                    //   //     crossAxisCount: 2,
+                    //   //     crossAxisSpacing: 1.5,
+                    //   //     mainAxisSpacing: 1.5,
+                    //   //     childAspectRatio: 0.9,
+                    //   //   ),
+                    //   //   shrinkWrap: true,
+                    //   // ),
+                    // ),
+                    // // FutureBuilder(
+                    // //   future: FirebaseFirestore.instance
+                    // //       .collection('reels')
+                    // //       .where(
+                    // //         'reelId',
+                    // //       )
+                    // //       .get(),
+                    // //   builder: (context, snapshot) {
+                    // //     if (!snapshot.hasData) {
+                    // //       return const Center(
+                    // //         child: CircularProgressIndicator(),
+                    // //       );
+                    // //     }
+                    // //
+                    // //     return StaggeredGridView.countBuilder(
+                    // //       controller: ScrollController(
+                    // //         keepScrollOffset: true,
+                    // //       ),
+                    // //       shrinkWrap: true,
+                    // //       crossAxisCount: 3,
+                    // //       itemCount: (snapshot.data! as dynamic).docs.length,
+                    // //       itemBuilder: (context, index) => Container(
+                    // //         child: VideoPlayerSearch(
+                    // //           videoUrl: (snapshot.data! as dynamic)
+                    // //               .docs[index]['reelUrl'],
+                    // //         ),
+                    // //       ),
+                    // //       staggeredTileBuilder: (index) =>
+                    // //           MediaQuery.of(context).size.width >
+                    // //                   webScreenSize
+                    // //               ? StaggeredTile.count(
+                    // //                   (index % 7 == 0) ? 1 : 1,
+                    // //                   (index % 7 == 0) ? 1 : 1)
+                    // //               : StaggeredTile.count(
+                    // //                   (index % 7 == 0) ? 2 : 1,
+                    // //                   (index % 7 == 0) ? 2 : 1),
+                    // //       mainAxisSpacing: 2.0,
+                    // //       crossAxisSpacing: 2.0,
+                    // //     );
+                    // //   },
+                    // // ),
+                    // Divider(thickness: 6, color: Color(0xFFEFEFEF)),
+                    //
+                    // Align(
+                    //     alignment: Alignment.centerLeft,
+                    //     child: Container(
+                    //       child: Text(
+                    //         "College Life Style",
+                    //         style: TextStyle(
+                    //             color: Colors.black54,
+                    //             fontSize: 15,
+                    //             fontWeight: FontWeight.w700,
+                    //             fontFamily: "Comfortaa"),
+                    //       ),
+                    //       padding:
+                    //           EdgeInsets.only(left: 22, top: 10, bottom: 10),
+                    //     )),
+                    // Divider(thickness: 6, color: Color(0xFFEFEFEF)),
+                    //
+                    // Padding(
+                    //   padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    //   child: Row(
+                    //       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    //       children: [
+                    //         GestureDetector(
+                    //           onTap: () {
+                    //             setState(() {
+                    //               opt = 'men';
+                    //             });
+                    //           },
+                    //           child: Container(
+                    //             width: 79,
+                    //             height: 30,
+                    //             child: Center(
+                    //               child: Text(
+                    //                 'MEN',
+                    //                 style: TextStyle(
+                    //                     color: opt == 'men'
+                    //                         ? Color(0xFF3A8CC9)
+                    //                         : Color(0xFF1D1C1D),
+                    //                     fontFamily: 'Roboto',
+                    //                     fontWeight: FontWeight.w700,
+                    //                     fontSize: 12),
+                    //               ),
+                    //             ),
+                    //             decoration: BoxDecoration(
+                    //                 color: Color(
+                    //                   0xFFF2F6F5,
+                    //                 ),
+                    //                 borderRadius: BorderRadius.circular(22)),
+                    //           ),
+                    //         ),
+                    //         GestureDetector(
+                    //           onTap: () {
+                    //             setState(() {
+                    //               opt = 'women';
+                    //             });
+                    //           },
+                    //           child: Container(
+                    //             width: 79,
+                    //             height: 30,
+                    //             child: Center(
+                    //               child: Text(
+                    //                 'WOMEN',
+                    //                 style: TextStyle(
+                    //                     color: opt == 'women'
+                    //                         ? Color(0xFF3A8CC9)
+                    //                         : Color(0xFF1D1C1D),
+                    //                     fontFamily: 'Roboto',
+                    //                     fontWeight: FontWeight.w700,
+                    //                     fontSize: 12),
+                    //               ),
+                    //             ),
+                    //             decoration: BoxDecoration(
+                    //                 color: Color(
+                    //                   0xFFF2F6F5,
+                    //                 ),
+                    //                 borderRadius: BorderRadius.circular(22)),
+                    //           ),
+                    //         ),
+                    //         GestureDetector(
+                    //           onTap: () {
+                    //             setState(() {
+                    //               opt = 'beauty';
+                    //             });
+                    //           },
+                    //           child: Container(
+                    //             width: 79,
+                    //             height: 30,
+                    //             child: Center(
+                    //               child: Text(
+                    //                 'BEAUTY',
+                    //                 style: TextStyle(
+                    //                     color: opt == 'beauty'
+                    //                         ? Color(0xFF3A8CC9)
+                    //                         : Color(0xFF1D1C1D),
+                    //                     fontFamily: 'Roboto',
+                    //                     fontWeight: FontWeight.w700,
+                    //                     fontSize: 12),
+                    //               ),
+                    //             ),
+                    //             decoration: BoxDecoration(
+                    //                 color: Color(
+                    //                   0xFFF2F6F5,
+                    //                 ),
+                    //                 borderRadius: BorderRadius.circular(22)),
+                    //           ),
+                    //         ),
+                    //       ]),
+                    // ),
+                    // StreamBuilder(
+                    //   stream: FirebaseFirestore.instance
+                    //       .collection('ecommale')
+                    //       .where('type', isEqualTo: opt)
+                    //       .snapshots(),
+                    //   builder: (context,
+                    //       AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
+                    //           snapshot) {
+                    //     if (snapshot.connectionState ==
+                    //         ConnectionState.waiting) {
+                    //       return Center(
+                    //           child: CircularProgressIndicator(
+                    //         color: Colors.grey.shade300,
+                    //         strokeWidth: 1.5,
+                    //       ));
+                    //     }
+                    //     return ListView.builder(
+                    //       shrinkWrap: true,
+                    //       controller: ScrollController(),
+                    //       scrollDirection: Axis.vertical,
+                    //       itemCount: snapshot.data!.docs.length,
+                    //       itemBuilder: (ctx, index) => Container(
+                    //         margin: EdgeInsets.symmetric(
+                    //           horizontal:
+                    //               width > webScreenSize ? width * 0.3 : 0,
+                    //           vertical: width > webScreenSize ? 15 : 0,
+                    //         ),
+                    //         child: FashionCard(
+                    //           snap: snapshot.data!.docs[index].data(),
+                    //         ),
+                    //       ),
+                    //     );
+                    //   },
+                    // )
                   ],
                 ),
     );

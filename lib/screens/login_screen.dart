@@ -26,6 +26,7 @@ import '/widgets/text_field_input.dart';
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
   static const id = '/loginScreen';
+
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
@@ -94,7 +95,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (doc != null) {
         Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => SignupScreen()));
+            context,
+            MaterialPageRoute(
+                builder: (context) => SignupScreen(
+                      userObj: googleUser,
+                    )));
       }
     });
 

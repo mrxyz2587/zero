@@ -1,10 +1,8 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:clipboard/clipboard.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expandable_text/expandable_text.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:share_plus/share_plus.dart';
@@ -27,11 +25,10 @@ import 'package:http/http.dart' as http;
 
 class PostCard extends StatefulWidget {
   final snap;
+  final currentusername;
 
-  const PostCard({
-    Key? key,
-    required this.snap,
-  }) : super(key: key);
+  const PostCard({Key? key, required this.snap, required this.currentusername})
+      : super(key: key);
 
   @override
   State<PostCard> createState() => _PostCardState();
@@ -85,9 +82,12 @@ class _PostCardState extends State<PostCard> {
           minChildSize: 0.3,
           builder: (context, controller) => Container(
             decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(8), topLeft: Radius.circular(8))),
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topRight: Radius.circular(8),
+                topLeft: Radius.circular(8),
+              ),
+            ),
             width: MediaQuery.of(context).size.width,
             padding: EdgeInsets.symmetric(
               horizontal: 5,
@@ -292,7 +292,7 @@ class _PostCardState extends State<PostCard> {
         return DraggableScrollableSheet(
           initialChildSize: 0.6,
           minChildSize: 0.30,
-          maxChildSize: 0.95,
+          maxChildSize: 1,
           builder: (context, scrollController) {
             return Container(
               decoration: BoxDecoration(
@@ -408,7 +408,7 @@ class _PostCardState extends State<PostCard> {
                       return ListView.builder(
                         shrinkWrap: true,
                         controller: scrollController,
-                        physics: ClampingScrollPhysics(),
+                        physics: BouncingScrollPhysics(),
                         itemCount: (snapshot.data! as dynamic).docs.length,
                         itemBuilder: (context, index) => likedUid.contains(
                                 (snapshot.data! as dynamic)
@@ -1084,7 +1084,7 @@ class _PostCardState extends State<PostCard> {
               },
               body: jsonEncode(<String, dynamic>{
                 'notification': <String, dynamic>{
-                  'title': widget.snap['username'].toString(),
+                  'title': widget.currentusername.toString(),
                   'body': 'Liked your Post',
                 },
                 'priority': 'high',
@@ -1170,7 +1170,9 @@ class _PostCardState extends State<PostCard> {
                                   fontFamily: 'Roboto'),
                             ),
                             SizedBox(height: 2),
-                            Text('Quantum University, Roorkee',
+                            Text(
+                                widget.snap['universityname'] ??
+                                    'Quantum University, Roorkee',
                                 style: TextStyle(
                                     color: Color(0xFF1F1F1F),
                                     fontSize: 10,
@@ -1467,7 +1469,7 @@ class _PostCardState extends State<PostCard> {
                       MaterialPageRoute(
                         builder: (context) => CommentsScreen(
                           snap: widget.snap,
-                          name: widget.snap['username'],
+                          name: widget.currentusername.toString(),
                           token: tokenpst,
                         ),
                       ),

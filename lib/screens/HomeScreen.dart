@@ -150,6 +150,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                         .where("uid",
                             isNotEqualTo: FirebaseAuth.instance.currentUser!.uid
                                 .toString())
+                        .limit(50)
                         .snapshots(),
                     builder: (context,
                         AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>

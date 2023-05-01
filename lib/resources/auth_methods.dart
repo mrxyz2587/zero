@@ -28,38 +28,40 @@ class AuthMethods {
       required String department,
       required String dateOfBirth,
       required Uint8List file,
-      required String university}) async {
+      required String university,
+      required String googlephotoUrls}) async {
     String res = "Some error Occurred";
     try {
       if (username.isNotEmpty ||
           designation.isNotEmpty ||
           department.isNotEmpty ||
-          dateOfBirth.isNotEmpty ||
-          file != null) {
+          dateOfBirth.isNotEmpty) {
         // registering user in auth with email and password
-
-        String photoUrl = await StorageMethods()
-            .uploadImageToStorage('profilePics', file, false);
-
+        String? photoUrl;
+        if (file != null) {
+          photoUrl = await StorageMethods()
+              .uploadImageToStorage('profilePics', file, false);
+        }
         model.User _user = model.User(
-            username: username.toLowerCase(),
-            uid: _auth.currentUser!.uid,
-            photoUrl: photoUrl,
-            email: email,
-            designation: designation,
-            department: department,
-            dateOfBirth: dateOfBirth,
-            followers: [],
-            following: [],
-            university: university,
-            latitudeCoordinates: "29.564",
-            longCoordinates: "85.562",
-            bio: "Heyy I am also a zero",
-            status: "Online");
+          username: username.toLowerCase(),
+          uid: _auth.currentUser!.uid,
+          photoUrl: photoUrl ?? googlephotoUrls,
+          email: email,
+          designation: designation,
+          department: department,
+          dateOfBirth: dateOfBirth,
+          followers: [],
+          following: [],
+          university: university,
+          latitudeCoordinates: "29.564",
+          longCoordinates: "85.562",
+          bio: "Heyy I am also a zero",
+          status: "Online",
+        );
         await _firestore
             .collection("users")
             .doc(_auth.currentUser!.uid)
-            .set(_user.toJson());
+            .update(_user.toJson());
         // adding user in our database
 
         res = "success";
