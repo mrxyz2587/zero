@@ -48,8 +48,14 @@ class FireStoreMethods {
     return res;
   }
 
-  Future<String> uploadPost(String description, Uint8List file, String uid,
-      String username, String profImage, String privacy) async {
+  Future<String> uploadPost(
+      String description,
+      Uint8List file,
+      String uid,
+      String username,
+      String profImage,
+      String privacy,
+      String universityname) async {
     // asking uid here because we dont want to make extra calls to firebase auth when we can just get from our state management
     String res = "Some error occurred";
     try {
@@ -71,7 +77,8 @@ class FireStoreMethods {
           profImage: profImage,
           saves: [],
           privacy: privacy,
-          timestamp: DateTime.now());
+          timestamp: DateTime.now(),
+          universityname: universityname);
       _firestore.collection('posts').doc(postId).set(post.toJson());
       res = "success";
     } catch (err) {

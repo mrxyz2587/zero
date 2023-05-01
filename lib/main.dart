@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:feature_discovery/feature_discovery.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -7,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:zero_fin/resources/firebase_dynamic_links.dart';
+import 'package:zero_fin/screens/SharedPostDisplay.dart';
 import 'package:zero_fin/screens/testing-screen.dart';
 import 'package:zero_fin/utils/local_notification_services.dart';
 import '/providers/user_provider.dart';
@@ -20,7 +23,6 @@ import 'splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   // initialise app based on platform- web or mobile
   if (kIsWeb) {
     await Firebase.initializeApp(
@@ -34,15 +36,39 @@ void main() async {
   } else {
     await Firebase.initializeApp();
   }
-
+  final PendingDynamicLinkData? initialLink =
+      await FirebaseDynamicLinks.instance.getInitialLink();
   FirebaseMessaging.onBackgroundMessage(_handleBackgroundMessage);
   LocalNotificationService.initialize();
-  runApp(const MyApp());
+  runApp(MyApp(
+    initialLink: initialLink,
+  ));
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+class MyApp extends StatefulWidget {
+  final PendingDynamicLinkData? initialLink;
 
+  MyApp({Key? key, required this.initialLink})
+      : super(
+          key: key,
+        );
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  initState() {
+    if (widget.initialLink != null) {
+      String path = widget.initialLink!.link!.path;
+      print('path = ${path.toString()}');
+    }
+
+    super.initState();
+  }
+
+  String? userName;
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
@@ -56,15 +82,11 @@ class MyApp extends StatelessWidget {
           create: (_) => UserProvider(),
         ),
       ],
-      child: FeatureDiscovery(
-        recordStepsInSharedPreferences: true,
-        sharedPreferencesPrefix: 'steps_of_feature',
-        child: MaterialApp(
-          color: Colors.white,
-          debugShowCheckedModeBanner: false,
-          title: 'zero',
-          home: Splash(),
-        ),
+      child: MaterialApp(
+        color: Colors.white,
+        debugShowCheckedModeBanner: false,
+        title: 'zero',
+        home: Splash(widget.initialLink),
       ),
     );
   }

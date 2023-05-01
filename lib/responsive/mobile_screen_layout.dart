@@ -1,17 +1,21 @@
 import 'dart:async';
 
 import 'package:feature_discovery/feature_discovery.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:zero_fin/screens/SharedPostDisplay.dart';
+import 'package:zero_fin/screens/event_description_screen.dart';
 import '../resources/firebase_dynamic_links.dart';
 import '/utils/colors.dart';
 import '/utils/global_variable.dart';
 
 class MobileScreenLayout extends StatefulWidget {
-  const MobileScreenLayout({Key? key}) : super(key: key);
+  PendingDynamicLinkData? data;
+  MobileScreenLayout({Key? key, this.data}) : super(key: key);
 
   @override
   State<MobileScreenLayout> createState() => _MobileScreenLayoutState();
@@ -26,24 +30,60 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout>
   void initState() {
     super.initState();
     pageController = PageController();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) => handleLinkData());
+
     print('homeScreenCalled');
     WidgetsBinding.instance.addObserver(this);
 
     FirebaseMessaging.onMessage.listen((event) {
       print("Fcm Recieved");
     });
+
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       FeatureDiscovery.discoverFeatures(context, <String>['home_tappine']);
     });
   }
 
+  String? userName;
+  void handleLinkData() {
+    final Uri? uri = widget.data?.link;
+    if (uri != null) {
+      if (uri.path == '/post') {
+        final queryParams = uri.queryParameters;
+
+        if (queryParams.length > 0) {
+          userName = queryParams["postId"];
+
+          // verify the username is parsed correctly
+
+          print("My users username is: $userName");
+        }
+        Navigator.push(context, MaterialPageRoute(builder: (context) {
+          return SharedPostsDiplay(postId: userName.toString());
+        }));
+      }
+
+      if (uri.path == '/event') {
+        final queryParams = uri.queryParameters;
+
+        if (queryParams.length > 0) {
+          userName = queryParams["eventSnap"];
+
+          // verify the username is parsed correctly
+
+          print("My users username is: $userName");
+        }
+        Navigator.push(context, MaterialPageRoute(builder: (context) {
+          return EventDescriptionScreen(snap: userName.toString());
+        }));
+      }
+    }
+  }
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      Timer(const Duration(milliseconds: 1000), () {
-        FirebaseDynamicLinksService.initDynamicLink(context);
-      });
-    }
+    if (state == AppLifecycleState.resumed) {}
   }
 
   @override

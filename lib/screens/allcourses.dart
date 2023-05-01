@@ -111,11 +111,11 @@ class _CertificationCOursesState extends State<CertificationCOurses>
                     actions: [
                       IconButton(
                           onPressed: () async {
-                            if (await canLaunch('quizUrl')) {
-                              await launch('quizUrl',
-                                  enableDomStorage: true,
-                                  enableJavaScript: true,
-                                  forceWebView: true);
+                            if (await canLaunch(
+                                'https://docs.google.com/forms/d/1bBf4P_2Jr1MWXRgGnZedOTbuvVG-J-uwPK837mIcz-4/viewform?edit_requested=true#settings')) {
+                              await launch(
+                                'https://docs.google.com/forms/d/1bBf4P_2Jr1MWXRgGnZedOTbuvVG-J-uwPK837mIcz-4/viewform?edit_requested=true#settings',
+                              );
                             }
                           },
                           icon: Icon(

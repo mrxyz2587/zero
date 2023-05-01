@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expandable_text/expandable_text.dart';
@@ -6,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:zero_fin/screens/email_verification.dart';
@@ -22,7 +24,9 @@ import '/widgets/text_field_input.dart';
 import 'package:intl/intl.dart';
 
 class SignupScreen extends StatefulWidget {
-  const SignupScreen({Key? key}) : super(key: key);
+  final GoogleSignInAccount? userObj;
+
+  SignupScreen({Key? key, required this.userObj}) : super(key: key);
 
   @override
   _SignupScreenState createState() => _SignupScreenState();
@@ -105,15 +109,18 @@ class _SignupScreenState extends State<SignupScreen> {
     });
     print('signUp called');
     String res = await AuthMethods().signUpUser(
-        email: _emailController.text,
+        email: widget.userObj!.email.toString(),
         password: _passwordController.text,
-        username: _usernameController.text,
+        username: _usernameController.text.isEmpty
+            ? widget.userObj!.displayName.toString()
+            : _usernameController.text,
         designation: designation,
         dateOfBirth:
             DateFormat.yMMMMd('en_US').format(_selectedDate!).toString(),
         department: selectedText,
         file: _image!,
-        university: _universitycontroller.text);
+        university: _universitycontroller.text,
+        googlephotoUrls: widget.userObj!.displayName.toString());
     // if string returned is sucess, user has been created
     if (res == "success") {
       setState(() {
@@ -123,7 +130,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
-            builder: (context) => const ResponsiveLayout(
+            builder: (context) => ResponsiveLayout(
                 mobileScreenLayout: MobileScreenLayout(),
                 webScreenLayout: WebScreenLayout())),
         (route) => false,
@@ -310,41 +317,13 @@ class _SignupScreenState extends State<SignupScreen> {
                     radius: 80,
                     child: Padding(
                       padding: const EdgeInsets.all(1),
-                      child: _image != null
-                          ? Padding(
-                              padding: const EdgeInsets.all(2.0),
-                              child: CircleAvatar(
-                                  radius: 80,
-                                  backgroundImage: MemoryImage(_image!)),
-                            )
-                          : Container(
-                              decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Color(0xFFF2F2F2)),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  Icon(
-                                    Icons.camera_alt_rounded,
-                                    size: 25,
-                                    color: Colors.black26,
-                                  ),
-                                  Text(
-                                    'Tap to click/select ',
-                                    style: TextStyle(
-                                        color: Colors.black26, fontSize: 12),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  Text(
-                                    'your profile picture',
-                                    style: TextStyle(
-                                        color: Colors.black26, fontSize: 12),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
-                              ),
-                            ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(2.0),
+                        child: CircleAvatar(
+                            radius: 80,
+                            backgroundImage: NetworkImage(
+                                widget.userObj!.photoUrl.toString())),
+                      ),
                     ),
                   ),
                   onTap: () {
@@ -363,7 +342,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                 ),
                 TextFieldInput(
-                  hintText: 'Full name',
+                  hintText: widget.userObj!.displayName.toString(),
                   textInputType: TextInputType.text,
                   textEditingController: _usernameController,
                   isPass: false,
@@ -848,6 +827,15 @@ class _SignupScreenState extends State<SignupScreen> {
                                           setState(() {
                                             selectedText =
                                                 "Doctor of Philosophy - Management";
+                                          });
+                                          Navigator.pop(context);
+                                        }),
+                                    SimpleDialogOption(
+                                        child: Text("Others"),
+                                        onPressed: () {
+                                          setState(() {
+                                            selectedText =
+                                                "Less Popular Department";
                                           });
                                           Navigator.pop(context);
                                         }),

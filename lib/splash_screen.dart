@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:data_connection_checker_tv/data_connection_checker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:zero_fin/resources/firebase_dynamic_links.dart';
 import 'package:zero_fin/screens/email_verification.dart';
+import 'package:zero_fin/screens/event_description_screen.dart';
 
 import '/responsive/mobile_screen_layout.dart';
 import '/responsive/responsive_layout.dart';
@@ -13,6 +15,8 @@ import 'package:zero_fin/screens/login_screen.dart';
 
 class Splash extends StatefulWidget {
   static const id = '/SplashScreen';
+  PendingDynamicLinkData? data;
+  Splash(this.data);
   @override
   _SplashState createState() => _SplashState();
 }
@@ -36,7 +40,7 @@ class _SplashState extends State<Splash> {
       switch (event) {
         case DataConnectionStatus.connected:
           Timer(
-            Duration(seconds: 5),
+            Duration(seconds: 3),
             () {
               Navigator.pushReplacement(context,
                   MaterialPageRoute(builder: (context) {
@@ -49,7 +53,8 @@ class _SplashState extends State<Splash> {
                         // if snapshot has data which means user is logged in then we check the width of screen and accordingly display the screen layout
                         if (FirebaseAuth.instance.currentUser!.emailVerified)
                           return ResponsiveLayout(
-                              mobileScreenLayout: MobileScreenLayout(),
+                              mobileScreenLayout:
+                                  MobileScreenLayout(data: widget.data),
                               webScreenLayout: WebScreenLayout());
                       } else if (snapshot.hasError) {
                         return Center(

@@ -13,7 +13,7 @@ class RestuarantShowingScreen extends StatefulWidget {
 
 class _RestuarantShowingScreenState extends State<RestuarantShowingScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  String selectedLocation = 'Select Location';
+  String selectedLocation = 'Quantum University, Roorkee';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -157,7 +157,6 @@ class _RestuarantShowingScreenState extends State<RestuarantShowingScreen> {
                             crossAxisSpacing: 0.5),
                     itemCount: snapshot.data!.docs.length,
                     shrinkWrap: true,
-                    reverse: true,
                     physics: BouncingScrollPhysics(),
                     itemBuilder: (context, index) {
                       DocumentSnapshot snap =
@@ -180,6 +179,9 @@ class _RestuarantShowingScreenState extends State<RestuarantShowingScreen> {
                                 borderRadius: BorderRadius.circular(10),
                                 child: Image.network(
                                   snap['restaurantimage'],
+                                  height: 120,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
                                 ),
                               ),
                             ),

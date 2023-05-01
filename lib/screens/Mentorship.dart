@@ -91,11 +91,11 @@ class _MentorshipCoursesState extends State<MentorshipCourses> {
                       actions: [
                         IconButton(
                             onPressed: () async {
-                              if (await canLaunch(quizUrl)) {
-                                await launch(quizUrl,
-                                    enableDomStorage: true,
-                                    enableJavaScript: true,
-                                    forceWebView: true);
+                              if (await canLaunch(
+                                  'https://docs.google.com/forms/d/e/1FAIpQLSfyv_BMkvO99YazDGBX32VlSPoJEBTCSohAXYJKHH7W7oPmRg/viewform')) {
+                                await launch(
+                                  'https://docs.google.com/forms/d/e/1FAIpQLSfyv_BMkvO99YazDGBX32VlSPoJEBTCSohAXYJKHH7W7oPmRg/viewform',
+                                );
                               }
                             },
                             icon: Icon(
@@ -111,11 +111,11 @@ class _MentorshipCoursesState extends State<MentorshipCourses> {
                               vertical: 10, horizontal: 25),
                           child: InkWell(
                             onTap: () async {
-                              if (await canLaunch(quizUrl)) {
-                                await launch(quizUrl,
-                                    enableDomStorage: true,
-                                    enableJavaScript: true,
-                                    forceWebView: true);
+                              if (await canLaunch(
+                                  'https://docs.google.com/forms/d/e/1FAIpQLSfyv_BMkvO99YazDGBX32VlSPoJEBTCSohAXYJKHH7W7oPmRg/viewform')) {
+                                await launch(
+                                  'https://docs.google.com/forms/d/e/1FAIpQLSfyv_BMkvO99YazDGBX32VlSPoJEBTCSohAXYJKHH7W7oPmRg/viewform',
+                                );
                               }
                             },
                             child: Container(
@@ -133,7 +133,7 @@ class _MentorshipCoursesState extends State<MentorshipCourses> {
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(20)),
                                   child: Image(
-                                    image: NetworkImage(imageUrl),
+                                    image: AssetImage('images/mentee.png'),
                                     fit: BoxFit.cover,
                                   ),
                                 ),
