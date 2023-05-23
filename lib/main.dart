@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:zero_fin/resources/firebase_dynamic_links.dart';
 import 'package:zero_fin/screens/SharedPostDisplay.dart';
+import 'package:zero_fin/screens/newlogin/pageViewScreen.dart';
 import 'package:zero_fin/screens/testing-screen.dart';
 import 'package:zero_fin/utils/local_notification_services.dart';
 import '/providers/user_provider.dart';

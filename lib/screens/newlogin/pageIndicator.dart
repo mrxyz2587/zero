@@ -12,7 +12,7 @@ class PageIndicator extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: List.generate(
-          5,
+          3,
           (index) => Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: AnimatedContainer(

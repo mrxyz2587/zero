@@ -10,8 +10,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zero_fin/screens/SharedPostDisplay.dart';
 import 'package:zero_fin/screens/event_description_screen.dart';
 import '../resources/firebase_dynamic_links.dart';
+import '../screens/internship_details_screen.dart';
 import '/utils/colors.dart';
 import '/utils/global_variable.dart';
+import 'package:in_app_update/in_app_update.dart';
 
 class MobileScreenLayout extends StatefulWidget {
   PendingDynamicLinkData? data;
@@ -25,10 +27,13 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout>
     with WidgetsBindingObserver {
   int _page = 0;
   late PageController pageController; // for tabs animation
+  bool _updateAvailable = false;
 
   @override
   void initState() {
     super.initState();
+    _checkForUpdate();
+
     pageController = PageController();
 
     WidgetsBinding.instance.addPostFrameCallback((_) => handleLinkData());
@@ -43,6 +48,44 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout>
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       FeatureDiscovery.discoverFeatures(context, <String>['home_tappine']);
     });
+  }
+
+  Future<void> _checkForUpdate() async {
+    print('chack for avail callde');
+    final updateInfo = await InAppUpdate.checkForUpdate();
+    if (updateInfo.updateAvailability == true) {
+      setState(() {
+        showModalBottomSheet(
+            context: context,
+            enableDrag: true,
+            isScrollControlled: true,
+            isDismissible: true,
+            builder: (BuildContext ctx) {
+              return Container(
+                color: Colors.black.withOpacity(0.1),
+                child: Container(
+                  height: MediaQuery.of(context).size.height * 0.25,
+                  width: MediaQuery.of(context).size.width,
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                          topRight: Radius.circular(5),
+                          topLeft: Radius.circular(5))),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 5,
+                    vertical: 10,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Container(child: Center(child: Text('Update'))),
+                  ),
+                ),
+              );
+            });
+
+        _updateAvailable = true;
+      });
+    }
   }
 
   String? userName;
@@ -75,7 +118,23 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout>
           print("My users username is: $userName");
         }
         Navigator.push(context, MaterialPageRoute(builder: (context) {
-          return EventDescriptionScreen(snap: userName.toString());
+          return EventDescriptionScreen(id: userName.toString());
+        }));
+      }
+      if (uri.path == '/internship') {
+        final queryParams = uri.queryParameters;
+
+        if (queryParams.length > 0) {
+          userName = queryParams["internid"];
+
+          // verify the username is parsed correctly
+
+          print("My users username is: $userName");
+        }
+        Navigator.push(context, MaterialPageRoute(builder: (context) {
+          return InternshpDetaailsScreen(
+            id: userName.toString(),
+          );
         }));
       }
     }

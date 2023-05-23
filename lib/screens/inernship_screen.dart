@@ -396,7 +396,6 @@ class _InternshipScreenState extends State<InternshipScreen> {
                           itemBuilder: (ctx, index) => Container(
                             child: InternshipCard(
                               snap: snapshot.data!.docs[index].data(),
-                              onpressed: () {},
                             ),
                           ),
                         );

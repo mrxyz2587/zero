@@ -14,6 +14,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import 'package:scroll_to_top/scroll_to_top.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:zero_fin/resources/firebase_dynamic_links.dart';
 import 'package:zero_fin/screens/Creative_club_chat.dart';
@@ -27,6 +28,7 @@ import 'package:zero_fin/screens/signup_screen.dart';
 import 'package:zero_fin/screens/startup_club_chat.dart';
 import '../providers/user_provider.dart';
 import '../utils/local_notification_services.dart';
+import '../widgets/mentors_card.dart';
 import '/utils/colors.dart';
 import '/utils/global_variable.dart';
 import '/widgets/post_card.dart';
@@ -430,6 +432,8 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
   //   });
   // }
 
+  int num = 0;
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -516,487 +520,611 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
             controller: _scrollController,
             physics: BouncingScrollPhysics(),
             children: [
-              // StreamBuilder(
-              //   stream: FirebaseFirestore.instance
-              //       .collection('banners')
-              //       .snapshots(),
-              //   builder: (context,
-              //       AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
-              //           snapshot) {
-              //     if (snapshot.connectionState == ConnectionState.waiting) {
-              //       return Center(
-              //           child: CircularProgressIndicator(
-              //         color: Colors.grey.shade300,
-              //         strokeWidth: 1.5,
-              //       ));
-              //     }
-              //     return ClipRRect(
-              //       child: CarouselSlider.builder(
-              //         itemCount: snapshot.data!.docs.length,
-              //
-              //         options: CarouselOptions(
-              //           viewportFraction: 0.8,
-              //           disableCenter: true,
-              //           height: MediaQuery.of(context).size.height * 0.25,
-              //           autoPlay: true,
-              //           autoPlayInterval: Duration(seconds: 5),
-              //           scrollDirection: Axis.horizontal,
-              //         ),
-              //         itemBuilder: (BuildContext context, int itemIndex,
-              //                 int pageViewIndex) =>
-              //             GestureDetector(
-              //           onTap: () async {
-              //             final url = snapshot.data!.docs[itemIndex]
-              //                 .data()["url"]
-              //                 .toString();
-              //             if (await canLaunch(url)) {
-              //               await launch(url);
-              //             }
-              //           },
-              //           child: Container(
-              //             margin: EdgeInsets.symmetric(
-              //                 horizontal: 1, vertical: 10),
-              //             decoration: BoxDecoration(
-              //                 borderRadius: BorderRadius.circular(10),
-              //                 color: Colors.grey.shade200),
-              //             child: ClipRRect(
-              //                 borderRadius: BorderRadius.circular(10),
-              //                 child: Image.network(
-              //                         snapshot.data!.docs[itemIndex]
-              //                             .data()["imageUrl"]
-              //                             .toString(),
-              //                         fit: BoxFit.fill) ??
-              //                     Image.asset("images/logo.jpeg",
-              //                         fit: BoxFit.fill)),
-              //           ),
-              //         ),
-              //         // imageUrls.map((i) {
-              //         //   return Container(
-              //         //     margin: EdgeInsets.symmetric(horizontal: 1, vertical: 10),
-              //         //     decoration: BoxDecoration(
-              //         //         borderRadius: BorderRadius.circular(10),
-              //         //         color: Colors.grey.shade200),
-              //         //     child: ClipRRect(
-              //         //         borderRadius: BorderRadius.circular(10),
-              //         //         child: Image.network(  snapshot.data!.docs[index]
-              //         //             .data()["imageUrl"]
-              //         //             .toString(),
-              //         //             , fit: BoxFit.fill)),
-              //         //   );
-              //         // }).toList(),
-              //       ),
-              //     );
-              //
-              //     // ListView.builder(
-              //     //   addAutomaticKeepAlives: true,
-              //     //   shrinkWrap: true,
-              //     //   controller: ScrollController(keepScrollOffset: true),
-              //     //   scrollDirection: Axis.vertical,
-              //     //   itemCount: snapshot.data!.docs.length,
-              //     //   itemBuilder: (ctx, index) => Container(
-              //     //     margin:
-              //     //     EdgeInsets.symmetric(horizontal: 1, vertical: 10),
-              //     //     decoration: BoxDecoration(
-              //     //         borderRadius: BorderRadius.circular(10),
-              //     //         color: Colors.grey.shade200),
-              //     //     child: ClipRRect(
-              //     //         borderRadius: BorderRadius.circular(10),
-              //     //         child: Image.network(
-              //     //             snapshot.data!.docs[index]
-              //     //                 .data()["imageUrl"]
-              //     //                 .toString(),
-              //     //             fit: BoxFit.fill)),
-              //     //   ),
-              //     // );
-              //   },
-              // ),
-              GestureDetector(
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => RestuarantShowingScreen(),
-                    ),
-                  );
-                },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 0),
-                  child: Image.asset(
-                    'images/orderfood.png',
-                    fit: BoxFit.fill,
-                    height: MediaQuery.of(context).size.height * 0.25,
-                    width: MediaQuery.of(context).size.width,
-                  ),
-                ),
-              ),
-              if (userProvider.getUser.designation.toString() == "Student")
-                Container(
-                    height: 45,
-                    width: MediaQuery.of(context).size.width,
-                    color: Colors.white,
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 15.0),
-                        child: Text(
-                          'Top Clubs',
-                          style: TextStyle(
-                              fontSize: 17,
-                              color: Colors.black,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 1.5),
-                        ),
-                      ),
-                    )),
-              if (userProvider.getUser.designation.toString() == "Student")
-                SizedBox(height: 5),
-              if (userProvider.getUser.designation.toString() == "Student")
-                Container(
-                    height: 98,
-                    width: MediaQuery.of(context).size.width,
-                    color: Colors.white,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        GestureDetector(
-                          onTap: () => Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => GlobalGroupChatScreen(),
-                            ),
-                          ),
-                          child: Container(
-                            child: Column(
-                              children: [
-                                CircleAvatar(
-                                  backgroundImage:
-                                      AssetImage('images/confession_club.png'),
-                                  radius: 27.5,
-                                ),
-                                SizedBox(height: 10),
-                                Text(
-                                  'Confession Club',
-                                  style: TextStyle(
-                                      fontSize: 10,
-                                      color: Color(0xFF1D1C1D),
-                                      fontFamily: 'Roboto'),
-                                  softWrap: true,
-                                  overflow: TextOverflow.fade,
-                                )
-                              ],
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                            ),
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () => Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => StartupClubChatScreen(
-                                  usernamecurrent:
-                                      userProvider.getUser.username),
-                            ),
-                          ),
-                          child: Container(
-                            child: Column(
-                              children: [
-                                CircleAvatar(
-                                  backgroundImage:
-                                      AssetImage('images/startup_club.png'),
-                                  radius: 27.5,
-                                ),
-                                SizedBox(height: 10),
-                                Text(
-                                  'Startup Club',
-                                  style: TextStyle(
-                                      fontSize: 10,
-                                      color: Color(0xFF1D1C1D),
-                                      fontFamily: 'Roboto'),
-                                  softWrap: true,
-                                  overflow: TextOverflow.fade,
-                                )
-                              ],
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                            ),
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () => Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => FinanceClubChatScreen(
-                                  usernamecurrent:
-                                      userProvider.getUser.username),
-                            ),
-                          ),
-                          child: Container(
-                            child: Column(
-                              children: [
-                                CircleAvatar(
-                                  backgroundImage:
-                                      AssetImage('images/finance_club.png'),
-                                  radius: 27.5,
-                                ),
-                                SizedBox(height: 10),
-                                Text(
-                                  'Finance Club',
-                                  style: TextStyle(
-                                      fontSize: 10,
-                                      color: Color(0xFF1D1C1D),
-                                      fontFamily: 'Roboto'),
-                                  softWrap: true,
-                                  overflow: TextOverflow.fade,
-                                )
-                              ],
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                            ),
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () => Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => MemeClubChatScreen(
-                                  usernamecurrent:
-                                      userProvider.getUser.username),
-                            ),
-                          ),
-                          child: Container(
-                            child: Column(
-                              children: [
-                                CircleAvatar(
-                                  backgroundImage:
-                                      AssetImage('images/meme_club.png'),
-                                  radius: 27.5,
-                                ),
-                                SizedBox(height: 10),
-                                Text(
-                                  'Meme Club',
-                                  style: TextStyle(
-                                      fontSize: 10,
-                                      color: Color(0xFF1D1C1D),
-                                      fontFamily: 'Roboto'),
-                                  softWrap: true,
-                                  overflow: TextOverflow.fade,
-                                )
-                              ],
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                            ),
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () => Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => CreativeClubChatScreen(
-                                  usernamecurrent:
-                                      userProvider.getUser.username),
-                            ),
-                          ),
-                          child: Container(
-                            child: Column(
-                              children: [
-                                CircleAvatar(
-                                  backgroundImage: AssetImage('images/one.png'),
-                                  radius: 27.5,
-                                ),
-                                SizedBox(height: 10),
-                                Text(
-                                  'Creative Club',
-                                  style: TextStyle(
-                                      fontSize: 10,
-                                      color: Color(0xFF1D1C1D),
-                                      fontFamily: 'Roboto'),
-                                  softWrap: true,
-                                  overflow: TextOverflow.fade,
-                                )
-                              ],
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                            ),
-                          ),
-                        ),
-                      ],
-                    )),
-
+              SizedBox(height: 10),
               Container(
                   height: 35,
                   width: MediaQuery.of(context).size.width,
-                  color: Color(0xffecf4f5),
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Padding(
-                      padding: const EdgeInsets.only(left: 15.0, top: 2),
-                      child: Text(
-                        'Trending Events',
-                        style: TextStyle(
-                            fontSize: 17,
-                            color: Colors.black,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 1.5),
+                      padding: const EdgeInsets.symmetric(horizontal: 21.0),
+                      child: Row(
+                        children: [
+                          Icon(Icons.headset_mic_rounded,
+                              color: Colors.black54),
+                          SizedBox(
+                            width: 7,
+                          ),
+                          Text(
+                            'Trending Events',
+                            style: TextStyle(
+                                fontSize: 15,
+                                color: Colors.black54,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1.5,
+                                fontFamily: 'Comfortaa'),
+                          ),
+                        ],
                       ),
                     ),
                   )),
-              Container(
-                color: Color(0xffecf4f5),
-                padding: EdgeInsets.symmetric(horizontal: 10),
-                height: 335,
-                width: MediaQuery.of(context).size.width,
-                child: StreamBuilder(
-                  stream: FirebaseFirestore.instance
-                      .collection('topevents')
-                      .snapshots(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(
-                          child: CircularProgressIndicator(
-                        color: Colors.grey.shade300,
-                        strokeWidth: 1.5,
-                      ));
-                    }
 
-                    return ListView.builder(
-                      controller: ScrollController(keepScrollOffset: true),
-                      scrollDirection: Axis.horizontal,
-                      shrinkWrap: true,
-                      physics: ClampingScrollPhysics(),
-                      itemCount: (snapshot.data! as dynamic).docs.length,
-                      itemBuilder: (context, index) {
-                        DocumentSnapshot snap =
-                            (snapshot.data! as dynamic).docs[index];
+              StreamBuilder(
+                stream: FirebaseFirestore.instance
+                    .collection('topevents')
+                    .snapshots(),
+                builder: (context,
+                    AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
+                        snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(
+                        child: CircularProgressIndicator(
+                      color: Colors.grey.shade300,
+                      strokeWidth: 1.5,
+                    ));
+                  }
+                  return ClipRRect(
+                    child: CarouselSlider.builder(
+                        itemCount: snapshot.data!.docs.length,
+                        options: CarouselOptions(
+                          viewportFraction: 0.85,
+                          disableCenter: true,
+                          height: MediaQuery.of(context).size.height * 0.28,
+                          autoPlay: true,
+                          autoPlayInterval: Duration(seconds: 5),
+                          scrollDirection: Axis.horizontal,
+                        ),
+                        itemBuilder: (BuildContext context, int itemIndex,
+                            int pageViewIndex) {
+                          DocumentSnapshot snap =
+                              (snapshot.data! as dynamic).docs[itemIndex];
 
-                        return GestureDetector(
-                          onTap: () {
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) =>
-                                    EventDescriptionScreen(snap: snap)));
-                          },
-                          child: Align(
-                            alignment: Alignment.topLeft,
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) =>
+                                      EventDescriptionScreen(id: snap['id'])));
+                            },
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 6.0, vertical: 0),
-                              child: Container(
-                                width: 130,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 8.0),
-                                      child: Stack(
-                                        children: [
-                                          ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                            child: Image.network(
-                                              snap['eventposterimg'],
-                                              height: 185,
-                                              fit: BoxFit.fill,
-                                            ),
-                                          ),
-                                          if (snap['mode'] == 'online')
-                                            Positioned(
-                                              left: 10,
-                                              top: 10,
-                                              child: Container(
-                                                height: 15,
-                                                width: 40,
-                                                child: Center(
-                                                  child: Text('ONLINE',
-                                                      style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          fontSize: 7)),
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  color: Color(
-                                                    0xFF040606,
-                                                  ),
-                                                  borderRadius:
-                                                      BorderRadius.circular(25),
-                                                ),
-                                              ),
-                                            )
-                                        ],
-                                      ),
+                                  horizontal: 6.0, vertical: 10),
+                              child: Column(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(15),
+                                        topRight: Radius.circular(15)),
+                                    child: Image.network(
+                                      snap['eventposterimg'],
+                                      fit: BoxFit.fill,
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.15,
+                                      width: MediaQuery.of(context).size.width,
                                     ),
-                                    SizedBox(height: 5),
-                                    Padding(
+                                  ),
+
+                                  Container(
+                                    decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.only(
+                                          bottomLeft: Radius.circular(15),
+                                          bottomRight: Radius.circular(15),
+                                        )),
+                                    child: Padding(
                                       padding: const EdgeInsets.symmetric(
-                                          vertical: 4.0),
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
-                                        height: 36,
-                                        width: 179,
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 8.0),
-                                          child: Align(
-                                            alignment: Alignment.centerLeft,
-                                            child: Text(snap['eventDate'],
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 14,
-                                                  fontFamily: 'Roboto',
-                                                  letterSpacing: 1,
-                                                )),
+                                          vertical: 12, horizontal: 12),
+                                      child: Column(
+                                        children: [
+                                          Text(
+                                            snap['evetitle'],
+                                            softWrap: true,
+                                            style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold,
+                                                letterSpacing: 1,
+                                                fontFamily: 'Roboto'),
                                           ),
-                                        ),
+                                          SizedBox(height: 10),
+                                          Row(
+                                              children: [
+                                                Text(snap['eventDate'],
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontFamily: 'Roboto',
+                                                      letterSpacing: 1,
+                                                    )),
+                                                Spacer(),
+                                                GestureDetector(
+                                                  onTap: () async {
+                                                    if (await canLaunch(
+                                                        snap['paymentUrl'])) {
+                                                      await launch(
+                                                          snap['paymentUrl'],
+                                                          enableDomStorage:
+                                                              true,
+                                                          enableJavaScript:
+                                                              true,
+                                                          forceWebView: true);
+                                                    }
+                                                  },
+                                                  child: Container(
+                                                    height: 30,
+                                                    width: 100,
+                                                    decoration: BoxDecoration(
+                                                        color: btnCOlorblue,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10)),
+                                                    child: Center(
+                                                      child: Text('BOOK',
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white,
+                                                              fontFamily:
+                                                                  'Roboto',
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w700)),
+                                                    ),
+                                                  ),
+                                                )
+                                              ],
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center),
+                                        ],
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                       ),
                                     ),
-                                    SizedBox(height: 4.5),
-                                    Text(
-                                      snap['evetitle'],
-                                      softWrap: true,
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold,
-                                          letterSpacing: 1,
-                                          fontFamily: 'Roboto'),
-                                    ),
-                                    SizedBox(height: 5),
-                                    Text(
-                                      snap['evedescc'],
-                                      softWrap: true,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.fade,
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 11,
-                                          fontFamily: 'Roboto',
-                                          letterSpacing: 0.5),
-                                    ),
-                                    // SizedBox(height: 5),
-                                    // Text(
-                                    //   'Rs ${snap['price']}',
-                                    //   softWrap: true,
-                                    //   overflow: TextOverflow.fade,
-                                    //   style: TextStyle(
-                                    //       color: Colors.black,
-                                    //       fontWeight: FontWeight.bold,
-                                    //       fontSize: 15,
-                                    //       fontFamily: 'Roboto',
-                                    //       letterSpacing: 1),
-                                    // ),
-                                  ],
-                                ),
+                                  )
+                                  // Positioned(
+                                  //   child: Container(
+                                  //     height: 56,
+                                  //     decoration: BoxDecoration(
+                                  //       color: Color(
+                                  //         0xFFFFFFFF,
+                                  //       ),
+                                  //     ),
+                                  //   ),
+                                  //   bottom: 0,
+                                  // )
+                                ],
                               ),
                             ),
-                          ),
-                        );
-                      },
-                    );
-                  },
-                ),
+                          );
+                        }
+                        // imageUrls.map((i) {
+                        //   return Container(
+                        //     margin: EdgeInsets.symmetric(horizontal: 1, vertical: 10),
+                        //     decoration: BoxDecoration(
+                        //         borderRadius: BorderRadius.circular(10),
+                        //         color: Colors.grey.shade200),
+                        //     child: ClipRRect(
+                        //         borderRadius: BorderRadius.circular(10),
+                        //         child: Image.network(  snapshot.data!.docs[index]
+                        //             .data()["imageUrl"]
+                        //             .toString(),
+                        //             , fit: BoxFit.fill)),
+                        //   );
+                        // }).toList(),
+                        ),
+                  );
+
+                  // ListView.builder(
+                  //   addAutomaticKeepAlives: true,
+                  //   shrinkWrap: true,
+                  //   controller: ScrollController(keepScrollOffset: true),
+                  //   scrollDirection: Axis.vertical,
+                  //   itemCount: snapshot.data!.docs.length,
+                  //   itemBuilder: (ctx, index) => Container(
+                  //     margin:
+                  //     EdgeInsets.symmetric(horizontal: 1, vertical: 10),
+                  //     decoration: BoxDecoration(
+                  //         borderRadius: BorderRadius.circular(10),
+                  //         color: Colors.grey.shade200),
+                  //     child: ClipRRect(
+                  //         borderRadius: BorderRadius.circular(10),
+                  //         child: Image.network(
+                  //             snapshot.data!.docs[index]
+                  //                 .data()["imageUrl"]
+                  //                 .toString(),
+                  //             fit: BoxFit.fill)),
+                  //   ),
+                  // );
+                },
               ),
 
+              // GestureDetector(
+              //   onTap: () {
+              //     Navigator.of(context).push(
+              //       MaterialPageRoute(
+              //         builder: (context) => RestuarantShowingScreen(),
+              //       ),
+              //     );
+              //   },
+              //   child: Padding(
+              //     padding: const EdgeInsets.symmetric(vertical: 0),
+              //     child: Image.asset(
+              //       'images/orderfood.png',
+              //       fit: BoxFit.fill,
+              //       height: MediaQuery.of(context).size.height * 0.25,
+              //       width: MediaQuery.of(context).size.width,
+              //     ),
+              //   ),
+              // ),
+
+              // Container(
+              //   color: Color(0xffecf4f5),
+              //   padding: EdgeInsets.symmetric(horizontal: 10),
+              //   height: 335,
+              //   width: MediaQuery.of(context).size.width,
+              //   child: StreamBuilder(
+              //     stream: FirebaseFirestore.instance
+              //         .collection('topevents')
+              //         .snapshots(),
+              //     builder: (context, snapshot) {
+              //       if (snapshot.connectionState == ConnectionState.waiting) {
+              //         return Center(
+              //             child: CircularProgressIndicator(
+              //           color: Colors.grey.shade300,
+              //           strokeWidth: 1.5,
+              //         ));
+              //       }
+              //
+              //       return ListView.builder(
+              //         controller: ScrollController(keepScrollOffset: true),
+              //         scrollDirection: Axis.horizontal,
+              //         shrinkWrap: true,
+              //         physics: ClampingScrollPhysics(),
+              //         itemCount: (snapshot.data! as dynamic).docs.length,
+              //         itemBuilder: (context, index) {
+              //           DocumentSnapshot snap =
+              //               (snapshot.data! as dynamic).docs[index];
+              //
+              //           return GestureDetector(
+              //             onTap: () {
+              //               Navigator.of(context).push(MaterialPageRoute(
+              //                   builder: (context) =>
+              //                       EventDescriptionScreen(id: snap['id'])));
+              //             },
+              //             child: Align(
+              //               alignment: Alignment.topLeft,
+              //               child: Padding(
+              //                 padding: const EdgeInsets.symmetric(
+              //                     horizontal: 6.0, vertical: 0),
+              //                 child: Container(
+              //                   width: 130,
+              //                   child: Column(
+              //                     mainAxisAlignment: MainAxisAlignment.start,
+              //                     crossAxisAlignment:
+              //                         CrossAxisAlignment.stretch,
+              //                     children: [
+              //                       Padding(
+              //                         padding: const EdgeInsets.only(top: 8.0),
+              //                         child: Stack(
+              //                           children: [
+              //                             ClipRRect(
+              //                               borderRadius:
+              //                                   BorderRadius.circular(8),
+              //                               child: Image.network(
+              //                                 snap['eventposterimg'],
+              //                                 height: 185,
+              //                                 fit: BoxFit.fill,
+              //                               ),
+              //                             ),
+              //                             if (snap['mode'] == 'online')
+              //                               Positioned(
+              //                                 left: 10,
+              //                                 top: 10,
+              //                                 child: Container(
+              //                                   height: 15,
+              //                                   width: 40,
+              //                                   child: Center(
+              //                                     child: Text('ONLINE',
+              //                                         style: TextStyle(
+              //                                             color: Colors.white,
+              //                                             fontWeight:
+              //                                                 FontWeight.bold,
+              //                                             fontSize: 7)),
+              //                                   ),
+              //                                   decoration: BoxDecoration(
+              //                                     color: Color(
+              //                                       0xFF040606,
+              //                                     ),
+              //                                     borderRadius:
+              //                                         BorderRadius.circular(25),
+              //                                   ),
+              //                                 ),
+              //                               )
+              //                           ],
+              //                         ),
+              //                       ),
+              //                       SizedBox(height: 5),
+              //                       Padding(
+              //                         padding: const EdgeInsets.symmetric(
+              //                             vertical: 4.0),
+              //                         child: Container(
+              //                           decoration: BoxDecoration(
+              //                             color: Colors.white,
+              //                             borderRadius:
+              //                                 BorderRadius.circular(10),
+              //                           ),
+              //                           height: 36,
+              //                           width: 179,
+              //                           child: Padding(
+              //                             padding: const EdgeInsets.symmetric(
+              //                                 horizontal: 8.0),
+              //                             child: Align(
+              //                               alignment: Alignment.centerLeft,
+              //                               child: Text(snap['eventDate'],
+              //                                   style: TextStyle(
+              //                                     fontWeight: FontWeight.bold,
+              //                                     fontSize: 14,
+              //                                     fontFamily: 'Roboto',
+              //                                     letterSpacing: 1,
+              //                                   )),
+              //                             ),
+              //                           ),
+              //                         ),
+              //                       ),
+              //                       SizedBox(height: 4.5),
+              //                       Text(
+              //                         snap['evetitle'],
+              //                         softWrap: true,
+              //                         style: TextStyle(
+              //                             color: Colors.black,
+              //                             fontSize: 15,
+              //                             fontWeight: FontWeight.bold,
+              //                             letterSpacing: 1,
+              //                             fontFamily: 'Roboto'),
+              //                       ),
+              //                       SizedBox(height: 5),
+              //                       Text(
+              //                         snap['evedescc'],
+              //                         softWrap: true,
+              //                         maxLines: 2,
+              //                         overflow: TextOverflow.fade,
+              //                         style: TextStyle(
+              //                             color: Colors.black,
+              //                             fontSize: 11,
+              //                             fontFamily: 'Roboto',
+              //                             letterSpacing: 0.5),
+              //                       ),
+              //                       // SizedBox(height: 5),
+              //                       // Text(
+              //                       //   'Rs ${snap['price']}',
+              //                       //   softWrap: true,
+              //                       //   overflow: TextOverflow.fade,
+              //                       //   style: TextStyle(
+              //                       //       color: Colors.black,
+              //                       //       fontWeight: FontWeight.bold,
+              //                       //       fontSize: 15,
+              //                       //       fontFamily: 'Roboto',
+              //                       //       letterSpacing: 1),
+              //                       // ),
+              //                     ],
+              //                   ),
+              //                 ),
+              //               ),
+              //             ),
+              //           );
+              //         },
+              //       );
+              //     },
+              //   ),
+              // ),
+              Container(
+                  height: 45,
+                  width: MediaQuery.of(context).size.width,
+                  color: Colors.white,
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Top Clubs',
+                        style: TextStyle(
+                          fontSize: 17,
+                          color: Colors.black,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 1.5,
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => ChatScreen()));
+                        },
+                        child: Container(
+                          height: 27,
+                          width: 65,
+                          decoration: BoxDecoration(
+                            color: Color(0xFFF9EDBB),
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                          child: Center(
+                            child: Text(
+                              "See all",
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 13,
+                                  fontFamily: "Roboto"),
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  )),
+              SizedBox(height: 5),
+              Container(
+                  height: 98,
+                  width: MediaQuery.of(context).size.width,
+                  color: Colors.white,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      GestureDetector(
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => GlobalGroupChatScreen(),
+                          ),
+                        ),
+                        child: Container(
+                          child: Column(
+                            children: [
+                              CircleAvatar(
+                                backgroundImage:
+                                    AssetImage('images/confession_club.png'),
+                                radius: 27.5,
+                              ),
+                              SizedBox(height: 10),
+                              Text(
+                                'Confession Club',
+                                style: TextStyle(
+                                    fontSize: 10,
+                                    color: Color(0xFF1D1C1D),
+                                    fontFamily: 'Roboto'),
+                                softWrap: true,
+                                overflow: TextOverflow.fade,
+                              )
+                            ],
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                          ),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => StartupClubChatScreen(
+                                usernamecurrent: userProvider.getUser.username),
+                          ),
+                        ),
+                        child: Container(
+                          child: Column(
+                            children: [
+                              CircleAvatar(
+                                backgroundImage:
+                                    AssetImage('images/startup_club.png'),
+                                radius: 27.5,
+                              ),
+                              SizedBox(height: 10),
+                              Text(
+                                'Startup Club',
+                                style: TextStyle(
+                                    fontSize: 10,
+                                    color: Color(0xFF1D1C1D),
+                                    fontFamily: 'Roboto'),
+                                softWrap: true,
+                                overflow: TextOverflow.fade,
+                              )
+                            ],
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                          ),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => FinanceClubChatScreen(
+                                usernamecurrent: userProvider.getUser.username),
+                          ),
+                        ),
+                        child: Container(
+                          child: Column(
+                            children: [
+                              CircleAvatar(
+                                backgroundImage:
+                                    AssetImage('images/finance_club.png'),
+                                radius: 27.5,
+                              ),
+                              SizedBox(height: 10),
+                              Text(
+                                'Finance Club',
+                                style: TextStyle(
+                                    fontSize: 10,
+                                    color: Color(0xFF1D1C1D),
+                                    fontFamily: 'Roboto'),
+                                softWrap: true,
+                                overflow: TextOverflow.fade,
+                              )
+                            ],
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                          ),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => MemeClubChatScreen(
+                                usernamecurrent: userProvider.getUser.username),
+                          ),
+                        ),
+                        child: Container(
+                          child: Column(
+                            children: [
+                              CircleAvatar(
+                                backgroundImage:
+                                    AssetImage('images/meme_club.png'),
+                                radius: 27.5,
+                              ),
+                              SizedBox(height: 10),
+                              Text(
+                                'Meme Club',
+                                style: TextStyle(
+                                    fontSize: 10,
+                                    color: Color(0xFF1D1C1D),
+                                    fontFamily: 'Roboto'),
+                                softWrap: true,
+                                overflow: TextOverflow.fade,
+                              )
+                            ],
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                          ),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => CreativeClubChatScreen(
+                                usernamecurrent: userProvider.getUser.username),
+                          ),
+                        ),
+                        child: Container(
+                          child: Column(
+                            children: [
+                              CircleAvatar(
+                                backgroundImage: AssetImage('images/one.png'),
+                                radius: 27.5,
+                              ),
+                              SizedBox(height: 10),
+                              Text(
+                                'Creative Club',
+                                style: TextStyle(
+                                    fontSize: 10,
+                                    color: Color(0xFF1D1C1D),
+                                    fontFamily: 'Roboto'),
+                                softWrap: true,
+                                overflow: TextOverflow.fade,
+                              )
+                            ],
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                          ),
+                        ),
+                      ),
+                    ],
+                  )),
+              SizedBox(height: 5),
               userProvider.getUser.photoUrl == null
                   ? Center(
                       child: CircularProgressIndicator(
@@ -1040,6 +1168,7 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
                         );
                       },
                     ),
+
               // FirestorePagination(
               //   viewType: ViewType.list,
               //   shrinkWrap: true,

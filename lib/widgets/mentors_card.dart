@@ -50,34 +50,35 @@ class MentorsCard extends StatelessWidget {
                         snap['name'],
                         textAlign: TextAlign.start,
                         style: TextStyle(
-                          fontSize: 16.sp,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       SizedBox(
-                        height: 5.h,
+                        height: 5,
                       ),
                       Text(
                         snap["category"].toString(),
                         // 'Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled.',
                         maxLines: 2,
                         style: TextStyle(
-                          fontSize: 11.sp,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                       SizedBox(
-                        height: 5.h,
+                        height: 5,
                       ),
                       Text(
                         snap["description"].toString(),
                         // 'Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled.',
                         maxLines: 2,
                         style: TextStyle(
-                          fontSize: 11.sp,
+                          fontSize: 11,
                         ),
                       ),
                       SizedBox(
-                        height: 10.h,
+                        height: 10,
                       ),
                       Text(
                         snap["price"].toString(),
@@ -85,8 +86,7 @@ class MentorsCard extends StatelessWidget {
                         // snap["coursetiming"].toString(),
                         // 'Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled.',
                         maxLines: 1,
-                        style:
-                            TextStyle(fontSize: 11.sp, color: Colors.black54),
+                        style: TextStyle(fontSize: 11, color: Colors.black54),
                       ),
                     ],
                   ),

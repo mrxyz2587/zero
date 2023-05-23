@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zero_fin/screens/newlogin/designation_selection_screen.dart';
 
 import 'DetailsScreen.dart';
 import 'DetailsScreenTwo.dart';
@@ -16,7 +17,7 @@ class MyWidget extends StatefulWidget {
 
 class _MyWidgetState extends State<MyWidget> {
   late PageController _pageController;
-  var pageIndex=0;
+  var pageIndex = 0;
 
   @override
   void initState() {
@@ -29,40 +30,41 @@ class _MyWidgetState extends State<MyWidget> {
   //   _pageController.dispose();
   //   super.dispose();
   // }
-
+  String designation = "";
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-
-    child: Scaffold(
-      body:  Column(
+        child: Scaffold(
+      body: Column(
+        children: [
+          PageIndicator(PageIndex: pageIndex),
+          Expanded(
+            child: PageView(
+              onPageChanged: (value) {
+                setState(() {
+                  pageIndex = value;
+                });
+              },
+              physics: const NeverScrollableScrollPhysics(),
+              controller: _pageController,
               children: [
-                PageIndicator(PageIndex: pageIndex),
-                Expanded(
-                  child: PageView(
-                    onPageChanged: (value){
-                      setState(() {
-                        pageIndex=value;
-                      });
-                    },
-                      physics:const NeverScrollableScrollPhysics(),
-                      controller: _pageController,
-                      children:  [
-                        NewLoginScreen(pageController: _pageController),
-                        DetailsScreen(pageController: _pageController),
-                        DetailsScreenTwo(pageController: _pageController,),
-                        PickYourSkills(pageController: _pageController,),
-                        PickTheInterests(pageController: _pageController,)
-                      ],
-                    
-                      ),
+                NewLoginScreen(
+                    pageController: _pageController, designation: designation),
+                DetailsScreen(pageController: _pageController),
+                DetailsScreenTwo(
+                  pageController: _pageController,
                 ),
+                PickYourSkills(
+                  pageController: _pageController,
+                ),
+                PickTheInterests(
+                  pageController: _pageController,
+                )
               ],
             ),
+          ),
+        ],
+      ),
     ));
-
-        
-      
-    
   }
 }

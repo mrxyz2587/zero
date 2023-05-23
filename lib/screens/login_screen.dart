@@ -10,6 +10,8 @@ import 'package:introduction_screen/introduction_screen.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:zero_fin/screens/newlogin/designation_selection_screen.dart';
+import 'package:zero_fin/screens/newlogin/pageViewScreen.dart';
 import 'package:zero_fin/widgets/dialog_progress_indicator.dart';
 import '../constants.dart';
 import '../widgets/bottom_sheet.dart';
@@ -97,9 +99,8 @@ class _LoginScreenState extends State<LoginScreen> {
         Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-                builder: (context) => SignupScreen(
-                      userObj: googleUser,
-                    )));
+                builder: (context) =>
+                    DesignationSelectionPage(userObj: googleUser)));
       }
     });
 

@@ -12,11 +12,13 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:zero_fin/resources/firestore_methods.dart';
 import 'package:zero_fin/screens/ChatRoom.dart';
 import 'package:zero_fin/screens/HomeScreen.dart';
+import 'package:zero_fin/screens/Mentorship.dart';
 import 'package:zero_fin/screens/resturant_showing_screen.dart';
 import 'package:zero_fin/widgets/fashion_card_widget.dart';
 import 'package:zero_fin/widgets/text_field_input.dart';
 import 'package:zero_fin/widgets/video_player_items.dart';
 import 'package:zero_fin/widgets/videoplayersearch.dart';
+import '../widgets/mentors_card.dart';
 import '../widgets/post_card.dart';
 import '/screens/profile_screen.dart';
 import '/utils/colors.dart';
@@ -857,15 +859,16 @@ class _SearchScreenState extends State<SearchScreen> {
             )
           : isShowUsers
               ? ListView(
+                  physics: BouncingScrollPhysics(),
                   children: [
-                    FutureBuilder(
-                      future: FirebaseFirestore.instance
+                    StreamBuilder(
+                      stream: FirebaseFirestore.instance
                           .collection('users')
                           .where(
                             'username',
                             isGreaterThanOrEqualTo: searchController.text,
                           )
-                          .get(),
+                          .snapshots(),
                       builder: (context, snapshot) {
                         if (!snapshot.hasData) {
                           return const Center(
@@ -874,6 +877,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         }
                         return ListView.builder(
                           shrinkWrap: true,
+                          physics: BouncingScrollPhysics(),
                           itemCount: (snapshot.data! as dynamic).docs.length,
                           itemBuilder: (context, index) {
                             return InkWell(
@@ -930,7 +934,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           child: Row(
                             children: [
                               Text(
-                                "Nearby Buddies",
+                                "Active Buddies",
                                 style: TextStyle(
                                     color: Colors.black54,
                                     fontSize: 15,
@@ -971,115 +975,472 @@ class _SearchScreenState extends State<SearchScreen> {
                             ],
                           ),
                         )),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: StreamBuilder(
+                        stream: FirebaseFirestore.instance
+                            .collection('users')
+                            .where("status", isEqualTo: 'Online')
+                            .limit(7)
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+
+                          return SizedBox(
+                            height: 220,
+                            width: MediaQuery.of(context).size.width,
+                            child: ListView.builder(
+                              physics: ClampingScrollPhysics(),
+                              scrollDirection: Axis.horizontal,
+                              controller:
+                                  ScrollController(keepScrollOffset: true),
+                              shrinkWrap: true,
+                              itemCount:
+                                  (snapshot.data! as dynamic).docs.length,
+                              itemBuilder: (context, index) {
+                                return Align(
+                                  alignment: Alignment.topLeft,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 10, bottom: 5, right: 4),
+                                    child: InkWell(
+                                      onTap: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    ProfileScreen(
+                                                      uid: (snapshot.data!
+                                                              as dynamic)
+                                                          .docs[index]['uid']
+                                                          .toString(),
+                                                    )));
+                                      },
+                                      child: Container(
+                                        padding: EdgeInsets.all(4),
+                                        width: 150,
+                                        height: 220,
+                                        child: Stack(
+                                          children: [
+                                            ClipRRect(
+                                              child: Image.network(
+                                                (snapshot.data! as dynamic)
+                                                    .docs[index]['photoUrl']
+                                                    .toString(),
+                                                fit: BoxFit.fill,
+                                                height: 220,
+                                                width: 150,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                            // Positioned(
+                                            //   bottom: 3,
+                                            //   right: 6,
+                                            //   child: Container(
+                                            //     decoration: BoxDecoration(
+                                            //         color: btnCOlorblue,
+                                            //         borderRadius:
+                                            //             BorderRadius.circular(
+                                            //                 10),
+                                            //         border: Border.all(
+                                            //             color: Colors.white,
+                                            //             width: 1)),
+                                            //     constraints:
+                                            //         BoxConstraints.tight(
+                                            //             Size.fromRadius(5)),
+                                            //   ),
+                                            // ),
+                                            SizedBox(
+                                              height: 8,
+                                            ),
+                                            Positioned(
+                                              bottom: 0,
+                                              child: Container(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: 7.0),
+                                                height: 50,
+                                                width: 142,
+                                                decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8),
+                                                    gradient: LinearGradient(
+                                                        begin: Alignment
+                                                            .bottomCenter,
+                                                        end:
+                                                            Alignment.topCenter,
+                                                        tileMode:
+                                                            TileMode.clamp,
+                                                        colors: [
+                                                          Color(0xD2000000),
+                                                          Color(0x8E000000),
+                                                          Color(0x3D000000),
+                                                          Color(0x17000000),
+                                                          Color(0xB000000),
+                                                        ])),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    Container(
+                                                      width: 80,
+                                                      child: Text(
+                                                        (snapshot.data!
+                                                                as dynamic)
+                                                            .docs[index]
+                                                                ['username']
+                                                            .toString(),
+                                                        style: TextStyle(
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .fade,
+                                                            color: Color(
+                                                                0xFFFFFFFF),
+                                                            fontSize: 15,
+                                                            fontWeight:
+                                                                FontWeight.w700,
+                                                            fontFamily:
+                                                                'Roboto'),
+                                                        maxLines: 1,
+                                                        softWrap: false,
+                                                        overflow:
+                                                            TextOverflow.fade,
+                                                        textAlign:
+                                                            TextAlign.left,
+                                                      ),
+                                                    ),
+                                                    CircleAvatar(
+                                                        radius: 14,
+                                                        backgroundColor:
+                                                            Colors.red,
+                                                        child: Center(
+                                                            child: Icon(
+                                                          FontAwesomeIcons
+                                                              .solidHeart,
+                                                          color: Colors.white,
+                                                          size: 16,
+                                                        )))
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                            // Positioned(
+                                            //   left: 6,
+                                            //   bottom: 20,
+                                            //   child: Container(
+                                            //     width: 80,
+                                            //     child: Text(
+                                            //       (snapshot.data! as dynamic)
+                                            //           .docs[index]['username']
+                                            //           .toString(),
+                                            //       style: TextStyle(
+                                            //           overflow:
+                                            //               TextOverflow.fade,
+                                            //           color: Color(0xFFFFFFFF),
+                                            //           fontSize: 15,
+                                            //           fontWeight:
+                                            //               FontWeight.w700,
+                                            //           fontFamily: 'Roboto'),
+                                            //       maxLines: 1,
+                                            //       softWrap: false,
+                                            //       overflow: TextOverflow.fade,
+                                            //       textAlign: TextAlign.left,
+                                            //     ),
+                                            //   ),
+                                            // ),
+                                            // Positioned(
+                                            //     bottom: 10,
+                                            //     right: 6,
+                                            //     child: CircleAvatar(
+                                            //         radius: 15,
+                                            //         backgroundColor: Colors.red,
+                                            //         child: Center(
+                                            //             child: Icon(
+                                            //           FontAwesomeIcons
+                                            //               .solidHeart,
+                                            //           color: Colors.white,
+                                            //           size: 16,
+                                            //         ))))
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    Divider(height: 0.5, thickness: 0.5, color: Colors.black26),
+
+                    Align(
+                        alignment: Alignment.center,
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                              left: 22.0, right: 22, bottom: 15, top: 20),
+                          child: Text(
+                            "Top Mentors",
+                            style: TextStyle(
+                                color: Colors.black54,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: "Comfortaa"),
+                          ),
+                        )),
+                    Divider(height: 0.5, thickness: 0.5, color: Colors.black26),
+
                     StreamBuilder(
                       stream: FirebaseFirestore.instance
-                          .collection('users')
-                          .where("uid",
-                              isNotEqualTo:
-                                  FirebaseAuth.instance.currentUser!.uid)
-                          .limit(7)
+                          .collection('coursesection')
+                          .doc('mentorship')
+                          .collection('allmentors')
                           .snapshots(),
-                      builder: (context, snapshot) {
-                        if (!snapshot.hasData) {
+                      builder: (context,
+                          AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
+                              snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
                           return const Center(
                             child: CircularProgressIndicator(),
                           );
                         }
-
-                        return SizedBox(
-                          height: 110,
-                          width: MediaQuery.of(context).size.width,
-                          child: ListView.builder(
-                            physics: ClampingScrollPhysics(),
-                            scrollDirection: Axis.horizontal,
-                            controller:
-                                ScrollController(keepScrollOffset: true),
-                            shrinkWrap: true,
-                            itemCount: (snapshot.data! as dynamic).docs.length,
-                            itemBuilder: (context, index) {
-                              return Align(
-                                alignment: Alignment.topLeft,
-                                child: Padding(
-                                  padding:
-                                      const EdgeInsets.only(top: 10, bottom: 5),
-                                  child: InkWell(
-                                    onTap: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  ProfileScreen(
-                                                    uid: (snapshot.data!
-                                                            as dynamic)
-                                                        .docs[index]['uid']
-                                                        .toString(),
-                                                  )));
-                                    },
-                                    child: Container(
-                                      padding: EdgeInsets.all(4),
-                                      width: 100,
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          Stack(
-                                            children: [
-                                              CircleAvatar(
-                                                backgroundImage: NetworkImage(
-                                                  (snapshot.data! as dynamic)
-                                                      .docs[index]['photoUrl']
-                                                      .toString(),
-                                                ),
-                                                radius: 30,
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          controller: ScrollController(keepScrollOffset: true),
+                          scrollDirection: Axis.vertical,
+                          itemCount: snapshot.data!.docs.length,
+                          itemBuilder: (ctx, index) => Container(
+                            child: MentorsCard(
+                              snap: snapshot.data!.docs[index].data(),
+                              onpressed: () {
+                                showModalBottomSheet(
+                                  enableDrag: true,
+                                  isDismissible: true,
+                                  backgroundColor: Colors.black.withOpacity(0),
+                                  context: context,
+                                  builder: (BuildContext c) {
+                                    return Container(
+                                      color: Colors.transparent,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.only(
+                                                topRight: Radius.circular(20),
+                                                topLeft: Radius.circular(20))),
+                                        child: Column(
+                                          children: <Widget>[
+                                            SizedBox(height: 8),
+                                            Container(
+                                              height: 5,
+                                              width: 45,
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(5),
+                                                color: Colors.black87,
                                               ),
-                                              Positioned(
-                                                bottom: 3,
-                                                right: 6,
-                                                child: Container(
-                                                  decoration: BoxDecoration(
-                                                      color: btnCOlorblue,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      border: Border.all(
-                                                          color: Colors.white,
-                                                          width: 1)),
-                                                  constraints:
-                                                      BoxConstraints.tight(
-                                                          Size.fromRadius(5)),
+                                            ),
+                                            SizedBox(height: 17),
+                                            Container(
+                                              height: 140,
+                                              width: MediaQuery.of(context)
+                                                  .size
+                                                  .width,
+                                              child: Image.network(
+                                                snapshot.data!.docs[index]
+                                                    .data()["mentorcoverimg"]
+                                                    .toString(),
+                                                fit: BoxFit.fill,
+                                              ),
+                                            ),
+                                            SizedBox(height: 15),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 15.0),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: [
+                                                  CircleAvatar(
+                                                    radius: 20,
+                                                    backgroundImage:
+                                                        NetworkImage(
+                                                      snapshot.data!.docs[index]
+                                                          .data()[
+                                                              "photomentorurl"]
+                                                          .toString(),
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    width: 10,
+                                                  ),
+                                                  Text(
+                                                    snapshot.data!.docs[index]
+                                                        .data()["name"]
+                                                        .toString(),
+                                                    style: TextStyle(
+                                                      fontSize: 18,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                    softWrap: false,
+                                                    overflow: TextOverflow.fade,
+                                                  ),
+                                                  Padding(
+                                                    padding: const EdgeInsets
+                                                            .symmetric(
+                                                        vertical: 12.0,
+                                                        horizontal: 8),
+                                                    child: GestureDetector(
+                                                        onTap: () {},
+                                                        child: Icon(
+                                                            FontAwesomeIcons
+                                                                .linkedin,
+                                                            size: 20,
+                                                            color:
+                                                                Colors.blue)),
+                                                  ),
+                                                  Expanded(child: SizedBox()),
+                                                  GestureDetector(
+                                                      child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            right: 16.0),
+                                                    child: Container(
+                                                      padding:
+                                                          EdgeInsets.all(10),
+                                                      decoration: BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius.all(
+                                                                  Radius
+                                                                      .circular(
+                                                                          5)),
+                                                          border: Border.all(
+                                                            color: Color(
+                                                              0xFF6F6F6F,
+                                                            ),
+                                                          )),
+                                                      child: Image.asset(
+                                                          'images/share_icons.png'),
+                                                    ),
+                                                  )),
+                                                ],
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              height: 15,
+                                            ),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                horizontal: 15.0,
+                                              ),
+                                              child: Text(
+                                                snapshot.data!.docs[index]
+                                                    .data()["description"]
+                                                    .toString(),
+                                                textAlign: TextAlign.left,
+                                                maxLines: 4,
+                                                style: TextStyle(
+                                                  fontSize: 15,
                                                 ),
-                                              )
-                                            ],
-                                          ),
-                                          SizedBox(
-                                            height: 8,
-                                          ),
-                                          Text(
-                                            (snapshot.data! as dynamic)
-                                                .docs[index]['username']
-                                                .toString(),
-                                            style: TextStyle(
-                                                color: Color(0xFF000000),
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.w700,
-                                                fontFamily: 'Roboto'),
-                                            maxLines: 1,
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        ],
+                                              ),
+                                            ),
+                                            Expanded(child: SizedBox()),
+                                            Container(
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical: 10, horizontal: 50),
+                                              decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                          Radius.circular(7)),
+                                                  border: Border.all(
+                                                    color: Color(
+                                                      0xFF585858,
+                                                    ),
+                                                  )),
+                                              child: Text(
+                                                snapshot.data!.docs[index]
+                                                    .data()["category"]
+                                                    .toString(),
+                                                style: TextStyle(
+                                                    fontFamily: 'Roboto',
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 15),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ),
+                                            Expanded(child: SizedBox()),
+                                            Align(
+                                              alignment: Alignment.bottomCenter,
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    bottom: 15.0),
+                                                child: ElevatedButton(
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      backgroundColor:
+                                                          btnCOlorblue,
+                                                      shape: RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius.all(
+                                                                  Radius
+                                                                      .circular(
+                                                                          7))),
+                                                    ),
+                                                    onPressed: () async {
+                                                      String url = snapshot
+                                                          .data!.docs[index]
+                                                          .data()["applylink"]
+                                                          .toString();
+                                                      if (await canLaunch(
+                                                          url)) {
+                                                        await launch(url,
+                                                            enableDomStorage:
+                                                                true,
+                                                            enableJavaScript:
+                                                                true,
+                                                            forceWebView: true);
+                                                      }
+                                                    },
+                                                    // color: btnCOlorblue,
+                                                    child: Padding(
+                                                      padding: const EdgeInsets
+                                                              .symmetric(
+                                                          horizontal: 50,
+                                                          vertical: 8),
+                                                      child: Text(
+                                                        'Apply',
+                                                        style: TextStyle(
+                                                            fontSize: 16,
+                                                            color:
+                                                                Colors.white),
+                                                      ),
+                                                    )),
+                                              ),
+                                            )
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
+                                    );
+                                  },
+                                );
+                              },
+                            ),
                           ),
                         );
                       },
-                    ),
-                    Divider(height: 0.5, thickness: 0.5, color: Colors.black26),
+                    )
+
                     // Align(
                     //     alignment: Alignment.topLeft,
                     //     child: Container(

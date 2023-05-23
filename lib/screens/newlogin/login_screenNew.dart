@@ -5,16 +5,17 @@ import '../../widgets/widgetTreeforLoginScreen.dart';
 class NewLoginScreen extends StatefulWidget {
   final PageController pageController;
 
-  
-  const NewLoginScreen({Key? key,required this.pageController}) : super(key: key);
+  final String designation;
+
+  const NewLoginScreen(
+      {Key? key, required this.pageController, required this.designation})
+      : super(key: key);
 
   @override
   State<NewLoginScreen> createState() => _NewLoginScreenState();
 }
 
 class _NewLoginScreenState extends State<NewLoginScreen> {
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -118,8 +119,10 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
             ),
             Container(
               margin: const EdgeInsets.only(left: 8.0),
-              child: const Text(
-                "University name",
+              child: Text(
+                widget.designation.toString() == 'student'
+                    ? "School name"
+                    : "Uiversity Name",
                 style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -133,28 +136,30 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
               margin: const EdgeInsets.all(8.0),
               width: double.infinity,
               height: 50,
-              child:  ElevatedButton(
-        style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all(Colors.black),
-            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20.0)))),
-        onPressed: () {
-          widget.pageController.animateToPage(1, duration:const Duration(milliseconds: 500), curve: Curves.easeIn);
-        },
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            Text(
-              "Continue",
-              style: TextStyle(fontSize: 16),
-            ),
-            SizedBox(
-              width: 15,
-            ),
-            Icon(Icons.arrow_right_alt)
-          ],
-        )),
+              child: ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(Colors.black),
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20.0)))),
+                  onPressed: () {
+                    widget.pageController.animateToPage(2,
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.easeIn);
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Text(
+                        "Continue",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      SizedBox(
+                        width: 15,
+                      ),
+                      Icon(Icons.arrow_right_alt)
+                    ],
+                  )),
             )
           ],
         ),

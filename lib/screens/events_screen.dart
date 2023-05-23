@@ -175,7 +175,7 @@ class _EventScreenState extends State<EventScreen>
                       onTap: () {
                         Navigator.of(context).push(MaterialPageRoute(
                             builder: (context) =>
-                                EventDescriptionScreen(snap: snap)));
+                                EventDescriptionScreen(id: snap['id'])));
                       },
                       child: Align(
                         alignment: Alignment.topLeft,

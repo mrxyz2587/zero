@@ -914,7 +914,8 @@ class _PostCardState extends State<PostCard> {
                             await FirebaseDynamicLinksService.createDynamicLink(
                                 widget.snap['postId'].toString());
                         Share.share(
-                          generatedDeepLink,
+                          'Hey buddy! just see what just ${widget.snap['username'].toString().toUpperCase()} posted on zero :\n 👇👇👇👇👇 \n\n' +
+                              generatedDeepLink,
                         );
                         print(generatedDeepLink.toString());
                       },

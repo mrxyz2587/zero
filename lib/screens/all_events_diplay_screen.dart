@@ -75,7 +75,7 @@ class _AllEventsDisplayScreenState extends State<AllEventsDisplayScreen> {
                   onTap: () {
                     Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) =>
-                            EventDescriptionScreen(snap: snap)));
+                            EventDescriptionScreen(id: snap['id'])));
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(4.0),

@@ -725,39 +725,46 @@ class _AddPostScreenState extends State<AddPostScreen> {
                               icon: Icon(FontAwesomeIcons.solidImage)),
                           IconButton(
                               onPressed: () async {
-                                FilePickerResult? result =
-                                    await FilePicker.platform.pickFiles(
-                                  allowMultiple: false,
-                                  allowCompression: true,
-                                  type: FileType.video,
-                                );
-                                if (result != null) {
-                                  File c =
-                                      File(result.files.single.path.toString());
+                                // FilePickerResult? result =
+                                //     await FilePicker.platform.pickFiles(
+                                //   allowMultiple: false,
+                                //   allowCompression: true,
+                                //   type: FileType.video,
+                                // );
+                                // if (result != null) {
+                                //   File c =
+                                //       File(result.files.single.path.toString());
+                                //
+                                //   setState(() {
+                                //     file = c;
+                                //     name = result.names.toString();
+                                //   });
+                                //   // String res = await FireStoreMethods()
+                                //   //     .UploadResume(file!);
+                                // }
+                                // if (file != null) {
+                                //   // Navigator.push(
+                                //   //   context,
+                                //   //   MaterialPageRoute(
+                                //   //     builder: (context) {
+                                //   //       return AddReelsScreen(
+                                //   //         filePath: file,
+                                //   //       );
+                                //   //     },
+                                //   //   ),
+                                //   // );
+                                // }
 
-                                  setState(() {
-                                    file = c;
-                                    name = result.names.toString();
-                                  });
-                                  // String res = await FireStoreMethods()
-                                  //     .UploadResume(file!);
-                                }
-                                if (file != null) {
-                                  // Navigator.push(
-                                  //   context,
-                                  //   MaterialPageRoute(
-                                  //     builder: (context) {
-                                  //       return AddReelsScreen(
-                                  //         filePath: file,
-                                  //       );
-                                  //     },
-                                  //   ),
-                                  // );
+                                if (await canLaunch(
+                                    'https://docs.google.com/forms/d/e/1FAIpQLSf3EeUu6M_LI0FSop29ZW8wwuqJFOJrLIRAGnepHcmIBEsBfw/viewform?usp=sf_link')) {
+                                  launch(
+                                      'https://docs.google.com/forms/d/e/1FAIpQLSf3EeUu6M_LI0FSop29ZW8wwuqJFOJrLIRAGnepHcmIBEsBfw/viewform?usp=sf_link',
+                                      enableJavaScript: true,
+                                      enableDomStorage: true);
                                 }
                               },
                               icon: Icon(
-                                Icons.slow_motion_video,
-                                size: 29,
+                                FontAwesomeIcons.blog,
                               )),
                           SizedBox(
                             width: 20,

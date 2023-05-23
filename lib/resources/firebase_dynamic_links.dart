@@ -42,4 +42,26 @@ class FirebaseDynamicLinksService {
     print(linkMessage);
     return linkMessage;
   }
+
+  static Future<String> createDynamicLinkforinternships(
+      String internshipid) async {
+    String linkMessage;
+    String link =
+        "https://zeromonk.page.link/internship?internid=$internshipid";
+
+    final dynamicLinkParams = DynamicLinkParameters(
+      link: Uri.parse(link),
+      uriPrefix: "https://zeromonk.page.link",
+      androidParameters: const AndroidParameters(
+        packageName: "com.zeromonk.zero",
+        minimumVersion: 30,
+      ),
+    );
+    final dynamicLink = await FirebaseDynamicLinks.instance.buildLink(
+      dynamicLinkParams,
+    );
+    linkMessage = dynamicLink.toString();
+    print(linkMessage);
+    return linkMessage;
+  }
 }

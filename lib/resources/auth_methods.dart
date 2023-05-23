@@ -27,9 +27,9 @@ class AuthMethods {
       required String designation,
       required String department,
       required String dateOfBirth,
-      required Uint8List file,
       required String university,
-      required String googlephotoUrls}) async {
+      required String googlephotoUrls,
+      required String gender}) async {
     String res = "Some error Occurred";
     try {
       if (username.isNotEmpty ||
@@ -38,26 +38,22 @@ class AuthMethods {
           dateOfBirth.isNotEmpty) {
         // registering user in auth with email and password
         String? photoUrl;
-        if (file != null) {
-          photoUrl = await StorageMethods()
-              .uploadImageToStorage('profilePics', file, false);
-        }
         model.User _user = model.User(
-          username: username.toLowerCase(),
-          uid: _auth.currentUser!.uid,
-          photoUrl: photoUrl ?? googlephotoUrls,
-          email: email,
-          designation: designation,
-          department: department,
-          dateOfBirth: dateOfBirth,
-          followers: [],
-          following: [],
-          university: university,
-          latitudeCoordinates: "29.564",
-          longCoordinates: "85.562",
-          bio: "Heyy I am also a zero",
-          status: "Online",
-        );
+            username: username.toLowerCase(),
+            uid: _auth.currentUser!.uid,
+            photoUrl: photoUrl ?? googlephotoUrls,
+            email: email,
+            designation: designation,
+            department: department,
+            dateOfBirth: dateOfBirth,
+            followers: [],
+            following: [],
+            university: university,
+            latitudeCoordinates: "29.564",
+            longCoordinates: "85.562",
+            bio: "Heyy I am also a zero",
+            status: "Online",
+            gender: gender);
         await _firestore
             .collection("users")
             .doc(_auth.currentUser!.uid)

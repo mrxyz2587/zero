@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -9,8 +10,8 @@ import 'package:zero_fin/utils/colors.dart';
 import '../resources/firebase_dynamic_links.dart';
 
 class EventDescriptionScreen extends StatefulWidget {
-  var snap;
-  EventDescriptionScreen({Key? key, required this.snap}) : super(key: key);
+  var id;
+  EventDescriptionScreen({Key? key, required this.id}) : super(key: key);
 
   @override
   State<EventDescriptionScreen> createState() => _EventDescriptionScreenState();
@@ -18,14 +19,53 @@ class EventDescriptionScreen extends StatefulWidget {
 
 class _EventDescriptionScreenState extends State<EventDescriptionScreen> {
   final _razorpay = Razorpay();
+
+  String eventimg = "";
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-
+    something();
     _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
     _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
     _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+  }
+
+  String title = '';
+  String eventMode = '';
+  String eventDate = '';
+  String eventDescription = '';
+  String eventprice = '';
+  String eventLanguage = '';
+  String minage = '';
+  String eventTime = '';
+  String termsandcondition = '';
+  String bookingurl = "";
+  String eventVenue = '';
+  String eventCategory = '';
+
+  void something() async {
+    FirebaseFirestore.instance
+        .collection("topevents")
+        .doc(widget.id)
+        .get()
+        .then((value) {
+      setState(() {
+        title = value.data()!["evetitle"].toString();
+        eventMode = value.data()!["mode"].toString();
+        eventVenue = value.data()!["venue"].toString();
+        eventimg = value.data()!["eventposterimg"].toString();
+        minage = value.data()!["agegroup"].toString();
+        eventprice = value.data()!["price"].toString();
+        eventDescription = value.data()!["evedescc"].toString();
+        eventLanguage = value.data()!["language"].toString();
+        eventTime = value.data()!["courseTiming"].toString();
+        eventDate = value.data()!["eventDate"].toString();
+        bookingurl = value.data()!["paymentUrl"].toString();
+        termsandcondition = value.data()!["t&c"].toString();
+        eventCategory = value.data()!["catagory"].toString();
+      });
+    });
   }
 
   void _handlePaymentSuccess(PaymentSuccessResponse response) {
@@ -60,7 +100,7 @@ class _EventDescriptionScreenState extends State<EventDescriptionScreen> {
           ),
           centerTitle: true,
           title: Text(
-            widget.snap['evetitle'],
+            title,
             style: TextStyle(
                 fontWeight: FontWeight.w700,
                 color: Color(0xFF000000),
@@ -77,9 +117,10 @@ class _EventDescriptionScreenState extends State<EventDescriptionScreen> {
                 ),
                 onPressed: () async {
                   String generatedDeepLink = await FirebaseDynamicLinksService
-                      .createDynamicLinkforevents(widget.snap.toString());
+                      .createDynamicLinkforevents(widget.id.toString());
                   Share.share(
-                    generatedDeepLink,
+                    'Hey buddy! I am attending an interesting event on "${title.toUpperCase()}".Would love to join with you. To join the event click below:\n\n ' +
+                        generatedDeepLink,
                   );
                 },
               ),
@@ -92,7 +133,7 @@ class _EventDescriptionScreenState extends State<EventDescriptionScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Image.network(widget.snap['eventposterimg'],
+                Image.network(eventimg,
                     fit: BoxFit.fill,
                     width: MediaQuery.of(context).size.width,
                     height: MediaQuery.of(context).size.height * 0.27),
@@ -111,7 +152,7 @@ class _EventDescriptionScreenState extends State<EventDescriptionScreen> {
                               borderRadius: BorderRadius.circular(5)),
                           child: Center(
                             child: Text(
-                              widget.snap['category'],
+                              eventCategory,
                               style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w700,
@@ -120,38 +161,27 @@ class _EventDescriptionScreenState extends State<EventDescriptionScreen> {
                             ),
                           ),
                         ),
-                        if (widget.snap['mode'] == 'online')
-                          GestureDetector(
-                            onTap: () async {
-                              String generatedDeepLink =
-                                  await FirebaseDynamicLinksService
-                                      .createDynamicLinkforevents(
-                                          widget.snap.toString());
-                              Share.share(
-                                generatedDeepLink,
-                              );
-                            },
-                            child: Container(
-                              height: 24,
-                              width: 60,
-                              child: Center(
-                                child: Text('Online',
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 12)),
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.redAccent,
-                                borderRadius: BorderRadius.circular(25),
-                              ),
+                        if (eventMode == 'online')
+                          Container(
+                            height: 24,
+                            width: 60,
+                            child: Center(
+                              child: Text('Online',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12)),
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.redAccent,
+                              borderRadius: BorderRadius.circular(25),
                             ),
                           )
                       ]),
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 13),
-                  child: Text(widget.snap['evetitle'],
+                  child: Text(title,
                       style: TextStyle(
                           color: Colors.black,
                           fontFamily: 'Roboto',
@@ -172,7 +202,7 @@ class _EventDescriptionScreenState extends State<EventDescriptionScreen> {
                           width: 10,
                         ),
                         Text(
-                          widget.snap['eventDate'],
+                          eventDate,
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
@@ -196,7 +226,7 @@ class _EventDescriptionScreenState extends State<EventDescriptionScreen> {
                           width: 10,
                         ),
                         Text(
-                          widget.snap['venue'],
+                          eventVenue,
                           style: TextStyle(
                               fontSize: 15,
                               fontFamily: 'Roboto',
@@ -225,7 +255,7 @@ class _EventDescriptionScreenState extends State<EventDescriptionScreen> {
                   padding: const EdgeInsets.symmetric(
                     horizontal: 13.0,
                   ),
-                  child: Text(widget.snap['evedescc']),
+                  child: Text(eventDescription),
                 ),
                 SizedBox(
                   height: 12,
@@ -256,7 +286,7 @@ class _EventDescriptionScreenState extends State<EventDescriptionScreen> {
                       width: 10,
                     ),
                     Text(
-                      widget.snap['courseTiming'],
+                      eventTime,
                       style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
@@ -275,7 +305,7 @@ class _EventDescriptionScreenState extends State<EventDescriptionScreen> {
                       width: 10,
                     ),
                     Text(
-                      widget.snap['language'],
+                      eventLanguage,
                       style: TextStyle(
                           fontSize: 15,
                           fontFamily: 'Roboto',
@@ -293,7 +323,7 @@ class _EventDescriptionScreenState extends State<EventDescriptionScreen> {
                       width: 10,
                     ),
                     Text(
-                      widget.snap['agegroup'],
+                      minage,
                       style: TextStyle(
                           fontSize: 15,
                           fontFamily: 'Roboto',
@@ -320,7 +350,7 @@ class _EventDescriptionScreenState extends State<EventDescriptionScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(
                       vertical: 12.0, horizontal: 13),
-                  child: Text(widget.snap['t&c'],
+                  child: Text(termsandcondition,
                       style: TextStyle(
                           fontFamily: 'Roboto',
                           fontSize: 13,
@@ -346,7 +376,7 @@ class _EventDescriptionScreenState extends State<EventDescriptionScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Rs ${widget.snap['price']}',
+                      'Rs ${eventprice}',
                       softWrap: true,
                       overflow: TextOverflow.fade,
                       style: TextStyle(
@@ -389,12 +419,12 @@ class _EventDescriptionScreenState extends State<EventDescriptionScreen> {
                       padding:
                           EdgeInsets.symmetric(vertical: 11, horizontal: 55)),
                   onPressed: () async {
-                    // if (await canLaunch(widget.snap['paymentUrl'].toString())) {
-                    //   await launch(widget.snap['paymentUrl'],
-                    //       enableDomStorage: true,
-                    //       enableJavaScript: true,
-                    //       forceWebView: true);
-                    // }
+                    if (await canLaunch(bookingurl)) {
+                      await launch(bookingurl,
+                          enableDomStorage: true,
+                          enableJavaScript: true,
+                          forceWebView: true);
+                    }
                   },
                   child: Text('BOOK',
                       style: TextStyle(

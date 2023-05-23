@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -15,6 +16,7 @@ import '../models/events_model.dart';
 import '../resources/firestore_methods.dart';
 import '../utils/colors.dart';
 import '../widgets/event_item.dart';
+import '../widgets/internship_card.dart';
 import 'HomeScreen.dart';
 import 'notice_screen.dart';
 
@@ -39,7 +41,7 @@ class _Course_screenState extends State<Course_screen> {
           backgroundColor: Colors.white,
           leading: Icon(FontAwesomeIcons.graduationCap, color: Colors.black),
           title: Text(
-            'Courses',
+            'Work Notice',
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
           ),
           actions: [
@@ -114,175 +116,217 @@ class _Course_screenState extends State<Course_screen> {
                 //     borderRadius: BorderRadius.circular(50)),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(6.0),
-              child: GridView(
-                physics: ClampingScrollPhysics(),
-                controller: ScrollController(keepScrollOffset: true),
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => ExamCrackers()));
-                    },
-                    child: Card(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Expanded(
-                              flex: 2,
-                              child: Image.asset(
-                                'images/exam.jpeg',
-                              )),
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 15.0),
-                            child: Text(
-                              'Exam Crackers',
-                              style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w700,
-                                  fontFamily: 'Comfortaa'),
-                            ),
-                          )
-                        ],
-                      ),
-                      color: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(5),
-                        ),
-                      ),
-                    ),
+            Align(
+                alignment: Alignment.centerLeft,
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                      left: 22.0, right: 22, bottom: 13, top: 16),
+                  child: Text(
+                    "Opportunities for You",
+                    style: TextStyle(
+                        color: Colors.black87,
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: "Comfortaa"),
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => CertificationCOurses()));
-                    },
-                    child: Card(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Expanded(
-                              flex: 2,
-                              child: Image.asset(
-                                'images/certification.jpeg',
-                              )),
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 15.0),
-                            child: Text(
-                              'Certification',
-                              style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w700,
-                                  fontFamily: 'Comfortaa'),
-                            ),
-                          )
-                        ],
-                      ),
-                      color: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(5),
-                        ),
-                      ),
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => InternshipScreen()));
-                    },
-                    child: Card(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Expanded(
-                              flex: 2,
-                              child: Image.asset(
-                                'images/internship.jpeg',
-                              )),
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 15.0),
-                            child: Text(
-                              'Internship',
-                              style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w700,
-                                  fontFamily: 'Comfortaa'),
-                            ),
-                          )
-                        ],
-                      ),
-                      color: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(5),
-                        ),
-                      ),
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => MentorshipCourses()));
-                    },
-                    child: Card(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Expanded(
-                              flex: 2,
-                              child: Image.asset(
-                                'images/mentores.jpeg',
-                              )),
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 15.0),
-                            child: Text(
-                              'Mentorship',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w700,
-                                fontFamily: 'Comfortaa',
-                                fontSize: 15,
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                      color: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(5),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 1.5,
-                  mainAxisSpacing: 1.5,
-                  childAspectRatio: 0.8,
-                ),
-                shrinkWrap: true,
-              ),
+                )),
+
+            StreamBuilder(
+              stream: FirebaseFirestore.instance
+                  .collection('coursesection')
+                  .doc('internship')
+                  .collection('allinternships')
+                  .snapshots(),
+              builder: (context,
+                  AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                return ListView.builder(
+                    shrinkWrap: true,
+                    controller: ScrollController(keepScrollOffset: true),
+                    scrollDirection: Axis.vertical,
+                    itemCount: snapshot.data!.docs.length,
+                    itemBuilder: (ctx, index) {
+                      int num = Random().nextInt(150);
+                      return Container(
+                        child: InternshipCard(
+                            snap: snapshot.data!.docs[index].data(), num: num),
+                      );
+                    });
+              },
             ),
+            // Padding(
+            //   padding: const EdgeInsets.all(6.0),
+            //   child: GridView(
+            //     physics: ClampingScrollPhysics(),
+            //     controller: ScrollController(keepScrollOffset: true),
+            //     children: [
+            //       GestureDetector(
+            //         onTap: () {
+            //           Navigator.push(
+            //               context,
+            //               MaterialPageRoute(
+            //                   builder: (context) => ExamCrackers()));
+            //         },
+            //         child: Card(
+            //           child: Column(
+            //             mainAxisAlignment: MainAxisAlignment.center,
+            //             crossAxisAlignment: CrossAxisAlignment.center,
+            //             children: [
+            //               Expanded(
+            //                   flex: 2,
+            //                   child: Image.asset(
+            //                     'images/exam.jpeg',
+            //                   )),
+            //               Padding(
+            //                 padding: const EdgeInsets.only(bottom: 15.0),
+            //                 child: Text(
+            //                   'Exam Crackers',
+            //                   style: TextStyle(
+            //                       fontSize: 15,
+            //                       fontWeight: FontWeight.w700,
+            //                       fontFamily: 'Comfortaa'),
+            //                 ),
+            //               )
+            //             ],
+            //           ),
+            //           color: Colors.white,
+            //           elevation: 0,
+            //           shape: RoundedRectangleBorder(
+            //             borderRadius: BorderRadius.all(
+            //               Radius.circular(5),
+            //             ),
+            //           ),
+            //         ),
+            //       ),
+            //       GestureDetector(
+            //         onTap: () {
+            //           Navigator.push(
+            //               context,
+            //               MaterialPageRoute(
+            //                   builder: (context) => CertificationCOurses()));
+            //         },
+            //         child: Card(
+            //           child: Column(
+            //             mainAxisAlignment: MainAxisAlignment.center,
+            //             crossAxisAlignment: CrossAxisAlignment.center,
+            //             children: [
+            //               Expanded(
+            //                   flex: 2,
+            //                   child: Image.asset(
+            //                     'images/certification.jpeg',
+            //                   )),
+            //               Padding(
+            //                 padding: const EdgeInsets.only(bottom: 15.0),
+            //                 child: Text(
+            //                   'Certification',
+            //                   style: TextStyle(
+            //                       fontSize: 15,
+            //                       fontWeight: FontWeight.w700,
+            //                       fontFamily: 'Comfortaa'),
+            //                 ),
+            //               )
+            //             ],
+            //           ),
+            //           color: Colors.white,
+            //           elevation: 0,
+            //           shape: RoundedRectangleBorder(
+            //             borderRadius: BorderRadius.all(
+            //               Radius.circular(5),
+            //             ),
+            //           ),
+            //         ),
+            //       ),
+            //       GestureDetector(
+            //         onTap: () {
+            //           Navigator.push(
+            //               context,
+            //               MaterialPageRoute(
+            //                   builder: (context) => InternshipScreen()));
+            //         },
+            //         child: Card(
+            //           child: Column(
+            //             mainAxisAlignment: MainAxisAlignment.center,
+            //             crossAxisAlignment: CrossAxisAlignment.center,
+            //             children: [
+            //               Expanded(
+            //                   flex: 2,
+            //                   child: Image.asset(
+            //                     'images/internship.jpeg',
+            //                   )),
+            //               Padding(
+            //                 padding: const EdgeInsets.only(bottom: 15.0),
+            //                 child: Text(
+            //                   'Internship',
+            //                   style: TextStyle(
+            //                       fontSize: 15,
+            //                       fontWeight: FontWeight.w700,
+            //                       fontFamily: 'Comfortaa'),
+            //                 ),
+            //               )
+            //             ],
+            //           ),
+            //           color: Colors.white,
+            //           elevation: 0,
+            //           shape: RoundedRectangleBorder(
+            //             borderRadius: BorderRadius.all(
+            //               Radius.circular(5),
+            //             ),
+            //           ),
+            //         ),
+            //       ),
+            //       GestureDetector(
+            //         onTap: () {
+            //           Navigator.push(
+            //               context,
+            //               MaterialPageRoute(
+            //                   builder: (context) => MentorshipCourses()));
+            //         },
+            //         child: Card(
+            //           child: Column(
+            //             mainAxisAlignment: MainAxisAlignment.center,
+            //             crossAxisAlignment: CrossAxisAlignment.center,
+            //             children: [
+            //               Expanded(
+            //                   flex: 2,
+            //                   child: Image.asset(
+            //                     'images/mentores.jpeg',
+            //                   )),
+            //               Padding(
+            //                 padding: const EdgeInsets.only(bottom: 15.0),
+            //                 child: Text(
+            //                   'Mentorship',
+            //                   style: TextStyle(
+            //                     fontWeight: FontWeight.w700,
+            //                     fontFamily: 'Comfortaa',
+            //                     fontSize: 15,
+            //                   ),
+            //                 ),
+            //               )
+            //             ],
+            //           ),
+            //           color: Colors.white,
+            //           elevation: 0,
+            //           shape: RoundedRectangleBorder(
+            //             borderRadius: BorderRadius.all(
+            //               Radius.circular(5),
+            //             ),
+            //           ),
+            //         ),
+            //       ),
+            //     ],
+            //     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            //       crossAxisCount: 2,
+            //       crossAxisSpacing: 1.5,
+            //       mainAxisSpacing: 1.5,
+            //       childAspectRatio: 0.8,
+            //     ),
+            //     shrinkWrap: true,
+            //   ),
+            // ),
           ],
         )
 

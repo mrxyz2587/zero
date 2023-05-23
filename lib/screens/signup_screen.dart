@@ -24,10 +24,11 @@ import '/widgets/text_field_input.dart';
 import 'package:intl/intl.dart';
 
 class SignupScreen extends StatefulWidget {
+  final String designation;
   final GoogleSignInAccount? userObj;
 
-  SignupScreen({Key? key, required this.userObj}) : super(key: key);
-
+  SignupScreen({Key? key, required this.userObj, required this.designation})
+      : super(key: key);
   @override
   _SignupScreenState createState() => _SignupScreenState();
 }
@@ -38,7 +39,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _universitycontroller = TextEditingController();
   String selectedText = "department";
-
+  String gender = 'select gender';
   var dats = {};
   bool _isLoading = false;
   String designation = "designation";
@@ -107,20 +108,21 @@ class _SignupScreenState extends State<SignupScreen> {
     setState(() {
       _isLoading = true;
     });
-    print('signUp called');
     String res = await AuthMethods().signUpUser(
         email: widget.userObj!.email.toString(),
         password: _passwordController.text,
         username: _usernameController.text.isEmpty
             ? widget.userObj!.displayName.toString()
             : _usernameController.text,
-        designation: designation,
+        designation: widget.designation == 'universitystudent'
+            ? 'student'
+            : widget.designation,
         dateOfBirth:
             DateFormat.yMMMMd('en_US').format(_selectedDate!).toString(),
         department: selectedText,
-        file: _image!,
         university: _universitycontroller.text,
-        googlephotoUrls: widget.userObj!.displayName.toString());
+        googlephotoUrls: widget.userObj!.photoUrl.toString(),
+        gender: gender);
     // if string returned is sucess, user has been created
     if (res == "success") {
       setState(() {
@@ -299,54 +301,53 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: _onbackPressed,
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        body: SafeArea(
-          child: SingleChildScrollView(
-            padding: EdgeInsets.only(top: 60),
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                GestureDetector(
-                  child: CircleAvatar(
-                    backgroundColor: Color(0xFFDFDFDF),
-                    radius: 80,
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.only(top: 60),
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              GestureDetector(
+                child: CircleAvatar(
+                  backgroundColor: Color(0xFFDFDFDF),
+                  radius: 80,
+                  child: Padding(
+                    padding: const EdgeInsets.all(1),
                     child: Padding(
-                      padding: const EdgeInsets.all(1),
-                      child: Padding(
-                        padding: const EdgeInsets.all(2.0),
-                        child: CircleAvatar(
-                            radius: 80,
-                            backgroundImage: NetworkImage(
-                                widget.userObj!.photoUrl.toString())),
-                      ),
+                      padding: const EdgeInsets.all(2.0),
+                      child: CircleAvatar(
+                          radius: 80,
+                          backgroundImage: NetworkImage(
+                              widget.userObj!.photoUrl.toString())),
                     ),
                   ),
-                  onTap: () {
-                    bottomSheet2(context);
-                  },
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Text(
-                    'Create your account ',
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 22,
-                        fontFamily: 'Comfortaa'),
-                    textAlign: TextAlign.center,
-                  ),
+                onTap: () {
+                  bottomSheet2(context);
+                },
+              ),
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Text(
+                  'Create your account ',
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 22,
+                      fontFamily: 'Comfortaa'),
+                  textAlign: TextAlign.center,
                 ),
-                TextFieldInput(
-                  hintText: widget.userObj!.displayName.toString(),
-                  textInputType: TextInputType.text,
-                  textEditingController: _usernameController,
-                  isPass: false,
-                ),
+              ),
+              TextFieldInput(
+                hintText: 'Name',
+                textInputType: TextInputType.text,
+                textEditingController: _usernameController,
+                isPass: false,
+              ),
+              if (widget.designation == 'universitystudent')
                 Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
@@ -856,6 +857,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                   ),
                 ),
+              if (widget.designation == 'student')
                 Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
@@ -869,82 +871,66 @@ class _SignupScreenState extends State<SignupScreen> {
                           borderRadius: BorderRadius.circular(8)),
                     ),
                     onPressed: () {
-                      showModalBottomSheet(
-                          context: context,
-                          enableDrag: true,
-                          isScrollControlled: true,
-                          isDismissible: true,
-                          builder: (BuildContext ctx) {
-                            return Container(
-                              color: Colors.black.withOpacity(0.1),
-                              child: Container(
-                                height:
-                                    MediaQuery.of(context).size.height * 0.20,
-                                width: MediaQuery.of(context).size.width,
-                                decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.only(
-                                        topRight: Radius.circular(5),
-                                        topLeft: Radius.circular(5))),
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 5,
-                                  vertical: 10,
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Column(children: [
-                                    ListTile(
-                                      onTap: () {
+                      showDialog(
+                        useRootNavigator: false,
+                        context: context,
+                        builder: (context) {
+                          return Dialog(
+                            child: SingleChildScrollView(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  SimpleDialogOption(
+                                      child: Text("class 8"),
+                                      onPressed: () {
                                         setState(() {
-                                          designation = "Student";
+                                          selectedText = "class 8";
                                         });
                                         Navigator.pop(context);
-                                      },
-                                      title: Text(
-                                        ' Student',
-                                        style: TextStyle(
-                                            color: Color(0xFFA3A3A3),
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                    ListTile(
-                                      onTap: () {
+                                      }),
+                                  SimpleDialogOption(
+                                      child: Text("class 9"),
+                                      onPressed: () {
                                         setState(() {
-                                          designation = "Faculty";
+                                          selectedText = "class 9";
                                         });
                                         Navigator.pop(context);
-                                      },
-                                      title: Text(
-                                        'Faculty',
-                                        style: TextStyle(
-                                            color: Color(0xFFA3A3A3),
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                    ListTile(
-                                      onTap: () {
+                                      }),
+                                  SimpleDialogOption(
+                                      child: Text("class 10"),
+                                      onPressed: () {
                                         setState(() {
-                                          designation = "Mentor";
+                                          selectedText = "class 10";
                                         });
                                         Navigator.pop(context);
-                                      },
-                                      title: Text(
-                                        'Mentor',
-                                        style: TextStyle(
-                                            color: Color(0xFFA3A3A3),
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                  ]),
-                                ),
+                                      }),
+                                  SimpleDialogOption(
+                                      child: Text("class 11"),
+                                      onPressed: () {
+                                        setState(() {
+                                          selectedText = "class 11";
+                                        });
+                                        Navigator.pop(context);
+                                      }),
+                                  SimpleDialogOption(
+                                      child: Text("class 12"),
+                                      onPressed: () {
+                                        setState(() {
+                                          selectedText = "class 12";
+                                        });
+                                        Navigator.pop(context);
+                                      }),
+                                ],
                               ),
-                            );
-                          });
+                            ),
+                          );
+                        },
+                      );
                     },
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        designation.toString(),
+                        selectedText == "department" ? 'class' : selectedText,
                         style:
                             TextStyle(color: Color(0xFFA3A3A3), fontSize: 15),
                         textAlign: TextAlign.left,
@@ -952,247 +938,439 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                   ),
                 ),
+              if (widget.designation == 'faculty')
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: Color(0xFFF2F2F2),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+                      side: BorderSide(width: 1.5, color: Color(0xFFD9D8D8)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8)),
+                    ),
+                    onPressed: () {
+                      showDialog(
+                        useRootNavigator: false,
+                        context: context,
+                        builder: (context) {
+                          return Dialog(
+                            child: SingleChildScrollView(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  SimpleDialogOption(
+                                      child: Text("class 8"),
+                                      onPressed: () {
+                                        setState(() {
+                                          selectedText = "class 8";
+                                        });
+                                        Navigator.pop(context);
+                                      }),
+                                  SimpleDialogOption(
+                                      child: Text("class 9"),
+                                      onPressed: () {
+                                        setState(() {
+                                          selectedText = "class 9";
+                                        });
+                                        Navigator.pop(context);
+                                      }),
+                                  SimpleDialogOption(
+                                      child: Text("class 10"),
+                                      onPressed: () {
+                                        setState(() {
+                                          selectedText = "class 10";
+                                        });
+                                        Navigator.pop(context);
+                                      }),
+                                  SimpleDialogOption(
+                                      child: Text("class 11"),
+                                      onPressed: () {
+                                        setState(() {
+                                          selectedText = "class 11";
+                                        });
+                                        Navigator.pop(context);
+                                      }),
+                                  SimpleDialogOption(
+                                      child: Text("class 12"),
+                                      onPressed: () {
+                                        setState(() {
+                                          selectedText = "class 12";
+                                        });
+                                        Navigator.pop(context);
+                                      }),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        selectedText,
+                        style:
+                            TextStyle(color: Color(0xFFA3A3A3), fontSize: 15),
+                        textAlign: TextAlign.left,
+                      ),
+                    ),
+                  ),
+                ),
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                child: OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    backgroundColor: Color(0xFFF2F2F2),
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+                    side: BorderSide(width: 1.5, color: Color(0xFFD9D8D8)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)),
+                  ),
+                  onPressed: () {
+                    showModalBottomSheet(
+                        context: context,
+                        enableDrag: true,
+                        isScrollControlled: true,
+                        isDismissible: true,
+                        builder: (BuildContext ctx) {
+                          return Container(
+                            color: Colors.black.withOpacity(0.1),
+                            child: Container(
+                              height: MediaQuery.of(context).size.height * 0.25,
+                              width: MediaQuery.of(context).size.width,
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.only(
+                                      topRight: Radius.circular(5),
+                                      topLeft: Radius.circular(5))),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 5,
+                                vertical: 10,
+                              ),
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      ListTile(
+                                        onTap: () {
+                                          setState(() {
+                                            gender = "Male";
+                                          });
+                                          Navigator.pop(context);
+                                        },
+                                        title: Text(
+                                          'Male',
+                                          style: TextStyle(
+                                              color: Colors.black87,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                      ListTile(
+                                        onTap: () {
+                                          setState(() {
+                                            gender = "Female";
+                                          });
+                                          Navigator.pop(context);
+                                        },
+                                        title: Text(
+                                          'Female',
+                                          style: TextStyle(
+                                              color: Colors.black87,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                      ListTile(
+                                        onTap: () {
+                                          setState(() {
+                                            gender = "Others";
+                                          });
+                                          Navigator.pop(context);
+                                        },
+                                        title: Text(
+                                          'Others',
+                                          style: TextStyle(
+                                              color: Colors.black87,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                    ]),
+                              ),
+                            ),
+                          );
+                        });
+                  },
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      gender,
+                      style: TextStyle(color: Color(0xFFA3A3A3), fontSize: 15),
+                      textAlign: TextAlign.left,
+                    ),
+                  ),
+                ),
+              ),
+
+              if (widget.designation == 'universitystudent')
                 TextFieldInput(
                   textEditingController: _universitycontroller,
                   hintText: 'university name',
                   textInputType: TextInputType.text,
                   isPass: false,
                 ),
+              if (widget.designation == 'student')
+                TextFieldInput(
+                  textEditingController: _universitycontroller,
+                  hintText: 'school name',
+                  textInputType: TextInputType.text,
+                  isPass: false,
+                ),
+              if (widget.designation == 'faculty')
+                TextFieldInput(
+                  textEditingController: _universitycontroller,
+                  hintText: 'school/university name',
+                  textInputType: TextInputType.text,
+                  isPass: false,
+                ),
 
-                // TextFieldInput(
-                //   textEditingController: _designationController,
-                //   hintText: 'Designation',
-                //   textInputType: TextInputType.text,
-                //   isPass: true,
-                // ),
-                // TextFieldInput(
-                //   textEditingController: _deptController,
-                //   hintText: 'department',
-                //   textInputType: TextInputType.text,
-                //   isPass: true,
-                // ),
-                // SelectionContainer(
-                //     onPressing: () {
-                //       print('pressed');
-                //       showDialog(
-                //           context: context,
-                //           builder: (BuildContext context) {
-                //             return Dialog(
-                //               shape: RoundedRectangleBorder(
-                //                   borderRadius: BorderRadius.circular(
-                //                       12.0)), //this right here
-                //               child: Container(
-                //                 height: 300.h,
-                //                 child: Column(
-                //                   mainAxisAlignment:
-                //                       MainAxisAlignment.start,
-                //                   crossAxisAlignment:
-                //                       CrossAxisAlignment.stretch,
-                //                   children: <Widget>[
-                //                     Padding(
-                //                       padding: EdgeInsets.all(10.0),
-                //                       child: Text(
-                //                         'Select Designation',
-                //                         style: TextStyle(
-                //                             color: Colors.black,
-                //                             fontWeight: FontWeight.bold,
-                //                             fontSize: 20.sp),
-                //                       ),
-                //                     ),
-                //                     TextButton(
-                //                         onPressed: () {
-                //                           Navigator.of(context).pop();
-                //                         },
-                //                         child: Text(
-                //                           'Faculty',
-                //                           style: TextStyle(
-                //                               color: Colors.black,
-                //                               fontSize: 18.sp),
-                //                         )),
-                //                     TextButton(
-                //                         onPressed: () {
-                //                           Navigator.of(context).pop();
-                //                         },
-                //                         child: Text(
-                //                           'Developer',
-                //                           style: TextStyle(
-                //                               color: Colors.black,
-                //                               fontSize: 20.0),
-                //                         )),
-                //                     TextButton(
-                //                         onPressed: () {
-                //                           Navigator.of(context).pop();
-                //                         },
-                //                         child: Text(
-                //                           'Officer',
-                //                           style: TextStyle(
-                //                               color: Colors.black,
-                //                               fontSize: 20.0),
-                //                         )),
-                //                     TextButton(
-                //                         onPressed: () {
-                //                           Navigator.of(context).pop();
-                //                         },
-                //                         child: Text(
-                //                           'Student',
-                //                           style: TextStyle(
-                //                               color: Colors.black,
-                //                               fontSize: 20.0),
-                //                         )),
-                //                     TextButton(
-                //                         onPressed: () {
-                //                           Navigator.of(context).pop();
-                //                         },
-                //                         child: Text(
-                //                           'Influencer',
-                //                           style: TextStyle(
-                //                               color: Colors.black45,
-                //                               fontSize: 20.0),
-                //                         )),
-                //                   ],
-                //                 ),
-                //               ),
-                //             );
-                //           });
-                //     },
-                //     title: "Designation",
-                //     icon: Icons.keyboard_arrow_down_rounded),
-                // SelectionContainer(
-                //     onPressing: () {
-                //
-                //     },
-                //     title: "Department",
-                //     icon: Icons.keyboard_arrow_down_rounded),
-                sc.SelectionContainer(
-                    onPressing: () {
-                      showDatePicker(
-                        context: context,
-                        initialDate: DateTime.now(),
-                        firstDate: DateTime(1901),
-                        lastDate: DateTime.now(),
-                        builder: (context, child) {
-                          return Theme(
-                            data: Theme.of(context).copyWith(
-                              backgroundColor: Colors.black,
-                              colorScheme: ColorScheme.light(
-                                background: Colors.black,
+              // TextFieldInput(
+              //   textEditingController: _designationController,
+              //   hintText: 'Designation',
+              //   textInputType: TextInputType.text,
+              //   isPass: true,
+              // ),
+              // TextFieldInput(
+              //   textEditingController: _deptController,
+              //   hintText: 'department',
+              //   textInputType: TextInputType.text,
+              //   isPass: true,
+              // ),
+              // SelectionContainer(
+              //     onPressing: () {
+              //       print('pressed');
+              //       showDialog(
+              //           context: context,
+              //           builder: (BuildContext context) {
+              //             return Dialog(
+              //               shape: RoundedRectangleBorder(
+              //                   borderRadius: BorderRadius.circular(
+              //                       12.0)), //this right here
+              //               child: Container(
+              //                 height: 300.h,
+              //                 child: Column(
+              //                   mainAxisAlignment:
+              //                       MainAxisAlignment.start,
+              //                   crossAxisAlignment:
+              //                       CrossAxisAlignment.stretch,
+              //                   children: <Widget>[
+              //                     Padding(
+              //                       padding: EdgeInsets.all(10.0),
+              //                       child: Text(
+              //                         'Select Designation',
+              //                         style: TextStyle(
+              //                             color: Colors.black,
+              //                             fontWeight: FontWeight.bold,
+              //                             fontSize: 20.sp),
+              //                       ),
+              //                     ),
+              //                     TextButton(
+              //                         onPressed: () {
+              //                           Navigator.of(context).pop();
+              //                         },
+              //                         child: Text(
+              //                           'Faculty',
+              //                           style: TextStyle(
+              //                               color: Colors.black,
+              //                               fontSize: 18.sp),
+              //                         )),
+              //                     TextButton(
+              //                         onPressed: () {
+              //                           Navigator.of(context).pop();
+              //                         },
+              //                         child: Text(
+              //                           'Developer',
+              //                           style: TextStyle(
+              //                               color: Colors.black,
+              //                               fontSize: 20.0),
+              //                         )),
+              //                     TextButton(
+              //                         onPressed: () {
+              //                           Navigator.of(context).pop();
+              //                         },
+              //                         child: Text(
+              //                           'Officer',
+              //                           style: TextStyle(
+              //                               color: Colors.black,
+              //                               fontSize: 20.0),
+              //                         )),
+              //                     TextButton(
+              //                         onPressed: () {
+              //                           Navigator.of(context).pop();
+              //                         },
+              //                         child: Text(
+              //                           'Student',
+              //                           style: TextStyle(
+              //                               color: Colors.black,
+              //                               fontSize: 20.0),
+              //                         )),
+              //                     TextButton(
+              //                         onPressed: () {
+              //                           Navigator.of(context).pop();
+              //                         },
+              //                         child: Text(
+              //                           'Influencer',
+              //                           style: TextStyle(
+              //                               color: Colors.black45,
+              //                               fontSize: 20.0),
+              //                         )),
+              //                   ],
+              //                 ),
+              //               ),
+              //             );
+              //           });
+              //     },
+              //     title: "Designation",
+              //     icon: Icons.keyboard_arrow_down_rounded),
+              // SelectionContainer(
+              //     onPressing: () {
+              //
+              //     },
+              //     title: "Department",
+              //     icon: Icons.keyboard_arrow_down_rounded),
+              sc.SelectionContainer(
+                  onPressing: () {
+                    showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(1901),
+                      lastDate: DateTime.now(),
+                      builder: (context, child) {
+                        return Theme(
+                          data: Theme.of(context).copyWith(
+                            backgroundColor: Colors.black,
+                            colorScheme: ColorScheme.light(
+                              background: Colors.black,
 
-                                primary: Color(
-                                    0xFF2B2B2B), // header background color
-                                onPrimary: Colors.white, // header text color
-                                onSurface: Colors.black,
-                                // body text color
-                              ),
-                              textButtonTheme: TextButtonThemeData(
-                                style: TextButton.styleFrom(
-                                  primary: btnCOlorblue, // button text color
-                                ),
+                              primary:
+                                  Color(0xFF2B2B2B), // header background color
+                              onPrimary: Colors.white, // header text color
+                              onSurface: Colors.black,
+                              // body text color
+                            ),
+                            textButtonTheme: TextButtonThemeData(
+                              style: TextButton.styleFrom(
+                                primary: btnCOlorblue, // button text color
                               ),
                             ),
-                            child: child!,
-                          );
-                        },
-                      ).then((pickedDate) {
-                        if (pickedDate == null) return;
-                        setState(() {
-                          _selectedDate = pickedDate;
-                        });
+                          ),
+                          child: child!,
+                        );
+                      },
+                    ).then((pickedDate) {
+                      if (pickedDate == null) return;
+                      setState(() {
+                        _selectedDate = pickedDate;
                       });
-                    },
-                    title: _selectedDate != null
-                        ? DateFormat.yMMMMd('en_US')
-                            .format(_selectedDate!)
-                            .toString()
-                        : dobString,
-                    icon: Icons.calendar_month_rounded),
-                SizedBox(height: 30),
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      print("builder setStare");
                     });
-                    if (_usernameController.text.isEmpty ||
-                        _selectedDate == null ||
-                        _image == null) {
-                      showSnackBar(context, "Please fill all details");
-                    } else {
-                      showDialog(
-                          barrierDismissible: false,
-                          context: context,
-                          builder: (context) => AlertDialog(
-                                scrollable: false,
-                                backgroundColor: Colors.white,
-                                title: Text("Saving Profile"),
-                                content: LinearProgressIndicator(
-                                  color: Colors.blue,
-                                ),
-                              ));
-
-                      signUpUser();
-                    }
                   },
-                  child: Container(
-                    margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 40),
-                    padding: EdgeInsets.all(13),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                          colors: [
-                            Color(0xFF2B2B2B),
-                            Color(0xFF000000),
-                          ],
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight),
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(11),
-                      ),
-                    ),
-                    child: Center(
-                      child: Text('Proceed',
-                          style: TextStyle(
-                              color: Color(0xFFFFFFFF),
-                              fontSize: 15,
-                              fontFamily: 'Roboto')),
+                  title: _selectedDate != null
+                      ? DateFormat.yMMMMd('en_US')
+                          .format(_selectedDate!)
+                          .toString()
+                      : dobString,
+                  icon: Icons.calendar_month_rounded),
+              SizedBox(height: 30),
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    print("builder setStare");
+                  });
+                  if (_usernameController.text.isEmpty ||
+                      _selectedDate == null) {
+                    showSnackBar(context, "Please fill all details");
+                  } else {
+                    showDialog(
+                        barrierDismissible: false,
+                        context: context,
+                        builder: (context) => AlertDialog(
+                              scrollable: false,
+                              backgroundColor: Colors.white,
+                              title: Text("Saving Profile"),
+                              content: LinearProgressIndicator(
+                                color: Colors.blue,
+                              ),
+                            ));
+
+                    signUpUser();
+                  }
+                },
+                child: Container(
+                  margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 40),
+                  padding: EdgeInsets.all(13),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(colors: [
+                      Color(0xFF2B2B2B),
+                      Color(0xFF000000),
+                    ], begin: Alignment.centerLeft, end: Alignment.centerRight),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(11),
                     ),
                   ),
+                  child: Center(
+                    child: Text('Finish',
+                        style: TextStyle(
+                            color: Color(0xFFFFFFFF),
+                            fontSize: 15,
+                            fontFamily: 'Roboto',
+                            fontWeight: FontWeight.w700)),
+                  ),
                 ),
-                Text('By Signing up you Agreeing all the'),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    GestureDetector(
-                      onTap: () async {
-                        String url = 'https://zeromonk.com/Terms&Condition';
-                        if (await canLaunch(url)) {
-                          await launch(url);
-                        }
-                      },
-                      child: Text(
-                        'Terms and Conditions',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF0B57A4),
-                            fontSize: 14),
-                      ),
+              ),
+              Text('By Signing up you Agreeing all the'),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: () async {
+                      String url = 'https://zeromonk.com/Terms&Condition';
+                      if (await canLaunch(url)) {
+                        await launch(url);
+                      }
+                    },
+                    child: Text(
+                      'Terms and Conditions',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF0B57A4),
+                          fontSize: 14),
                     ),
-                    GestureDetector(
-                      onTap: () async {
-                        String url = 'https://zeromonk.com/Privacy-Policy';
-                        if (await canLaunch(url)) {
-                          await launch(url);
-                        }
-                      },
-                      child: Text(
-                        'and Privacy Policy',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF0B57A4),
-                            fontSize: 14),
-                      ),
+                  ),
+                  GestureDetector(
+                    onTap: () async {
+                      String url = 'https://zeromonk.com/Privacy-Policy';
+                      if (await canLaunch(url)) {
+                        await launch(url);
+                      }
+                    },
+                    child: Text(
+                      'and Privacy Policy',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF0B57A4),
+                          fontSize: 14),
                     ),
-                  ],
-                )
-              ],
-            ),
+                  ),
+                ],
+              )
+            ],
           ),
         ),
       ),
