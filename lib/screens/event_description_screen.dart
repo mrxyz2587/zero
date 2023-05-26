@@ -2,11 +2,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:zero_fin/screens/certificate_generater_screen.dart';
 import 'package:zero_fin/utils/colors.dart';
 
+import '../providers/user_provider.dart';
 import '../resources/firebase_dynamic_links.dart';
 
 class EventDescriptionScreen extends StatefulWidget {
@@ -81,6 +84,8 @@ class _EventDescriptionScreenState extends State<EventDescriptionScreen> {
   }
   @override
   Widget build(BuildContext context) {
+    final UserProvider userProvider = Provider.of<UserProvider>(context);
+
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.white,
@@ -358,6 +363,26 @@ class _EventDescriptionScreenState extends State<EventDescriptionScreen> {
                           color: Colors.black87),
                       textAlign: TextAlign.justify),
                 ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      elevation: 0,
+                      backgroundColor: Color(0xFF00c2cb),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(7),
+                      ),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 11, horizontal: 55)),
+                  onPressed: () async {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => Certificateviewingscreen(
+                            name: userProvider.getUser.username)));
+                  },
+                  child: Text('Generate Cerificate',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontFamily: 'Roboto',
+                          fontWeight: FontWeight.w700)),
+                )
               ]),
         ),
         bottomNavigationBar: SafeArea(
